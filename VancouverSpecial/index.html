@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+
+		<link type="text/css" rel="stylesheet" href="stylesheet.css">
+		<title>Vancouver special Realty is fun!</title>
+		
+</meta>	
+<!-- function getDocHeight() {
+    var D = document;
+    return Math.max(
+        Math.max(D.body.scrollHeight, D.documentElement.scrollHeight),
+        Math.max(D.body.offsetHeight, D.documentElement.offsetHeight),
+        Math.max(D.body.clientHeight, D.documentElement.clientHeight)
+    );
+} -->
+	
+</head>
+	
+<body class="main">
+    <h1>
+        Score calculator
+    </h1>
+    <p>
+    <p> Automatic score calculator for Koehandel, You're bluffing.   </p>
+        Select the desired quartets to incorporate them into final score. 
+        Score = number of quartets X sum of quartet values.
+    </p>
+    <div id="koehandel_score">
+   
+    </div>
+
+<script type="text/javascript">
+
+	class QuartetScore{
+		constructor(div){
+			
+			this.div = div;
+            
+            this.score = 0;
+			this.equatation = "";
+			
+			this.quartets_data = {ranch:1000, 
+			mansion:800, 
+			penthouse:650,
+			commercial:500,
+			heritage:350,
+			special:250,
+			townhouse:160,
+			condo:90,
+			trailer:40,
+			RV:10
+			};
+			
+			this.quartets = {}
+			for (let quartet in this.quartets_data){
+				this.quartets[quartet] = new Quartet(quartet, this.quartets_data[quartet] ,this.callback.bind(this))
+			}
+			this.display();
+		}
+		
+        callback(){
+            console.log("called back");
+            this.refresh();
+        }
+        
+        refresh(){
+            this.calculate_score();
+            this.display();
+        }
+        
+        calculate_score(){
+            let multiplier = 0;
+            let sum = 0;
+            this.equatation = "";
+
+            for (let quartet in this.quartets){
+				
+				if (this.quartets[quartet].active){
+					
+					if (this.equatation == ""){
+						this.equatation += "( ";
+					}else{
+						this.equatation += " + ";
+					}
+                    sum += this.quartets[quartet].value;
+                    multiplier += 1;
+					this.equatation += this.quartets[quartet].value;
+                }
+                
+            }
+			
+			if (this.equatation != ""){
+				
+				this.equatation += ") * " + multiplier + " =";
+			}
+			
+            this.score = multiplier * sum;
+        }
+        
+		display(){
+            this.div.innerHTML = ""; // erase all.
+			for (let quartet in this.quartets){
+			
+                if (this.quartets[quartet].active){
+                    this.quartets[quartet].button.style.background='#33FF11';
+                }else{
+                    this.quartets[quartet].button.style.background='#DDDDDD';
+                }
+				this.div.appendChild(this.quartets[quartet].button);
+			}
+            
+            let score_el = document.createElement('H1');
+            score_el.innerHTML =  this.equatation + this.score ;
+            this.div.appendChild(score_el);
+		}
+	}
+	
+    
+	class Quartet{
+	
+		constructor(quartet_name, quartet_value, callback_function){
+				
+			this.button = document.createElement("button");
+			this.button.id = quartet_name;
+            this.value = quartet_value;
+			
+			this.button.addEventListener("click", 
+                    function(){
+                        this.active = !this.active;
+						callback_function();
+					}.bind(this)
+				 );
+			this.button.innerHTML = quartet_name + "<br>" + quartet_value;
+			this.active = false;
+		}
+	}
+	
+	
+	var animate ;
+	// self executing function here
+    (function() {
+        new QuartetScore(document.getElementById("koehandel_score"));
+    })();
+    
+	function getDocHeight() {
+        var D = document;
+        //console.log(document.documentElement.scrollHeight);
+        return Math.max(
+            Math.max(D.documentElement.scrollHeight, D.documentElement.scrollHeight),
+            Math.max(D.documentElement.offsetHeight, D.documentElement.offsetHeight),
+            Math.max(D.documentElement.clientHeight, D.documentElement.clientHeight)
+        );
+	}
+    
+    
+
+</script>
+</body>
