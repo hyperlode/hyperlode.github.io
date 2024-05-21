@@ -1,2 +1,9 @@
-# hyperlode.github.io
-personal public website
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- head definitions go here -->
+    </head>
+    <body>
+        <p> yoo de mannen!</p>
+    </body>
+</html>
