@@ -1,0 +1,126 @@
+<html>
+    <head>
+        <title>Supersite</title>
+         <link rel='stylesheet' type='text/css' href='index.css'/>
+
+        <!-- Bootstrap core CSS -->
+        <link href="../bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Bootstrap theme -->
+        <link href="../bootstrap-3.3.2-dist/css/bootstrap-theme.min.css" rel="stylesheet">
+        
+    </head>
+
+    <body>
+        
+        
+        <div class="row">
+            <div class="col-sm-2 col-xs-0">
+            </div>
+            <div class="col-sm-8 col-xs-12">
+                <div class="page-header">
+                <h1>Contact me</h1>
+                <p class ="lead">Lode will reply</p>
+                </div>
+            </div>
+            <div class="col-sm-2 col-xs-0">
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-sm-2 col-xs-0">
+            </div>
+            
+            <div class="col-sm-8 col-xs-12">
+            
+                <form action="/contact.php" method="post" id="contact-form">
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Email address</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" name="email">
+                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else. But, you can provide a fake one if you do not require a reply.</small>
+                  </div>
+                 
+                 <div class="form-group">
+                    <label for="exampleInputPassword1">Name</label>
+                    <input class="form-control" id="exampleInputPassword1" name="name">
+                  </div>
+                                     
+                  <div class="form-group">
+                    <label for="exampleInputPassword1">Message</label>
+                    <!-- <input  id="exampleInputPassword1" name="name"> -->
+                    <textarea class="form-control" name="message">Message</textarea>
+                  </div>
+                  
+                  <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="exampleCheck0" name="requestQuoteCheck">
+                    <label class="form-check-label" for="exampleCheck0">Provide me pricing for game boards (quoridor) and Luciebox</label>
+                  </div>
+                  
+                  <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="exampleCheck3" name="generalUpdateCheck">
+                    <label class="form-check-label" for="exampleCheck3">Keep me posted about everything! (maaaybe twice a year)</label>
+                  </div>
+                  
+                  <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="exampleCheck1" name="lucieboxUpdateCheck">
+                    <label class="form-check-label" for="exampleCheck1">Keep me posted about the Luciebox (probably once a year) </label>
+                  </div>
+                  
+                  <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="exampleCheck2" name="quoridorUpdateCheck">
+                    <label class="form-check-label" for="exampleCheck2">Keep me posted about quoridor (probably once a year)</label>
+                  </div>
+                  
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+
+
+
+                
+          
+            </div>
+            
+            <div class="col-sm-2 col-xs-0">
+            </div>
+        </div>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/validate.js/0.13.1/validate.min.js"></script>
+                    <script>
+                      const constraints = {
+                          name: {
+                              presence: {allowEmpty: false}
+                          },
+                          email: {
+                              presence: {allowEmpty: false},
+                              email: true
+                          },
+                          message: {
+                              presence: {allowEmpty: false}
+                          }
+                      };
+
+                      const form = document.getElementById('contact-form');
+
+                      form.addEventListener('submit', function (event) {
+                          const formValues = {
+                              name: form.elements.name.value,
+                              email: form.elements.email.value,
+                              message: form.elements.message.value
+                          };
+
+                          const errors = validate(formValues, constraints);
+
+                          if (errors) {
+                              event.preventDefault();
+                              const errorMessage = Object
+                                  .values(errors)
+                                  .map(function (fieldValues) {
+                                      return fieldValues.join(', ')
+                                  })
+                                  .join("\n");
+
+                              alert(errorMessage);
+                          }
+                      }, false);
+        </script>
+    </body>
+    </html>

@@ -1,0 +1,88 @@
+	<!DOCTYPE html>
+<html>
+	<head>
+	
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+		  <!-- Custom styles for this template -->
+    <link href="multitimer_app.css" rel="stylesheet">
+	 
+
+	
+		<script src="domFunctions.js"></script>
+		<script src="generalFunctions.js"></script>
+		<script src="svgOperations.js"></script>
+		<script src="timer.js"></script>
+		<script src="multitimer.js"></script>
+	
+	<!-- <link href="multitimer.css" rel="stylesheet">		 -->
+	 
+	 
+	 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+	
+    <title>Multi-Timer</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap theme -->
+    <link href="/bootstrap-3.3.2-dist/css/bootstrap-theme.min.css" rel="stylesheet">
+
+  
+		<!-- Custom styles for this template -->
+		<!-- <link href="theme.css" rel="stylesheet"> -->
+	
+	<!-- Seven segment display for clock: -->
+	<script type="text/javascript" src="SegmentDisplay/segment-display.js"></script>
+	
+	<!-- Bootstrap special select -->
+	<!-- <script src="silviomoreto-bootstrap-select-83d5a1b/js/bootstrap-select.js"></script> -->
+	<!-- <script src="silviomoreto-bootstrap-select-83d5a1b/dist/js/bootstrap-select.min.css"></script> -->
+	<!-- <link href="silviomoreto-bootstrap-select-83d5a1b/dist/css/bootstrap-select.min.css" rel="stylesheet"> -->
+	
+	 
+	</head>
+<body>
+
+<div id="multitimer" class = "container_fluid">
+<div class = "row show-grid">
+	<!--<div class = "col-xs-11 col-xs-offset-1 "><h1>The online MultiTimer <small>Super easy set and play!</small></h1></div>-->
+	<div class = "col-xs-12 row-centered"><h1>The online MultiTimer <small>Super easy set and play!</small></h1></div>
+</div>
+		<div class = "row show-grid">
+		
+			<div id="global_addTimer"  class = "bg-primary col-xs-12 col-sm-12 col-md-4 col-lg-4" ></div>
+			<div id="multitimer_parameters" class = "lode bg-info col-xs-12 col-sm-12 col-md-4 col-lg-4"></div>
+			<div id="global_TimeSetting" class = "lode bg-success col-xs-12 col-sm-12 col-md-4 col-lg-4"></div>
+			
+		</div>
+	<div class = "row show-grid">
+		<div id="timerfield" class = "col-xs-12  row-centered" ></div>
+		
+	</div>
+
+	<div class = "row show-grid">
+		<div id="global_start" class = "col-xs-12 row-centered"></div>
+		
+	</div>
+	<div class = "row show-grid">
+		<div id="activeTimers" class = "col-xs-12  row-centered" ></div>
+		<canvas id="displaytest" width="1200" height="340"></canvas>
+	</div>
+	
+	  
+	
+	
+</div>
+
+
+
+
+</body>
+</html>

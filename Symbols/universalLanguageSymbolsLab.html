@@ -1,0 +1,407 @@
+
+<!DOCTYPE html> 
+<html> 
+<!--
+Copyright 2010 The Closure Library Authors. All Rights Reserved.
+ 
+Use of this source code is governed by the Apache License, Version 2.0.
+See the COPYING file for details.
+--> 
+<head> 
+  <title>Universal language Symbols lab</title> 
+  <meta charset="utf-8">
+  <script src="closure/goog/base.js"></script>
+   <!--<script type="text/javascript" src="http://closure-library.googlecode.com/svn/trunk/closure/goog/base.js"></script>-->
+   <link rel="stylesheet" href="closure/goog/css/colorpicker-simplegrid.css"> 
+  
+  <!-- <link rel="stylesheet" href="closure/goog/css/demo.css"> -->
+  <link rel="stylesheet" href="closure/goog/css/menu.css">
+  <link rel="stylesheet" href="closure/goog/css/menuitem.css">
+  <link rel="stylesheet" href="closure/goog/css/menuseparator.css">
+  <link rel="stylesheet" href="closure/goog/css/combobox.css">
+   
+   
+   <!--http://code.google.com/p/closure-library/source/browse/trunk/closure/goog/css/-->
+  <script> 
+    goog.require('goog.ui.Component');
+    goog.require('goog.Timer');
+	goog.require('goog.ui.PopupColorPicker');
+	goog.require('goog.ui.ComboBox');
+	goog.require('goog.ui.Slider');
+ //background: #ddd url(//ssl.gstatic.com/closure/button-bg.gif) repeat-x scroll left top;  
+	//goog.require('goog.ui.ColorPicker');
+  </script> 
+  <script src="universalLanguageSymbol.js"></script> 
+ 
+ 
+  <!-- <link rel="stylesheet" href="css/demo.css">  -->
+  <style> 
+  .testtt{
+		font: normal 0.8em verdana,sans-serif;
+	}
+	
+  .goog-slider-horizontal {
+      background-color: ThreeDFace;
+      position: relative;
+      overflow: hidden;
+    }
+    .goog-slider-thumb {
+      position: absolute;
+      background-color: ThreeDShadow;
+      overflow: hidden;
+    }
+
+    .goog-slider-horizontal .goog-slider-thumb {
+      top: 0;
+      width: 20px;
+      height: 100%;
+    }
+
+  
+	.goog-combobox {
+	  background : #ddd; //overwrite combobox.css ---background gives error and stalling webpage
+	  border: 1px solid #b5b6b5;
+	  font: normal small arial, sans-serif;
+	  //width: 400;
+	}
+    
+    .goog-sample-component {
+      height: 1em;
+      padding: 1em;
+      color: white;
+      text-align: center;
+      font-size: 150%;
+    }
+    .goog-tooltip {
+      background: infobackground;
+      color: infotext;
+      border: 1px solid infotext;
+      padding: 1px;
+      font: menu;
+    }
+    .goog-popupcolorpicker {
+      position:absolute;
+      -moz-outline:0;
+      outline:0;
+    }
+	/*
+    //#button1, #button2, #buttonFillColour, #buttonStrokeColour, #buttonToggleAidingPoints, #comboSymbolType, #sliderStrokeWidth,#controls, #test, #sliderAidingPointsSize, #symbolPattern{
+    */
+	.controls{
+	  position : relative;
+	  display: inline-block; //inline;//
+      width: 60px;
+      text-align: left;
+      margin: 10px;
+      padding: 10px;
+      font: normal 0.8em verdana,sans-serif;
+      border: 1px solid #000;
+    }
+	
+	
+  </style> 
+</head> 
+<body>
+
+<div id = "controls" class = "controls" >
+
+<div id = "symbolPattern"  class = "controls">
+
+
+<div id = "numberOfSymbols" >
+	<p>Symbols:
+		<input type="text" value="100" id="textNumberOfSymbols" style="margin-left: 0px" size = "2">
+		<div id = "comboNumberOfQuadrants" >
+		</div>
+	</div>
+
+	<p>Pattern(4quadrants, x = random, [1..4]=copy):
+
+	<div id = "comboSymbolPattern" >
+	</div>
+	<input type="button" value="Generate" onclick="generateSymbols()">
+</div> 
+
+
+<div id = "comboSymbolType" class = "controls" >
+	<p> Select dictionary:
+</div> 
+
+<div id = "comboSegmentType" class = "controls" >
+<p> Select segment type:
+</div> 
+
+
+<a href="javascript:" id="buttonFillColour" class = "controls">Fill Colour</a> 
+<a href="javascript:" id="buttonStrokeColour" class = "controls">Stroke Colour</a> 
+<a href="javascript:toggleAidingPoints()" id="buttonToggleAidingPoints"  class = "controls">Toggle Aiding Points</a> 
+<!-- <fieldset style="float:left"> -->
+    <!-- <legend>LTR</legend> -->
+
+  
+<!-- <a href="javascript:" id="test">Stroke Colour</a>  -->
+
+<div id = "sliderStrokeWidth" class = "controls">
+<p>Line Width
+<input type="text" value="0" id="strokeWidth" disabled="disabled" style="margin-left: 0px" size = "2">
+</div>
+
+<div id = "sliderAidingPointsSize"  class = "controls" >
+<p>Aiding Points size
+<input type="text" value="0" id="aidingPointsSize" disabled="disabled" style="margin-left: 0px" size = "2">
+</div>
+
+<div id = "sliderSymbolSize"  class = "controls" >
+<p>Symbol size
+<input type="text" value="0" id="symbolSize" disabled="disabled" style="margin-left: 0px" size = "2">
+</div>
+
+<div id = "sliderMargin"  class = "controls" >
+<p>Margin between symbols
+<input type="text" value="0" id="margin" disabled="disabled" style="margin-left: 0px" size = "2">
+</div>
+ <!-- class="combo" -->
+ <!-- </fieldset> -->
+
+ </div>
+ <div id="root"> 
+ </div>
+
+ 
+ 
+ 
+ 
+  <script> 
+ 	var symbols = new Array();
+	var strokeColour = undefined;
+	var fillColour = undefined;
+	var strokeWidth = undefined;
+	var symbolSize = 100;
+	var margin = undefined;
+	var aidingPointDiam = undefined;
+	var symbolDictName = undefined;
+	var displayAidingPoints = undefined;
+	var randomPattern = undefined;
+	var numberOfQuadrants = 4;
+	goog.events.listen(window, goog.events.EventType.LOAD, generateSymbols);
+	//console.log(document.getElementById('textNumberOfSymbols'));
+	var segmentType = undefined;
+	
+	//colour buttons 
+	var picker = new goog.ui.PopupColorPicker();
+	picker.render();
+	picker.attach(document.getElementById('buttonFillColour'));
+	picker.attach(document.getElementById('buttonStrokeColour'));
+	
+	goog.events.listen(picker, 'change', function(e) {
+		picker.getLastTarget().style.backgroundColor = picker.getSelectedColor();
+		if (picker.getLastTarget().id == "buttonFillColour"){
+			fillColour = picker.getSelectedColor();
+			
+		}
+		if (picker.getLastTarget().id == "buttonStrokeColour"){
+			strokeColour = picker.getSelectedColor();
+		}
+		changeColour();
+	});
+	
+	//combo box symbol pattern 
+	var cbPat = createComboBox(["xxxx","x1xx","xx1x","xxx1","x11x","x1x1","xx11","x111","x1x3","xx12"],"xxxx");
+	//cbPat.setValue("xxxx");
+	cbPat.setDefaultText("xxxx");
+	cbPat.render(document.getElementById('comboSymbolPattern'));
+	//goog.events.listen(cbPat, 'change', changeSymbolType);
+	
+	//combo box number of quadrants
+	var cbQuadrants = createComboBox(["1","2","3","4"],"4");
+	cbQuadrants.setDefaultText(4);
+	cbQuadrants.render(document.getElementById('comboNumberOfQuadrants'));
+	
+	
+	//combobox symboldict
+	var adminSymbol = new goog.unilang.symbol();
+	var cb = createComboBox(adminSymbol.getSymbolDictNames(),'Select SymbolSet');
+	cb.render(document.getElementById('comboSymbolType'));
+	goog.events.listen(cb, 'change', changeSymbolType);
+	
+	
+	//combobox symboldict
+	//var adminSymbol = new goog.unilang.symbol();
+	var cbSegType = createComboBox(adminSymbol.getSegmentTypes(),'Select Segment Type');
+	cbSegType.render(document.getElementById('comboSegmentType'));
+	goog.events.listen(cbSegType, 'change', changeSegmentType);
+	
+	//stroke-width slider
+	var sliderStrokeWidth = new goog.ui.Slider;
+	sliderStrokeWidth.setOrientation(goog.ui.Slider.Orientation.HORIZONTAL);
+ 	sliderStrokeWidth.setStep(0.1);
+	sliderStrokeWidth.setMinimum(0);
+	sliderStrokeWidth.setMaximum (10);
+	sliderStrokeWidth.createDom();
+	var el = sliderStrokeWidth.getElement();
+	el.style.width = '200px';
+	el.style.height = '20px';
+	sliderStrokeWidth.render(document.getElementById('sliderStrokeWidth'));
+	sliderStrokeWidth.addEventListener(goog.ui.Component.EventType.CHANGE, changeStrokeWidth);
+	sliderStrokeWidth.setMoveToPointEnabled(true);
+	
+	//aidingPoints-width slider
+	var sliderAidingPointsSize = new goog.ui.Slider;
+	sliderAidingPointsSize.setOrientation(goog.ui.Slider.Orientation.HORIZONTAL);
+ 	sliderAidingPointsSize.setStep(0.1);
+	sliderAidingPointsSize.setMinimum(0);
+	sliderAidingPointsSize.setMaximum (20);
+	sliderAidingPointsSize.createDom();
+	var el = sliderAidingPointsSize.getElement();
+	el.style.width = '200px';
+	el.style.height = '20px';
+	sliderAidingPointsSize.render(document.getElementById('sliderAidingPointsSize'));
+	sliderAidingPointsSize.addEventListener(goog.ui.Component.EventType.CHANGE, changeAidingPointsSize);
+	sliderAidingPointsSize.setMoveToPointEnabled(true);
+	
+	//symbol size slider
+	var sliderSymbolSize = new goog.ui.Slider;
+	sliderSymbolSize.setOrientation(goog.ui.Slider.Orientation.HORIZONTAL);
+ 	sliderSymbolSize.setStep(1);
+	sliderSymbolSize.setMinimum(0);
+	sliderSymbolSize.setMaximum (100);
+	sliderSymbolSize.createDom();
+	var el = sliderSymbolSize.getElement();
+	el.style.width = '200px';
+	el.style.height = '20px';
+	sliderSymbolSize.render(document.getElementById('sliderSymbolSize'));
+	sliderSymbolSize.addEventListener(goog.ui.Component.EventType.CHANGE, changeSymbolSize);
+	sliderSymbolSize.setMoveToPointEnabled(true);
+	
+	//symbol size slider
+	var sliderMargin = new goog.ui.Slider;
+	sliderMargin.setOrientation(goog.ui.Slider.Orientation.HORIZONTAL);
+ 	sliderMargin.setStep(1);
+	sliderMargin.setMinimum(0);
+	sliderMargin.setMaximum (100);
+	sliderMargin.createDom();
+	var el = sliderMargin.getElement();
+	el.style.width = '200px';
+	el.style.height = '20px';
+	sliderMargin.render(document.getElementById('sliderMargin'));
+	sliderMargin.addEventListener(goog.ui.Component.EventType.CHANGE, changeSymbolMargin);
+	sliderMargin.setMoveToPointEnabled(true);
+	/*****************************************************
+	//FUNCTIONS
+	*****************************************************/
+	function generateSymbols(){
+	
+		var numberOfSymbols = document.getElementById('textNumberOfSymbols').value;
+		randomPattern = cbPat.getValue();
+		numberOfQuadrants = parseInt(cbQuadrants.getValue());
+		if (randomPattern == "" ) randomPattern = "xxxx";
+		
+		
+		
+		//remove all symbols
+		while (symbols.length > 0){   // used to be: symbols.length > numberOfSymbols --> only remove excess
+			var s = symbols.pop();
+			s.removeNodeFromDom();
+		};
+		
+		//generate  symbols
+		while (symbols.length< numberOfSymbols){	
+			var args = {width:symbolSize, height:symbolSize, margin: margin, aidingPointDiam: aidingPointDiam, stroke:strokeColour, fill:fillColour, strokeWidth: strokeWidth, symbolDictName:symbolDictName, displayAidingPoints: displayAidingPoints, randomPattern:randomPattern, segmentType:segmentType, numberOfQuadrants:numberOfQuadrants}
+			symbols.push( new goog.unilang.symbol(undefined,goog.dom.getElement('root'), args ));
+		}
+		
+		//generate symbolvalues
+		//for (s in symbols){
+		//	symbols[s].randomValueFromPattern(randomPattern);
+		//	symbols[s].symbolToGraphics();
+		//}
+	}
+	
+	function changeAidingPointsSize(e){
+		aidingPointDiam = e.target.getValue();
+		for (s in symbols){
+			symbols[s].changeAidingPointDiam({diam: aidingPointDiam, refresh :true});
+		}
+		document.getElementById('aidingPointsSize').value = aidingPointDiam;
+	}
+	
+	function changeSymbolSize(e){
+		symbolSize = e.target.getValue();
+		for (s in symbols){
+			symbols[s].changeSymbolSize({margin : margin, width: symbolSize, height:symbolSize, refresh :false});
+			symbols[s].updateDisplaySymbol();
+		}
+		document.getElementById('symbolSize').value = symbolSize;		
+	}
+	
+	function changeSymbolMargin(e){
+		margin = e.target.getValue();
+		for (s in symbols){
+			symbols[s].changeSymbolSize({margin : margin, width: symbolSize, height:symbolSize, refresh :false});
+			symbols[s].updateDisplaySymbol();
+		}	
+		document.getElementById('margin').value = margin;
+	}
+	
+	function changeStrokeWidth(e){
+		strokeWidth = e.target.getValue();
+		changeColour();
+		document.getElementById('strokeWidth').value = strokeWidth;
+	}
+	
+	function changeSymbolType(e){
+		symbolDictName = e.target.getValue();
+		//console.log( e.target.getValue());
+		//goog.dom.setTextContent(document.getElementById('v'),);
+		for (s in symbols){
+			symbols[s].changeSymbolDictForNextValue(symbolDictName);
+		}
+	}
+	
+	function changeSegmentType(e){
+		segmentType = e.target.getValue();
+		for (s in symbols){
+			symbols[s].changeSegmentType({segmentType:segmentType, refresh: true});
+		}
+		
+	}
+	
+	function changeColour(){
+		for (s in symbols){
+			symbols[s].changeColour( {fill:fillColour, stroke:strokeColour, strokeWidth:strokeWidth, refresh:true});
+		}
+	}
+	
+	function toggleAidingPoints(){
+		displayAidingPoints =  !displayAidingPoints ;
+		
+		for (s in symbols){
+			symbols[s].displayChangeAidingPoints( displayAidingPoints, true);
+		}
+	}
+	
+	function createComboBox(names, defaultValue) {
+		var cb = new goog.ui.ComboBox();
+		cb.setUseDropdownArrow(true);
+		cb.setDefaultText(defaultValue);
+		
+		//var caption = new goog.ui.ComboBoxItem('Select folder...');
+		//caption.setSticky(true);
+		//caption.setEnabled(false);
+		//cb.addItem(caption);
+		for (var i = 0; i< names.length; i++){
+		
+			cb.addItem(new goog.ui.ComboBoxItem(names[i]));
+		}
+		/*
+		cb.addItem(new goog.ui.MenuSeparator());
+		var newfolder = new goog.ui.ComboBoxItem('New Folder...');
+		newfolder.setSticky(true);
+		cb.addItem(newfolder);
+		*/
+		
+		return cb;
+	}
+  </script> 
+</body> 
+</html> 

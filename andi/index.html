@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+
+		<link type="text/css" rel="stylesheet" href="stylesheet.css">
+		<title>Checklist Canada</title>
+		
+</meta>	
+<!-- function getDocHeight() {
+    var D = document;
+    return Math.max(
+        Math.max(D.body.scrollHeight, D.documentElement.scrollHeight),
+        Math.max(D.body.offsetHeight, D.documentElement.offsetHeight),
+        Math.max(D.body.clientHeight, D.documentElement.clientHeight)
+    );
+} -->
+	
+</head>
+	
+<body class="main">
+
+    <div id="L_C_div">
+    </div>
+    <p> it's like a jungle sometimes </p>
+
+<script type="text/javascript">
+
+	<!--
+	
+	var animate ;
+	// self executing function here
+    (function() {
+        console.log("eifeifiefj");
+        L_C_setup();
+
+    })();
+    <!-- document.onload = function(){ -->
+            <!-- console.log("yeooe"); -->
+                    <!-- }; -->
+    
+	function getDocHeight() {
+        var D = document;
+        //console.log(document.documentElement.scrollHeight);
+        return Math.max(
+            Math.max(D.documentElement.scrollHeight, D.documentElement.scrollHeight),
+            Math.max(D.documentElement.offsetHeight, D.documentElement.offsetHeight),
+            Math.max(D.documentElement.clientHeight, D.documentElement.clientHeight)
+        );
+	}
+    
+    function L_C_setup(){
+        let L_C_div = document.getElementById("L_C_div");
+
+        let cobb = document.createElement("input");
+        cobb.setAttribute("type", "text");
+        cobb.setAttribute("placeholder", "cobb angle");
+        cobb.id = "cobb";
+        L_C_div.appendChild(cobb);
+        
+        let br = document.createElement("br");
+        L_C_div.appendChild(br);
+        
+        let risser = document.createElement("input");
+        risser.setAttribute("type", "text");
+        risser.id = "risser";
+        risser.setAttribute("placeholder", "risser");
+        L_C_div.appendChild(risser);
+
+        let br2 = document.createElement("br");
+        L_C_div.appendChild(br2);
+        
+        let age = document.createElement("input");
+        age.id = "age";
+        age.setAttribute("type", "text");
+        age.setAttribute("placeholder", "age");
+        L_C_div.appendChild(age);
+
+        let br3 = document.createElement("br");
+        L_C_div.appendChild(br3);
+
+        let calc = document.createElement("button");
+        calc.addEventListener("click", function(){
+                    L_C_calc();
+                }
+             );
+        <!-- calc.setAttribute("value", "calc cobb"); -->
+        calc.innerHTML = "calc Cobb";
+        L_C_div.appendChild(calc);
+
+        console.log("cobb is set up");
+        
+        let L_C = document.createElement("p");
+        L_C.id = "L_C_outcome";
+        L_C.innerHTML = "outcome";
+        L_C_div.appendChild(L_C);
+        
+        
+    }
+    
+    function L_C_calc(){
+        let cobb = parseInt(document.getElementById("cobb").value);
+        let risser = parseInt(document.getElementById("risser").value);
+        let age = parseInt(document.getElementById("age").value);
+        let outcome = document.getElementById("L_C_outcome");
+        
+        let L_C = (cobb - 3*risser) / age ;
+        outcome.innerHTML = L_C;
+    }
+    
+
+</script>
+</body>

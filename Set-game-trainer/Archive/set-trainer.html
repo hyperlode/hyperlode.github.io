@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- sequence of loading is important -->
+		<script src="generalFunctions.js"></script>
+		<script src="svgOperations.js"></script>
+		<script src="domFunctions.js"></script>
+		<script src="set-trainer.js"></script>
+		<script src="countDownTimer.js"></script>
+		<script src="simpleTimer.js"></script>
+		
+		<link href="set-trainer.css" rel="stylesheet">		
+	 
+	  <!-- Bootstrap core CSS -->
+    <link href="../bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap theme -->
+    <link href="../bootstrap-3.3.2-dist/css/bootstrap-theme.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <!-- <link href="theme.css" rel="stylesheet"> -->
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="../../assets/js/ie-emulation-modes-warning.js"></script>
+
+	 
+	</head>
+<body>
+
+
+
+	<div class="row bg-info" id = "info">
+		
+	</div>
+	<div class="row .bg-warning" id=  "user">
+	</div>
+	<div class="row bg-success">
+		<div class="col-md-2 col-lg-2 col-lg-offset-3 col-md-offset-3 vcenter">
+			<select class="selectpicker" id="gameLevelBootstrap"  data-width="auto" onchange="gameLevelChanged()">
+				<option value="1">Guess One card </option>
+				<option value = "2" selected="selected">Guess Two cards</option>
+				<option value="3">Guess Three Cards</option>
+			</select>
+		</div>
+		<!-- <div class="col-md-2 col-lg-2 vcenter"> -->
+			<!-- <select class="selectpicker" id="gameTypeBootstrap"  data-width="auto" onchange="gameTypeChanged()"> -->
+				<!-- <option value= "2" selected="selected" >Guess 10 Sets</option> -->
+				<!-- <option value = "1" >Guess for 60 seconds</option> -->
+			<!-- </select> -->
+		<!-- </div> -->
+		<div  class="col-md-2 col-lg-2 vcenter" id=  "main_button">
+			<button type="button" id = "mainButton">Start Timer!</button>
+		</div>
+	</div>
+
+	
+	<div class="row" id=  "score">
+	</div>
+
+	<div class="row" id=  "gameTimer">
+	</div>
+	
+	<div class="row" id=  "gameChrono">
+		
+	</div>
+
+
+	<!-- <div class="row" id=  "buttons"> -->
+	<!-- </div> -->
+
+
+	<div class="row">
+
+		<div id="set-trainer" class = "cardsField">
+			<!-- <div id="game">-->
+				<div id="topField">
+				</div>
+				<hr id = "cardsFieldDivider" width = "420px">
+				<div id="bottomField">
+				</div>
+			<!-- </div>-->
+		</div>
+		<!-- <div id = svgTest> -->
+		<!-- </div> -->
+	</div>
+
+	 <!-- Bootstrap core JavaScript
+	================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="../../bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+	<script src="../../bootstrap-3.3.2-dist/js/docs.min.js"></script>
+	<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+	<script src="../../bootstrap-3.3.2-dist/assets/js/ie10-viewport-bug-workaround.js"></script>
+
+</body>
+</html>

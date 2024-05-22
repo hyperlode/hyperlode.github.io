@@ -1,0 +1,108 @@
+body{
+	text-align: center;
+}
+
+.forecast_element{
+
+}
+.manage_element{
+	display:inline-block;
+	vertical-align:middle;
+}
+
+.button{
+	visibility: hidden;
+}
+.invisible{
+	visibility: hidden;
+}
+.visible{
+	visibility: visible;
+}
+
+.floatLeft{
+	float: left;  /*http://stackoverflow.com/questions/12557897/how-to-vertically-middle-align-floating-elements-of-unknown-heights*/
+}
+.strip {
+	display:inline-block;
+	vertical-align:middle;
+	
+    /*height:100px;*/
+    background-color:white;
+	overflow: auto; /*makes sure it gets scaled with children with float property */
+
+	/* display: table; /*centers the float elements*/     */
+	margin: 0 auto;
+	width: 700px;
+}
+.pane{
+ /*  width: 100px;
+  height: 100px; */
+  background-color:white;
+  float: left;
+}
+
+.preview_pane{
+ /*  width: 100px;
+  height: 100px; */
+  background-color:black;
+  float: left;
+}
+.tile{
+    width: 80px;
+	height: 80px;
+    margin: 10px;
+	border-radius: 5px;
+  }
+.tileTitle{
+	font-family: "Arial", Helvetica, sans-serif;
+	text-align:center;
+	margin: 0px;
+}  
+
+/* TilesDialogimimimim{ */
+
+.tilesDialog{
+	top: 100px;
+	/* height: 300px; */
+	width: 100%;
+	background-color:black;
+	float: left;
+
+}
+
+
+
+.paneStrip{
+	float:left;
+} 
+
+
+.panes {
+    /*height:100px;*/
+   /* background-color:blue;*/
+}
+
+/* create an arrow that points up   http://davidwalsh.name/css-triangles*/
+div.test {
+	width: 0; 
+	height: 100px; 
+	border-left: 5px solid transparent;  /* left arrow slant */
+	border-right: 5px solid transparent; /* right arrow slant */
+	border-bottom: 5px solid #2f2f2f; /* bottom, add background color here */
+	font-size: 0;
+	line-height: 0;
+}
+
+div.arrow-up_inPane {
+	width: 0; 
+	height: 0; 
+	border-left: 10px solid transparent;  /* left arrow slant */
+	border-right: 10px solid transparent; /* right arrow slant */
+	border-bottom: 10px solid #000000; /* bottom, add background color here */
+	font-size: 0;
+	line-height: 0;
+	/* positioning: */
+	margin-left: 40px; /*width pane - half of width arrow*/
+	background-color: white;
+}

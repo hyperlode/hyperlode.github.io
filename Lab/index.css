@@ -1,0 +1,43 @@
+.site-title{
+	/* margin-left: 100px; */
+	font-size: 25px;
+	text-align: left;
+	height: 30px;
+	
+}
+.site-description{
+	/* padding-left: 200px; */
+	font-size: 18px;
+	text-align: left;
+	
+}
+.site-icon {
+	/* padding-left: 200px; */
+	font-size: 10px;
+	/* text-align: left; */
+	height: 150px;
+	width: 20%;
+	float: left;
+	
+}
+
+
+.subsite{
+	text-align: center;
+	height: 150px;
+	background-color: white;
+	margin-left: 20%;
+	margin-right: 20%;
+	margin-bottom:20px;
+}
+.container{
+	float: right;
+	width: 80%;
+}
+body{
+	background-color:#b0c4de;;
+}
+
+.footer{
+	text-align:center;
+}

@@ -1,0 +1,702 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+
+		<link type="text/css" rel="stylesheet" href="stylesheet.css">
+		<title>Checklist Canada</title>
+		
+</meta>		
+<script type="text/javascript">
+	<!--
+	
+	var animate ;
+	
+	
+	function setHeightsHack(){
+		var imgObj = null;
+		imgObj2 = document.getElementById('openRight');
+		imgObj2.style.height= document.documentElement.scrollHeight +'px'; 
+		var imgObj2 = null;
+		imgObj = document.getElementById('openLeft');
+		imgObj.style.height= document.documentElement.scrollHeight +'px'; 
+	}
+	
+	function init(){
+		var imgObj = null;
+		imgObj = document.getElementById('openLeft');
+		imgObj.style.height= document.documentElement.scrollHeight +'px'; 
+		imgObj.style.width= (screen.width ) /2 + 'px'; 
+		
+		
+		animate = setTimeout( function(){openToSide(imgObj,new Boolean(1) )},3000);
+		
+		var imgObj2 = null;
+		imgObj2 = document.getElementById('openRight');
+		imgObj2.style.height= document.documentElement.scrollHeight +'px'; 
+		imgObj2.style.width= (screen.width ) /2 + 'px'; 
+		animate = setTimeout( function(){openToSide(imgObj2,new Boolean(0) )},3000);
+		
+		var imgObj3 = null;
+		imgObj3 = document.getElementById('openUp');
+		//imgObj3.style.width=  screen.width +'px'; 
+		imgObj3.style.height= (screen.height * 0.7 )+ 'px'; 
+		animate = setTimeout( function(){openVertical(imgObj3,new Boolean(1) )},6000);
+		
+	}
+	
+	function openVertical(obj, upElseDown){
+		var height= parseInt(obj.style.height);
+		if (upElseDown){
+			height -=3;
+		}else{
+			height +=3;
+		}
+		
+		if ( upElseDown && height <0){
+			obj.style.height = 0;
+		}else if (!upElseDown && height > screen.height){
+			obj.style.height = screen.height;
+		}else{
+			obj.style.height = height + 'px';
+			animate = setTimeout( function(){openVertical(obj,upElseDown )},25);
+		}
+		
+	}
+	
+	function openToSide(obj,  leftElseRight){
+		
+		var width = parseInt(obj.style.width);
+		if (leftElseRight){
+			width -= 3;
+		}else{
+			width +=3;
+		}
+		
+		if ( (leftElseRight && width<0) ){
+			obj.style.width = 0;
+		} else if (!leftElseRight && width > screen.width ) {
+			//width = screen.width;
+			obj.style.width = screen.width;
+		}else{
+			obj.style.width = width + 'px';
+			animate = setTimeout( function(){openToSide(obj,leftElseRight )},25);
+		}
+		
+		//animate = setTimeout(openLeft,200);
+		// alert(parseInt(imgObj.style.width));
+	}
+	
+	//function stop(){
+	//   clearTimeout(animate);
+	//   imgObj.style.left = '0px'; 
+	//}
+	//onload =init;
+	//-->
+</script>
+</head>
+	
+<body class="main">
+	<!---faceboek script-->
+	<div id="fb-root"></div>
+	<script>
+	(function(d, s, id) {
+		var js, fjs = d.getElementsByTagName(s)[0];
+		if (d.getElementById(id)) return;
+		js = d.createElement(s); js.id = id;
+		js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+		fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));
+	</script>
+	
+	
+	<div id="openLeft" style="position: absolute;	left:0px; top:0px;	height:100%;	background-color:red;	z-index:4;	" ></div>
+	<div id="openRight" style="position: absolute;	right:0px;	top:0px;	height:100%;	background-color:red;	z-index:4;" ></div>
+	
+	<div id="openUp" style="position: absolute;	left:35%;	top:0px;	height:100%;	width: 30%; right: 25%; background-color:red ;	z-index:2;" ></div>
+	
+
+	
+	<div class="centered">
+			
+		
+	
+		<div class="header" style = "width = 100%;"> 
+			<H1 style="position:absolute;z-index:6; text-align:middle">HABEMUS TURISTAM</H1>
+			<img src="mapleLeafSreenTransparent.png" alt="Maple Flag screen" style="z-index:3;position:relative;" >
+			<img src="mapleLeaf_Lode.png" alt="Maple Flag" style="z-index:1;" > 
+			
+		</div>
+		
+		<div class="content">
+			<ul>
+				<li><H1 > <span style="text-decoration:line-through">Dagelijkse, Wekelijkse, 2-Wekelijkse, Maandelijkse, Trimestriële,</span> 4-Maandelijkse 
+				update van Lode's belevenissen in Vancouver, Canada.</H1></li>
+				
+				<li><p style="text-align:left;"> Voor mijn eigen gemak heb ik hier gewoon mijn checklijstje in gekopieerd, zo kunnen jullie meevolgen wat ik al gedaan heb, en wat nog moet komen. Dit alles netjes geordend per categorie! Maak er het beste van!</p></li>
+				<li><p> Ik ben bijzonder trots dat ik dit kan berichten zonder het Faceboek te gebruiken! Dit kan je natuurlijk leuk vinden (du-uh, je zou moeten zot zijn om geen like-knop in te voegen, trouwens, I like like knoppen, maar dat is zo ongeveer het enige wat je niet kán liken op facebook. Ik heb hen een request gestuurd om een meta-like knop te maken, maar ik kreeg nog geen antwoord (which I do not like). Ik moet oppassen, ik ben hier zevercredits aan het verliezen en mijn checklijstje is nog niet eens begonnen.
+				</p>
+				
+				<div class="fb-like" data-href="http://www.custom-effects.com/habemusTuristam/index.html" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false" data-font="verdana"></div>
+				
+				</li>
+				<li><p> Ik werk in een éénmans-zaakje, dat nu uit twee man bestaat, dat op maat gemaakte LED verlichtingsoplossingen promoot een verkoopt! 	Een mooie zaak en een toffe job. <br>Je kan nu live meevolgen hoe Lode werkt, want hij is de website aan het moderniseren!<br>
+					Dit is <a href = "http://www.custom-effects.com/v3/project.php" target="_blank">de oude site</a> die ik -as we speak- aan het aanpassen ben. <a href = "http://www.custom-effects.com/v4/project.php" target="_blank">Waaaw wat een verandering </a> (ja, dat is gewoon in de adresbalk V3 in V4 veranderen). Ik nodig u uit om dit lokaal LED initiatief vanop een veilige 10000kilometer afstand like-wise te sponseren! </p>
+				
+				<div class="fb-like" data-href="http://www.facebook.com/pages/Custom-Effects-LED-Solutions/181994715198178" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false" data-font="verdana"></div>
+				
+				</li>
+			</ul>
+		
+			<h2>Gastronomie</h2>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Goed bier ontdekken</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Als Belg overal je oordeel moeten geven over het bieraanbod, en de facto als autoriteit aanzien worden</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Me als een groten gedragen bij het oordelen over de witjes. </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Hefe Weissen van Grandville Island tot nu toe het beste bier vinden</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Toch wel trots zijn dat ik bij het vorige puntje eens échte informatie kan doorspelen </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Het publiek voorbereiden op het feit dat er verder echt niet meer interessante info komt</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een bier tegenkomen genaamd 'Hermanator' --> tis nie meuhlik. Zie deze link:http://onlineslangdictionary.com/meaning-definition-of/hermanator Herman, als je arm ok is nog even wachten met skiën hé!</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Uitleggen dat je bij het klinken met kroegen elkaar in de ogen moet kijken</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Uitgelegd krijgen dat in de ogen kijken bij Chinezen taboe is</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Honderd keer dezelfde fout maken</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">30ste verjaardagsfeestje vieren met eclectisch gezelschap</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">In bar Oscars buitengesmeten worden in de regen omdat ik mijn paspoort niet mee heb (minimumleeftijd 19 jaar(!))</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een zeer diepe identiteitscrisis meemaken: En ik was net zo trots dat mijn paspoortleeftijd eindelijk mijn maturiteitsleeftijd weerspiegelde</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Mijn negentiende verjaardag gaan vieren in bar Oscars</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mij laten overtuigen om pindakaas te proeven</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Instant verslaafd raken aan peanutbutter (= de heroïne onder de spreads)</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Weten dat ik niet echt verslaafd ben, want dat ik kan stoppen wanneer ik wil</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">In mezelf zeggen dat het nog geen tijd is om te stoppen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Het verbruik zien stabiliseren op 1 kilogram per tien dagen</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Het thuisfront kunnen geruststellen met deze evolutie</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Geïntroduceerd worden in de PB&J-sandwich traditie. Als er íets Canadees is waar geen zalm of Maple Sirup in zit... </div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Mensen overtuigen om broodje choco-banaan te proeven (Electrawinds recipe)</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Broodje choco-peanutbutter-banaan introduceren</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mensen overtuigen om broodje choco-peanutbutter-banaan te proeven</div></li>
+			</ul>
+			<ul>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Iemand tegenkomen die mijn chocomousse niet graag eet</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mensen overtuigen om patatjes in de microgolf klaar te maken</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Als Kerstcadeau een dunschiller geven aan mijn hosts omdat er geen was</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Als Kerstcadeau een dunschiller krijgen van mijn hosts omdat ik had geklaagd dat er geen was</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Naam en faam maken als "de man die het Vancouverse Volk gebakken patatjes met kaas, look, ajuin en spek leerde maken"</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Popcorn in geprepareerde zakjes klaarmaken in de microwave</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Popcorn poffen in een pot waarbij slechts de helft der korreltjes openbloeit (ehh ploft)</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Eindelijk het recept leren, hoe popcorn poffen (99 procent van de korrels geploft) P50 </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Eindelijk het ultieme recept leren, hoe popcorn poffen (99 procent van de korrels geploft) P90 (Bankable!) </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Het ultieme popcornpoprecept verspreiden</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">(Bij dezen) Een beetje olie in de pot doen (type olie bepaalt de smaak, kan gaan van boter, over olijf olie tot afgewerkte motorolie) ik gebruik CANOLA olie omdat ik moet inburgeren, je vuur op maximum zetten (op 11), popcorn er in doen zodat maximum de hele bodem bedekt is, wachten tot de eerste pop (kan ook tak of pets zijn), pot van het vuur halen, vuur aan laten staan, dit voor de gezelligheid, maar ook om de temperatuur op peil te houden en eigenlijk vooral om niet te moeten multitasken want na de van het vuur haling moet je tot 50 tellen, 50 seconden wachten, pot weer op vuur zetten, vuur lager zetten (op 3), deksel op de pot doen, tijdens het popfestijn het deksel niet opheffen om te spieken, want je ziet toch niets en je keukenvloer ligt direct vol, wachten tot de pauze tussen verschillende pops te lang begint te duren naar je goesting, zout op strooien (naar believen) en schudden, pot van het vuur halen, popcorn in een ander recipiënt doen, popcorn schransen, pelletjes van tussen je tanden prutsen (dit neemt nog het meeste tijd in beslag)  </div></li>
+				
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Ontdekken dat er hier wel witloof te verkrijgen is, onder de naam "Belgian Endives"</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Naam en faam maken als "de man die het Vancouverse Volk leerde esperolletjes maken"</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Passagier zijn in een the A team busje op het werk</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Met een the A team busje naar de McDonald's gaan : x100</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een gemiddelde van meer dan 1x per dag naar de McDonald's drive through gaan per werkdag met de The A team van</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Bijna nooit plooien om zelf ook iets te bestellen.</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Te horen krijgen dat hier enkel snobs nooit naar de McDonald's gaan</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Vanaf nu steeds Big Macs, egg muffins en apple pie vragen in de McDonald's (om ze dan weg te smijten in de eerstvolgende vuilbak, want diep vanbinnen bén ik een echte snob, maar niemand moet dat geweten hebben). De daklozen geef ik dan de kartonnetjes (want die smijt ik niet weg) om onder te slapen.</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">bemerken dat iedereen in de fastfood business een zonneklep draagt</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Uitgelegd krijgen dat een zonneklep een "visor" is, maar een "supervisor" niet een hele grote zonneklep</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Tweemaal door eenzelfde mens bediend worden in de McDonald's</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Bedenken dat dat blijkbaar wel een verschrikkelijk tof bijjobtje moet zijn, in de mekkedie werken</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Bevestigd krijgen dat dat een verschrikkelijk tof bijjobtje is, in de mekkedie werken</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Nogal vreemd overkomen wanneer ik een Giant bestel bij de McDonald's</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Nogal vreemd overkomen wanneer ik een Big Mac bestel bij de Quick</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Het verschil leren tussen een Drive-in en een Drive-through</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Dat hier nu niet allemaal aan jullie neus gaan hangen...</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Geconfronteerd worden met de dagelijkse keuzestress voor de lunch als we met de auto de parking oprijden: de drive-thru van 1. de McDonald's, 2. Tim Horton's of 3. Subway. Dat zijn hier op deze parking gewoonweg de enige opties</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Beseffen dat we eeeeigenlijk ook te voet hadden kunnen gaan om te gaan eten, want het is maar honderd meter van waar we werken</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mijn eigen stuutjes weer meenemen naar het werk (met peanutbutter)</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Ontezettend reclamefilmpje zien waarin alle soorten van mensen (nee, niet alle soorten, enkel schoone vrouwen en mannen in het pak) met een lelijke kartonnen beker met plastieken dekseltje rondlopen of vergaderen. Dat blijkt een koffie van Tim Hortens te zijn, waar ze dan door een gaatje in het plastieken deksel van nippen en eventjes de wereld vergeten.</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Plots iedereen, op de trein, op het werk, thuis, op de straat, in de parken of de bergtoppen godbetert met een Tim Hortens kartonnen beker zien rondlopen. </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Tot mijn verbazing zien hoe reclame toch wel echt werkt</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Overal, te velde en op de daken, lege kartonnen bekers terugvinden</div></li>
+			</ul>
+			
+			<ul>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Hier goed brood vinden</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Me daar over zetten en iedere dag sponsbrood eten</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mislukt brood bakken</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Matig brood bakken</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Perfect brood bakken</div></li>
+			</ul>
+		
+			<ul>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Proteïnen shakesjes drinken omdat al mijn hosts dat ook doen.</div></li>
+			</ul>
+			
+			<h2>Sport en spel</h2>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Snowshoetrip zonder snowshoes</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Snowshoetrip met snowshoes</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Showsnoetrip met schnaps</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Me nét niet laten verleiden om schaatsen te kopen zonder dat het hier vriest</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">De draad van mijn multitimer projectje opnemen op het moment dat ik werkloos ben</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">De componentjes maar ontvangen op het moment dat ik werk heb</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Nachten spenderen aan het programmeren van een multitimer</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mijn roommates zot krijgen door het praten (lees: doorbomen) over multitimers</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mijn multitimer afwerken</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Scrabble spelen met mijn roommates met de multitimer</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mijn room mates heel enthousiast krijgen over mijn multitimer</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Even opmerken dat het vorige punt wel degelijk aangevinkt is!</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Mooi kastje maken voor de multitimer zodat het presentabel is.</div></li>
+			</ul>
+			
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Iemand vinden die wel graag het spel Quoridor speelt met mij. Die net als ik steeds geconfronteerd werd met het feit dat niemand nog met hem wou spelen na enkele pestspellejes omdat ze steeds van hem verliezen</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Geen Quoridor meer willen spelen met Chris</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">De enige frustratie hier aan mijn computer (de uiterst linkse toetsvoorin is de function toets in plaats van de ctrl toets godbetert) oplossen door in de BIOS de functie van beide toetsen om te draaien. Het feit dat die functie er in zit getuigt van veeeele technische discussies met dit als compromis. Dit is een echte tip voor mensen met een gelijkaardig probleem (dat vind je niet in de lonely planet hé).</div></li>
+			</ul>
+			
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Transportsteek gebruiken om boxspring op het dak te vervoeren</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Zeppelinsteek nuttig gebruiken</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Struikroversteek gebruiken om fiets vast te maken in Skytrain</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Uitgenodigd worden om knopenles te geven in meetup</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Het aantal inschrijvingen op mijn knopenspreekbeurt zien stijgen boven de vijftien</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Het aantal effectieve gasten op de spreekbeurt niet boven de 1 zien uitstijgen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Beseffen dat men in een grootstad wel allemaal een agenda heeft, maar dat deze in het laatste gat heel vaak verandert </div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Zelf een agenda aanschaffen </div></li>
+			</ul>
+		
+			
+			<h2>Cultuur</h2>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Kitschkoning worden door met afval led-lichtslangen decoratie te beginnen maken</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Tot mijn half afgrijnzen bemerken dat mijn huisgenootjes dat nog leuk vinden ook (de andere helft zwelt van trots)</div></li>
+			</ul>
+			
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een totaal andere muzieksmaak hebben dan mijn roommates</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Toch tien punten in achting bij hen stijgen als ze horen dat ik naar Goa Trance aan het luisteren ben al debuggend, en niet eens tegen mijn goesting </div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Lid zijn van de bibliotheek</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">10 boeken mogen ontlenen per keer</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">50 boeken mogen ontlenen per keer</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">1000000 boeken mogen ontlenen per keer</div></li>
+				<li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Het zwien is het schoonste der bjeesten op de piano van mijn host leren djengelen inclusief gezang</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Host de West-Vlaamse hit "Tzwien", niet uit zijn hoofd laten krijgen</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Prachtige bruggen tegenkomen: Lionsgatebrug (zodanig elegant, dat het bijna té simpel is om mooi te zijn) en ook wel de Ironworkersbrug</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Prachtige kartonnen viool tegenkomen (schoendoos) -> om kinderen de vingerzettingen aan te leren. Ze krijgen maar na een paar jaar een echte examplaar. Amaaai die gaan gemotiveerd zijn.</div></li>
+			</ul>
+			
+			<h2>Dierenrijk</h2>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Grote zwermen kraaien zien </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Me in de film the birds wanen</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Naar binnen moeten vluchten omdat duizenden kraaien op hun gemak in den hof zitten en me onteder aanstaren</div></li>
+			</ul>
+			<ul>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Bruine beer zien </div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Zwarte beer zien </div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Witte beer zien </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Concluderen: Beren zijn hier als godsdienst, veel uiterlijk vertoon (speciale vuilnisbakken, coole plakkaten,...) maar bevestiging blijft uit. Echter, I'm still a believer!</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Me niet meer wassen om beren aan te trekken</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Ik had het vorige puntje beter uitgevoerd, want ik zit hier nu met een wasberenplaag!</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Gebeten worden door een hond niet groter dan een groot bruin brood</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Wensen dat een specifieke hond een GESNEDEN groot bruin brood was</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een doos dinosauruskoekjes toegestuurd krijgen van mijn grootste fan in België</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">De oorzaak zijn van een gevaarlijke invasieve exoot door het kruimelen bij het eten van een koekje</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een kat tegenkomen die apporteert zoals een hond</div></li>
+			</ul>
+			
+			<h2>Taal</h2>
+			<ul>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Elke zin starten met "You guys wanna..."</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Overal "...like..." tussen plakken, and like is not like used like in like a Facebook like-button like way</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Horen hoe de term YOLO hier heerlijk wordt verkracht: wil je een koekje? Ach ja, YOLO. Dood aan de stoere acroniemen!</div></li>
+			</ul>
+			<ul>	
+				
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Beheersen dat ik L, E, D moet zeggen in plaats van LED</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Beheersen dat ik dan geen L, A, N cable moet zeggen maar LAN</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Die Canadezen toch eventjes in de neus wrijven dat ze niet zoo consequent zijn met hun acronymen.</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Yes zeggen als ik bevestigende antwoord, omdat ik geleerd heb dat dat correct is</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Te horen krijgen dat het lokaal dialect hier ya gebruikt in plaats van yes, en dat ik dus opval als foreigner als ik yes gebruik</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Dus als ik wil doen alsof ik een local ben (toch wel een droom van mij), dan moet ik me voor mezelf als een foreigner gedragen want ik moet "ja" zeggen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Het weer allemaal verknoeien als ik niet alleen "ya" begin te gebruiken maar ook "nee"</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Engelse uitspraak leren: Good judgment comes from experience; experience comes from using bad judgment.</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Volop ervaring opdoen</div></li>
+			</ul>
+			<ul>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Engels kruiswoordraadsel oplossen</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Meer dan 2 woorden vinden in een Engels kruiswoordraadsel</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Naar een krantenwinkel gaan achter een kruiswoordraadsel voor kinderen van 10 jaar ("iet ies not for me, but for ij friend")</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Complimentjes krijgen voor mijn eerder Brits accent (and by the way Lode: "the way you say 'can't', sounds like cunt")</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mensen entertainen met mijn serieuze uitleg over mijn universele taal</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mensen kunnen overtuigen om me te volgen in de universele taal</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mensen mijn universele taal succesvol laten afbreken "we Japanese people don't hear the distinction in some of your vowels" </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een klinker schrappen in mijn universele taal (we hebben er nu 5 in plaats van 6) </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Beseffen dat de enige échte universele taal klinkers noch medeklinkers heeft </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Beseffen dat dit hét moment is om mijn universele taal te oefenen, met al verschillende nationaliteiten hier</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Heel veel tijd hebben om me te verdiepen in mijn universele taal</div></li>
+			</ul>
+			
+			<h2>Transport</h2>
+			<ul>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Verdwalen in de Vancouversche straeten</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Lyrisch worden over het dambordpatroon</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Gelik een groten direct alles weten liggen in de stad bij het horen van twee straatnamen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Met fiets en al over een twee meter hoge muur moeten kruipen omdat het dambordpatroon "eventjes verstoord" is</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Al dagdromend plots beseffen dat het al meerdere malen groen zou zijn geweest, ware het niet dat ik vergat de voetgangersknop in te duwen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Honderd keer dezelfde fout maken</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een groot gevoel van "Mozes leidt zijn volk door de Rode zee" hebben als je op het voetgangersknopje duwt en het wordt instant rood voor het verkeer (lees: die knopjes doen hier meer dan enkel op een schermpje "aanvraag aanvaard" tonen)</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">De klootzak uithangen door op het knopje te duwen, en al door het rood te rijden met de fiets omdat er toch geen auto's zijn, waarna het rood wordt voor de aankomende auto's die staan te wachten voor niets </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Er achter komen dat het houtduiven "vraag en antwoordspel" bij de rode lichten eigenlijk een blindenhulp is</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Verstaan dat omwonenden niet zot worden van de indringende houtduiven oe-oe geluiden bij de rode lichten</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">De bus laten stoppen voor de halte waar ik uit moet, waarna de bus weer begint te rijden zonder dat ik uitstapte omdat de deuren niet opengingen omdat je daarvoor op een knop moet duwen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Honderd keer dezelfde fout maken</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Fiets op de bus meenemen </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Twee fietsen op de bus meenemen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Verwenst worden door de chauffeurs</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Maatje worden met de chauffeurs (toch wel veel later)</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Zelfs van 60-jarige buschauffeurs de opmerking krijgen "hey, you got a haircut?". Kijk, dan weet je dat het écht nodig was</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">In de bus, die met huilende motor een steile berg opklimt terwijl de ruitenwissers heen en weer zwiepen in de striemende regen 's morgens vroeg in het donker vooraan staande, me klaarmakend om eruit te springen en mijn fiets van het vooraan gemonteerde fietsrek te nemen aan de bushalte die langzaam maar zeker dichterbij komt, wachtend op de GO van de chauffeur, toch af en toe een Vietnam film flashback krijgen.</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">God danken dat het geen kogelregen is die me opwachten maar een onschuldige hagelstenenstormpje</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Leren dat wanneer ik een zware motor hoor achter me, het meestal geen vrachtwagen maar een "gewone" auto is</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Ontgoocheld zijn dat ze hier geen échte metro hebben (wat voor een nepgrootstad is dat hier)</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Zeer enthousiast worden over de skytrain (die als een monorail over de stad loopt, met magnifieke zichten op de besneeuwde bergtoppen, zonsondergangen in zee, en de skyline van downtown Vancouver)</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Joepie zeggen als je ziet dat er zich toch drie stations als metro gedragen (tis te zeggen: ze liggen onder de grond)</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Koersfiets kopen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Minachtend Europeaan genoemd worden omdat ik overal met de fiets naartoe ga</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Wennen aan het feit dat je hier altijd een fietshelm moet dragen</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Altijd een fietshelm dragen</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Mij een hippe kerel voelen met mijn hippe fietshelm</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Nog een koersfiets kopen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mount Seymour beklimmen tot aan de skipistes</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">De klimafstand serieus onderschatten</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Blij zijn dat ik de afstand heb onderschat, anders was ik er niet aan begonnen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mount Seymour afsjeezen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Het jammer vinden dat het niet nog verder was</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Met de velo gaan skieën</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">De Mount Seymour gps data omzetten in een Spinning sessie voor Steven op Country music</div></li>
+				
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Acht uit achterwiel halen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Met doos met 10 chocomoezen onder de arm fietsen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Met doos met 10 chocomoezen onder de arm fietsen in de regen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Met doos met 10 chocomoezen onder de arm fietsen in de regen lichtjes bergafgaand</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Met doos met 10 chocomoezen onder de arm fietsen in de regen lichtjes bergafgaand het zien oranje worden van verkeerslichten</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Met doos met 10 chocomoezen onder de arm fietsen in de regen lichtjes bergafgaand het zien oranje worden van verkeerslichten als ik de lichten net zodicht ben genaderd dat ik niet meer ga kunnen stoppen </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Het stertebeentje van een andere fietser een zeer onaangenaam gevoel geven</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Tweede acht uit het achterwiel halen (en dat op PI day :( (de dag dat ik er altijd voor zorg dat mijn achterwiel zo rond is dat je PI er tot tien cijfers na de komma nauwkeurig mee kan benaderen )</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Slechte inschatting maken van Tsprong op het einde van een bergaf</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Zoef door de bramen rijden</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een hoop bramen uit mijn achterband halen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Bedenken dat ik hier toch wel pèrdesjanse heb gehad dat ik geen platte band heb</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Bedenken dat ik toch ALTIJD sjanse heb en me daar goed bij voelen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een kilometer verder tóch zien dat de band lost en ik te voet moet verder gaan</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Die avond zien dat ik 4 gaten in mijn achterband heb</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Dan maar preus zijn op het feit dat ik in één seconde tijd vier gaten in mijn band kreeg, en ik een nieuw persoonlijk record heb gevestigd.</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Bedenken dat ik dat maar aan niemand moet vertellen</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Terugkomen van de Diez Vistas trail bij mijn fiets, en zien dat mijn band niet alleen platgestekt is, maar men heeft ook netjes de buitenband er half afgedaan teneinde de binnenband met een mes op dusdanige manier te kunnen bewerken dat ik hem zeeeeker niet meer kan plakken</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Op dat moment blij zijn dat ik fietspompje en plakkertjes tóch niet mee heb</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Het knap vinden dat zelfs de vandalen hier zeer gemotiveerd zijn en gedreven om hun werk zorgvuldig te doen</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Eventjes vermoeden dat een beer dat gedaan heeft op zoek naar de fameuze binnenbandpaling(te zien aan de sporen op de binnenband niet eens zo vergezocht) </div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Met fiets op skytrain </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Elke dag met fiets op skytrain</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Elke dag met fiets op skytrain, trap opsprinten om hem op het laatste nippertje te nemen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mijn rug zwaar verreken</div></li>
+			</ul>
+			<ul>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Een geloofwaardige bedelaar tegenkomen</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Wennen aan bedelaars</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mezelf erg verdiepen in de Engelse versie van Marco Polo's Travels op de skytrain</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Vele stations te laat, en zelfs bijna terug bij af zijn want het is een loop, uitstappen uit de skytrain </div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Me zwaar mispakken aan google maps bij het uitrekenen van de tijd die ik nodig heb om ergens te geraken. Fietsreistijden worden in Google maps niet aangegeven, en tis al helemaal verkeerd als het keihard naar boven gaat! Yeps, een nieuwe sorry-ik-ben-te-laat-omdat-uitvlucht is geboren!</div></li>
+			</ul>
+			
+			<h2>Tweer</h2>
+			<ul>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Regenvrije decemberdag mogen meemaken</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mezelf beloven om nooit, maar dan ook nooit meer te klagen over het Belgisch weer qua neerslag</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Verbrand zijn in gezicht na eerste dag met een beeetje zon</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">In mijn T-shirtje buiten in de schaduw op 19u00 's avonds kunnen rondwandelen terwijl het in België vriest</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Fietstochtje bij min vijftien graden in Montreal</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Denken van slim te zijn en de Mont Royal opfietsen tot aan de top teneinde mijn bevrozen ledematen weer tot leven te wekken</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Lekker warm hebben net als ik de top bereik</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Plots beseffen dat ik nu bergaf moet (= geen inspanning en veel wind)</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Ondanks met de remmen toe en krachtig trappend afdalen toch weer helemaal bevrozen zijn aan de voet van de berg</div></li>
+				<li class="li_TODO"><img src="checkbox_checked.png"><div class="li_p">Nooit niemeer fietsen bij min vijftien graden</div></li>
+			</ul>
+			
+			<h2>Werk</h2>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mijn CV veranderen in een hip verkoopspraatje omdat dat hier moet</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Werken voor een Hollander</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Werken voor een Hollander die jonger is dan ik</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Werken voor een Hollander die jonger is dan ik waarbij één zijner specialiteiten auto's tunen is</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Werken voor een Hollander die jonger is dan ik waarbij één zijner specialiteiten auto's tunen is en het nog leuk vinden ook</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Gaan shoppen naar "vuile werkkleren"</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Vuile werkkleren niet aandoen omdat ze te wel zijn om te gaan werken</div></li>
+			</ul>
+			
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Leren vissen: Fishing is de kunst van het draden achter houten wanden en plafonds trekken. Het start met gaten op bereikbare plaatsen boren, en dan een stalen draad van het ene gat naar het andere proberen te krijgen. Wel, ik kan u verzekeren, als het een ambetante locatie is, is het bereiken van het tweede gat net zo bevredigend als het vangen van een grote zalm.</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Leren solderen van componentjes met pinnetjes met een halve millimeter tussen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Leren zen solderen</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Slagen voor zen solderen zonder traantjes</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Prachtig zicht hebben op Mont Baker van waar ik werk</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mont Baker in gedachten beklimmen tijdens het werk</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Mont Baker fysiek beklimmen</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Meemaken hoe hier voor de eerste keer Family Day wordt gevierd, een nieuwe officiële feestdag om het gat tussen Jezus geboorte en verrijzing op te vullen. Officieel wordt het family day genoemd omdat in deze donkere periode de meeste zelfmoorden gebeuren. Een keer een dagje met je familie doorbrengen moet dit oplossen.</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Heeeelemaal alleen zijn op family day omdat iedereen naar zijn familie is</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Acuute zelfmoordneigingen ondervinden, "dat zal ze leren, met hun family day"</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">De daad bij het woord voegen</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Beseffen dat ik hier geen meerbuiteneetweermeter nodig heb om niet alleen te moeten buiten eten, aangezien ik mijn enige collega ben eet ik sowieso alleen</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Toch een group "HQ" aanmaken en onnozele mailtjes er naar toe sturen</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Antwoorden op HQ-mailtjes</div></li>
+			</ul>
+			<ul>
+			
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Vinden van alle correcte benamingen voor spanbandje</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Tie-wrap</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Zip strap</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Zapper</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Zip tie</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Wrap tie</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Zap strap</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Zip zap</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Zipje&zopje  </div></li>
+			</ul>
+			
+			
+			<h2>Huisvesting</h2>
+			<ul>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Vol bewondering foto's trekken van een huis in opbouw, volledig uit multiplexplaten.</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Na een tijdje beseffen dat ALLE huizen hier zo gebouwd worden.</div></li>
+			</ul>
+			<ul>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Ergens een plaats tegenkomen waar je geen schoon zicht hebt op de bergen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Met 6 man een volledig huis huren </div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Bed bouwen uit karton</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een Belg als roommate hebben</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een Antwerpenaar als roommate hebben</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een Antwerpenaar die België haaat en Europa haat als roommate hebben</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een Antwerpenaar die voor De Wever stemt als roommate hebben</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Met lede ogen aanzien hoe de NVA (mentaliteit) hier 50procent van de stemmen haalt</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Veel plezier met je kiespubliek Bart, veel succes gewenst met hen tevreden stellen!</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Fijne roommates hebben </div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Paspoort verliezen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Paspoort terugvinden</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Bovenstaande 2 items tien maal herhalen (gelukkig beide)</div></li>
+			</ul>
+			<ul>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Wegwijs worden in de mobile phone wereld</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mij een tweede smartphone laten aansmeren door een uiterst sympathieke verkoper</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een vent tegenkomen die in zijn benedenverdieping 5 starwarszwaarden heeft staan, 2 piano's, een synthesizer, gitaren, drums, 3 sofa's, menig spelcomputer, een laser van 2 watt waarbij je effectief de hele straal 2 kilometer ver kan volgen op die regenachtige dag, enkele revolvers (met instructies voor mij) waar zijn vrouw nooit komt.</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Het concept man-cave snappen</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Uitgelegd krijgen dat een huizenblok hier een achtste van een mile is, geheel volgens normale imperial units logica</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Tot inzicht komen dat de definitieve switch van imperial units naar metrisch stelsel hier enorme bouwkosten met zich mee zal brengen (want 201,67 meter per huizenblok moet natuurlijk naar 100 meter gebracht worden)</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Tzal dus nog een tijdje duren vooraleer er hier niemand nog inches, feets en pounds gebruikt</div></li>
+			</ul>
+		
+			
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Er eindelijk achter komen men hier "washrooms" bezigt als een hopeloos gecompliceerd eufimisme voor "de WC" </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Niet kunnen plassen zonder brobbelen omdat het water de volledige diameter van de pot overspant (zeeeker 30 centimeter diameter)</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Het leuk vinden dat het water de volledige diameter van de pot overspant</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Niet kunnen kakken zonder nat gat omdat het water de volledige diameter van de pot overspant</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Het niet leuk vinden dat het water de volledige diameter van de pot overspant</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Verbluft zijn hoe bij het doorspoelen de ganse watermassa begint rond te kolken waarna uw uitwerpselen als een spaghettisliertje door een getuite mond, door de afvoer opgeslurpt worden</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Alles bij elkaar genomen de wc's hier heel leuk vinden</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">De ongetwijfeld leukste deurstoppers ontdekken. Resorts die aan de muur hangen, en als je er tegen schopt zeggen ze prrrrrrrwwwt, prrrrrrrwt, de muur als klankkast laten dienend kan je het hele gebouw laten meegenieten van het praaachtige geluid (denk aan een pijl die in een boomstam geschoten wordt)</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Dat bepaalde huis toch maar niet huren omdat ze saaie deurstoppers hebben</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Het niet kunnen laten om ook enkele van deze deurstoppers te kopen in de Canadeese Stock American</div></li>
+			</ul>
+			
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Eindelijk eens een stofzuiger hebben met koplampen en roterende tapijtborstel</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Er niet in slagen de stofzuiger in gang te steken zonder hem eerst half open te vijzen</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Een fornuis tegenkomen minder dan een meter breed</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Een uitleg krijgen waarom fornuizen een dashboard moeten hebben een 747 waardig</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mezelf piloot wanen wanneer ik spaghetti maak "ignite all engines", "full throttle" "point of no return" allemaal termen in het fornuishandboek</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een jongensdroom in vervulling zien gaan wanneer ik spaghetti kook</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Elke dag spaghetti koken</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Plots beseffen dat de wasmachines hier hetzelfde concept zijn</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Elke dag mijn waste doen</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Al mijn kleren gekrompen na een "near mid air collision"</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een uitleg krijgen hoe een fornuis een self-clean function kan hebben zonder dat er een spoor van een robotarm is</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">In het huis waarin ik me "definitief" vestig een fornuis aantreffen waar expliciet "non self-cleaning" op vermeld staat</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Voorgaande punt wel een goed idee vinden en voorstellen om vanaf heden op apparaten te vermelden wat ze niet kunnen</div></li>
+			</ul>
+			<h2>Financieel</h2>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een super kwaliteits Bushnell verrekijker op de kop tikken voor maar 5CAD</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Het kunnen laten om te stoefen over mijn batjes</div></li>
+			</ul>
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Tegen iemand al lachend uitleggen hoe die andere mens consumer debts heeft en dat je daar toch een uil voor moet zijn</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Beseffen dat de toehoorder ook een massa consumer debts heeft</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Eindelijk begrijpen dat VISA wel degelijk grote winsten maakt</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Het als West-Vlaams boertje begrijpen dat iedereen (!) hier consumer debts heeft (2012=nieuw record: gemiddeld 27500 CAD  per inwoner, dat is grofweg hetzelfde als in euro)</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Naar mevrouw Leemans (mijn vriendin waarbij ik altijd kan gaan lenen) gaan om haar duidelijk te maken waar ze geld kan verdienen</div></li>
+			</ul>
+			
+			<h2>MENSEN</h2>
+			
+		
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mij afvragen of ze hier, naar analogie van de stock Americain, een stock Europeain hebben.</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Ontdekken dat ze hier ijdel genoeg zijn om hun stock, Stock Candadian te noemen (Canadian Tyre)</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mezelf inhouden niet alles aan te kopen in de Canadian Tyre, want vergis u niet : tis wel degelijk de Stock!</div></li>
+			</ul>
+		
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Lyrisch worden over Couchsurfing (de wikipedia van de reissites. Het kán niet werken, maar het werkt tóch!)</div></li>
+			</ul>
+			
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Checklijst maken</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Checklijst doorsturen aan vrienden en familie (technisch gezien is het onmogelijk dat dit kan aangevinkt zijn, want het is pas aanvinkbaar na doorsturen, maar toch, mocht je deze lijst met dit puntje onaangevinkt ontvangen, dan klopt het ook niet. Deze impasse, die bijna een maand aansleepte, werd opgelost door volgend technisch spitsvondigheidje: Aangezien ik mezelf tot vriend en familie van mezelf reken, stuurde ik deze lijst zoals jullie ze nu zien, maar met dit puntje unchecked, naar mezelf. Eens ontvangen (oooh post! O nee, weer spam van mezelf), vinkte ik dit puntje aan, kopieerde alles en zond het naar u door. </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Mensen mijn vernuftig trucje om de checklistanomalie te omzeilen mededelen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">De checklistanomalie gebruiken als alibi om heel laat iets van me te laten horen</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Blijven doorbomen over de checklistanomalie</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Checklistanomalie suggereren als "woord van het jaar"</div></li>
+			</ul>
+			
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Testen van de fameuze vriendelijkheid der Vancouverianen door een zwaar uitziende gast (per ongeluk) potje lap te leggen op de bus</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Aanhoren hoe die gast zegt "Sorry buddy"</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Excuses niet aanvaarden</div></li>
+			</ul>
+			
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Tijdens een meetup voor opensource sound libraries achteloos aan één van de tien deelnemers vragen "and what do you do in life"</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Alzo te weten komen dat die gepensioneerde mens de hoofdontwikkelaar van Excel was en bedenker van het contextmenuutje (=rechtermuisklikmenu)(</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Mezelf voor de kop slaan, ik had het kunnen weten, ik had vroeger een poster van hem op mijn kamer! </div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Die dag bombarderen tot de schoonste dag van mijn leven	</div></li>
+			</ul>
+				
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Een Caucasian genoemd worden, dat is het politiek correcte woord voor "white man"</div></li>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Snel leren dat je hier maar beter East-Indian, African-American en Asian gebruikt om rassen te netjes te beschrijven (in plaats van bruun'n, zwort'n	 en hjeel'n)</div></li>
+			</ul>
+		
+			<ul>
+				<li class="li_DONE"><img src="checkbox_checked.png"><div class="li_p">Lesje zet je vrienden niet af leren: Tickets doorverkopen met woekerwinsten is hier perfect legaal. Deze mensen worden scalpers genoemd. Mijn room mate probeert dit, maar helaas hebben zijn vrienden dezelfde smaak als hij (voor het concert waar hij tickets wilt van doorverkopen) en hij wilt mij als tussenpersoon gebruiken om het niet te laten opvallen dat hij zijn vrienden afzet. Het komt toch allemaal uit, en mijn room mate wordt bijna zelf gescalpt (en terecht)</div></li>
+			</ul>
+			
+			<ul>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Zeggen dat alles hier hetzelfde is als in Europa. Als er één conclusie is dat ik kan maken is het deze wel: tis anders</div></li>
+				<li class="li_TODO"><img src="checkbox_unchecked.png"><div class="li_p">Nooit meer terug naar huis willen komen. Dat is hier allemaal wel leuk voor een jaartje, maar om voor altijd te emigreren, ja... dat is toch iets anders, daar moet je toch wel karakter voor hebben. Mama zal blij zijn dat ik dat niet heb!</div></li>
+			</ul>
+		
+			
+			<ul>
+				<li><H1 > <span style="text-align:left;">Volgende update: Zeer onzeker.</H1></li>
+			</ul>
+				
+			
+
+			
+		</div>
+		<div class="footer">
+
+		</div>
+	</div>
+	
+</body>
+
+</html>

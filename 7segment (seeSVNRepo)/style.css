@@ -1,0 +1,24 @@
+
+
+
+circle[data-rel="true"],polygon[data-rel="true"] /*data-segmentVisible =true*/
+{
+	fill:red;
+} 
+circle[data-rel="false"],polygon[data-rel="false"]  /*data-segmentVisible = false*/
+{
+	fill:#E6E6E6;
+}
+
+#buttonSaveAsPng
+{
+	/* background-color:red; */
+}
+
+/* input[type="button"]
+{
+
+	background-color:green;
+	padding: 30px; 
+} */
+

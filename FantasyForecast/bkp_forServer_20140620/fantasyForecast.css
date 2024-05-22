@@ -1,0 +1,168 @@
+/* in chrome press CTRL+R to refresh css */
+
+body{
+	text-align: center;
+	font-family: "Arial", Helvetica, sans-serif;
+}
+
+.site-title{
+	/* padding-left: 200px; */
+	font-size: 20px;
+	text-align: left;
+	height: 80px;
+}
+
+.forecast_element{
+	background-color: white;
+}
+
+
+
+.forecast{
+	background-color: white;
+}
+
+.manage_element{
+	display:inline-block;
+	vertical-align:middle;
+	width: 200px;
+	text-align: left;
+}
+
+.toggleButton{
+	visibility: hidden;
+	width: 200px;
+	text-align: center;
+}
+.invisible{
+	visibility: hidden;
+	
+}
+.visible{
+	visibility: visible;
+}
+
+.floatLeft{
+	float: left;  /*http://stackoverflow.com/questions/12557897/how-to-vertically-middle-align-floating-elements-of-unknown-heights*/
+}
+.strip {
+	display:inline-block;
+	vertical-align:middle;
+	padding-right: 200px;
+    /*height:100px;*/
+    background-color:white;
+	overflow: auto; /*makes sure it gets scaled with children with float property */
+
+	/* display: table; /*centers the float elements*/     */
+	margin: 0 auto;
+	width: 700px;
+}
+.tile{
+   width: 100px;
+  /*height: 100px; */
+  background-color:white;
+  float: left;
+ 
+}
+.title{
+	font-family: "Arial", Helvetica, sans-serif;
+	text-align:left;
+	margin: 0px;
+	font-size: 60px;
+	height: 85px;
+	margin-left:20px;
+}
+
+.pane{
+
+}
+
+#textBox{
+	width:100px;
+	/*following code makes sure we set the size for the OUTER limits*/
+	-webkit-box-sizing: border-box; /* Safari, other WebKit */
+   -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+   box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+.preview_pane{
+ /*  width: 100px;
+  height: 100px; */
+  background-color:black;
+  float: left;
+}
+.icon{
+    width: 80px;
+	height: 80px;
+    margin: 10px;
+	border-radius: 5px;
+}
+.tileVisibility{
+	font-family: "Arial", Helvetica, sans-serif;
+	text-align:center;
+	margin: 0px;
+}  
+
+.tileHeading{
+	font-family: "Arial", Helvetica, sans-serif;
+	text-align:center;
+	margin: 0px;
+}  
+
+.tileTemperature{
+	font-family: "Arial", Helvetica, sans-serif;
+	text-align:center;
+	margin: 0px;
+	font-size: 40px;
+}  
+.tileMaxMin{
+	font-family: "Arial", Helvetica, sans-serif;
+	text-align:center;
+	margin: 0px;
+} 
+/* TilesDialogimimimim{ */
+
+.tilesDialog{
+	top: 100px;
+	/* height: 300px; */
+	width: 100%;
+	background-color:black;
+	float: left;
+
+}
+
+
+
+.paneStrip{
+	float:left;
+} 
+
+
+.panes {
+    /*height:100px;*/
+   /* background-color:blue;*/
+}
+
+/* create an arrow that points up   http://davidwalsh.name/css-triangles*/
+div.test {
+	width: 0; 
+	height: 100px; 
+	border-left: 5px solid transparent;  /* left arrow slant */
+	border-right: 5px solid transparent; /* right arrow slant */
+	border-bottom: 5px solid #2f2f2f; /* bottom, add background color here */
+	font-size: 0;
+	line-height: 0;
+}
+
+div.arrow-up_inPane {
+	width: 0; 
+	height: 0; 
+	border-left: 10px solid transparent;  /* left arrow slant */
+	border-right: 10px solid transparent; /* right arrow slant */
+	border-bottom: 10px solid #000000; /* bottom, add background color here */
+	font-size: 0;
+	line-height: 0;
+	/* positioning: */
+	margin-left: 40px; /*width pane - half of width arrow*/
+	background-color: white;
+}

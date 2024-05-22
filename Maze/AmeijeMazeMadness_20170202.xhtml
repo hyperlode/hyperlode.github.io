@@ -1,0 +1,698 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml"><head> 
+  <title>Create SVG Elements HTML</title>
+  <style type="text/css" media="screen">
+    body { background:#eee; margin:0 }
+    svg {
+      display:block; border:1px solid #ccc; position:absolute;
+      top:5%; left:5%; width:90%; height:90%; background:#fff;
+    }
+    .face { stroke:#000; stroke-width:20px; stroke-linecap:round }
+  </style>
+</head>
+  
+  
+  <body>
+  
+  
+		<!--<H1> Ameije's Amazing Mazes Amaiamaiamai</H1> -->
+			<!--<p> YIPIE! It's interactive, HURRAY! It's a game...</p>-->
+		
+  
+  
+  <script src="mazes_5x5.js" >
+  </script>
+  
+  <script src="path-data-polyfill.js"> //added 20170202 because of pathSegList is deprecated.
+  </script>
+  
+  
+  <svg height="100" version="1.1" width="140"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" onload="startup(evt)"  >
+  
+<!-- <text x="10" y="250" 									  -->	
+<!--       font-family="Verdana" font-size="40" fill="black" >-->
+<!--		Ameije's Amazing Mazes Amaiamaiamai               -->
+<!-- </text>                                                  -->
+<!--  <text x="10" y="300"                                    -->
+<!--       font-family="Verdana" font-size="40" fill="black" >-->
+<!--		YIPIE! It's interactive, HURRAY! It's a game...   -->
+<!--  </text>												  -->
+   <!-- <text x="10" y="320"  -->
+        <!-- font-family="Verdana" font-size="18" fill="black" > -->
+		<!-- The "no newline character found" one line rules: - left up = active maze  - right mazes = links to other mazes from the active maze  -->
+  <!-- </text> -->
+     <!-- <text x="10" y="340"  -->
+        <!-- font-family="Verdana" font-size="18" fill="black" > -->
+		<!-- ok ok this is another line: - red maze bottom left = maze you should try to reach  - bottom right mazes = clicked mazes for so far. -->
+		<!--  -->
+  <!-- </text> -->
+  <!-- <text x="10" y="360"  -->
+        <!-- font-family="Verdana" font-size="18" fill="black" > -->
+		<!-- yet another line: - click each time one of the top right mazes to find a path to the red maze. Succes!!! Press browser refresh to restart. -->
+		<!--  -->
+  <!-- </text> -->
+     <text x="10" y="320" font-family="Verdana" font-size="18" fill="black" >
+		<tspan x="0" dy="1.2em">Game rules: </tspan>
+		<tspan x="0" dy="1.2em">Study the top right blue maze demo carefully, do you see how it transforms from one state to another all the time?</tspan> 
+		<tspan x="0" dy="1.2em">The goal of our game is to find the transformation from a given maze (top left) to a goal maze (red maze below the top </tspan> 
+		<tspan x="0" dy="1.2em">left maze) by clicking a sequence of neighbours</tspan>
+		<tspan x="0" dy="1.2em">Top left = active maze  , on its right: links to other mazes from the active maze</tspan>
+		<tspan x="0" dy="1.2em">Red maze bottom left = maze you should try to reach  - bottom right mazes = clicked mazes for so far. </tspan>
+		<tspan x="0" dy="1.2em"> How to play?  </tspan>
+		<tspan x="0" dy="1.2em">  One of the top right mazes to find a path to the red maze. Succes!!! Press browser refresh to restart.</tspan>
+		
+		
+		
+  </text>
+     
+  
+  <!-- <script ><![CDATA[ -->
+  <script><![CDATA[
+	
+	//http://pilat.free.fr/english/routines/js_dom.htm
+	function getElementAttributeStandardDOM(ID,att){
+	  var element = document.getElementById(ID);
+	  return element.getAttribute(att);
+	}
+	
+	function getPathDataSVGDOM(ID){
+	  var path = document.getElementById(ID);
+	  // http://www.w3.org/TR/SVG/paths.html#__svg__SVGAnimatedPathData__normalizedPathSegList
+	  // See also path.pathSegList and path.animatedPathSegList and path.animatedNormalizedPathSegList
+	  var segments = path.pathSegList;
+	  for (var i=0,len=segments.numberOfItems;i<len;++i){
+		var pathSeg = segments.getItem(i);
+		// http://www.w3.org/TR/SVG/paths.html#InterfaceSVGPathSeg
+		switch(pathSeg.pathSegType){
+		  case SVGPathSeg.PATHSEG_MOVETO_ABS:
+			// http://www.w3.org/TR/SVG/paths.html#InterfaceSVGPathSegMovetoAbs
+			console.log("Move to",pathSeg.x,pathSeg.y);
+		  break;
+		  case SVGPathSeg.PATHSEG_LINETO_ABS:
+			// http://www.w3.org/TR/SVG/paths.html#InterfaceSVGPathSegLinetoAbs
+			console.log("Line to",pathSeg.x,pathSeg.y);
+		  break;
+		  case SVGPathSeg.PATHSEG_CLOSEPATH:
+			// http://www.w3.org/TR/SVG/paths.html#InterfaceSVGPathSegClosePath
+			console.log("Close Path");
+		  break;
+		}
+	  }
+	}
+	
+	function createSvgElement( root, name, attrs ){
+	  //createSvgElement( svg, 'path', {fill:"none", "class":"face",  transform:"translate(50 ,0)", d:"M200.41,100.411 c-15.07,36.137-50.735, 61.537-92.333,61.537     c-41.421,0-76.961-25.185-92.142-61.076"});
+      //createSvgElement( svg, 'circle', { cx:60, cy:50, 	 r:20, fill:'#060' });
+	  
+	  /*these vars are already defined globally...
+	  //var svg  = document.getElementsByTagName('svg')[0];
+	  var svgNS = svg.getAttribute('xmlns');
+	  */
+	  var el = document.createElementNS(svgNS,name);
+      for (var attr in attrs){
+        if (attrs.hasOwnProperty(attr)) el.setAttribute(attr,attrs[attr]);
+      }
+      return root.appendChild(el);
+    }
+	
+	function createSvgElementSvgDom(root,name,attrs,text){
+      var doc = root.ownerDocument, svg = root;
+      while (svg.tagName!='svg') svg = svg.parentNode;
+      var el = doc.createElementNS(svg.namespaceURI,name);
+	  
+      for (var a in attrs){
+        if (!attrs.hasOwnProperty(a)) continue;
+        var p = a.split(':');
+		//console.log(p);
+		//console.log(attrs);
+		
+        if (p[1]) el.setAttributeNS(svg.getAttribute('xmlns:'+p[0]),p[1],attrs[a]);
+        else el.setAttribute(a,attrs[a]);
+      }
+      if (text) el.appendChild(doc.createTextNode(text));
+      return root.appendChild(el);
+    }
+
+	function defaultValue(arg, defaultVal){
+		//checks if a variable is set (when given as an argument to a function), if not: set default value
+		if (typeof(arg) == 'undefined') arg = defaultVal;
+		return arg;
+	}
+	
+	function mazeStringToSvgPath(svg, name, mazeString, xScale, yScale, xOffset, yOffset,  colour, lineWidth, fill, onclick){
+		var yOffset = defaultValue(yOffset,0);
+		var xOffset = defaultValue(xOffset,0);
+		var colour = defaultValue(colour,"black");
+		var lineWidth = defaultValue(lineWidth,xScale/2);
+		var fill = defaultValue(fill,"none");
+		var offset = "translate("+ xOffset + ","  + yOffset + ")";
+		var d = getSVGPathFromMazeName(mazeString, xScale, yScale);
+		//console.log(d);
+		var onclick = defaultValue(onclick,"NONE");
+		
+		//console.log(d);
+		
+		//console.log(colour);
+		//console.log(lineWidth);
+		//console.log(fill);
+		//console.log("-----");
+		
+		var atts = new Array();
+		atts['id'] = name;
+		atts['fill'] = fill;
+		atts['transform'] = offset;
+		atts['stroke'] = colour;
+		atts['stroke-width'] = lineWidth;
+		atts['d'] = d;
+		if (onclick != "NONE"){
+			atts['onclick'] = onclick;
+		}
+		//console.log(atts['onclick']);
+		atts['maze'] = mazeString;
+		
+		//{'id': name, 'fill':fill,   'transform':offset, 'stroke':colour, 'stroke-width':lineWidth,	'd':d}
+		createSvgElementSvgDom( svg, 'path', atts); //
+	}
+	
+	function animateCircle(){
+		x += incr*dir;
+		if ((x<xlow+incr)||(x>xhigh+incr))dir=-dir;
+		console.log(x);
+		var el = document.getElementById("C1");
+		var data = el.getAttribute('id');
+		el.setAttribute('cx', x);
+		window.setTimeout("animateCircle()",500); //when creating a loop, it is important that the setTimeout is included in the called function in setTimeout
+	}
+	
+	function printPathData(path){
+		var segments = path.pathSegList;
+		for (var i=0,len=segments.numberOfItems;i<len;++i){
+			var pathSeg = segments.getItem(i);
+			console.log(pathSeg.x                  ) ; // i.e. 30
+			console.log(pathSeg.y                  ) ; // i.e. 40
+			console.log(pathSeg.pathSegType        ) ; // i.e. 3
+			console.log(pathSeg.pathSegTypeAsLetter) ; // i.e. L
+		}	
+	}
+	
+	function changePathMazeById(pathId, mazeString){
+		path = getElementById(pathId);
+		changePathMaze(path, mazeString);
+		
+	}
+	function changePathMaze(path, mazeString){
+		var coords = getPathcoordsScaledFromMazeString(mazeString, xScale, yScale);
+		changePathCoords(path, coords);
+		
+	}
+	function changePathCoords(path, coords){
+		//changes path d element in place. connects last coord to start.
+		
+		//http://www.geocities.ws/kcleung88/dom/interfaces/svg.html
+		//SVGPathSegList --> all possible methods for segList.... clear, appendItem,.....
+		//console.log("fleijflefllll");
+		//console.log(path);
+		//console.log(coords);
+		//get segments from path
+		//var segments = path.getPathData();
+		
+		var i=0;
+		
+		//console.log("segs:");
+		
+		//console.log(coords);
+		//run over segments.
+		var segBuilder = [];
+		
+		for (var i=0;i<coords.length;i++){
+			var seg={};
+			if (i==0){
+				seg.type = "M";
+			}else{
+				seg.type = "L";
+			}
+			seg.values = [Math.round(coords[i][0]), Math.round(coords[i][1])];
+			segBuilder.push(seg);
+		}
+		segBuilder.push({type:"Z"});
+		path.setPathData(segBuilder);
+		/*
+		
+		var segs = path.getPathData();
+		console.log(segs);
+		for (let seg of segs) {
+			//console.log(seg.type);
+			//console.log(seg.values);
+			if (seg.type != "Z"){
+				console.log(typeof seg);
+				seg.values[0]= Math.round(coords[i][0]);
+				seg.values[1]= Math.round(coords[i][1]);
+			}
+			i++;
+			
+		}
+		path.setPathData(segs);
+		//console.log(segs);
+		/**/
+	//console.log(segments);
+		/*OLD SCHOOL, deprecated 20170202
+		//get segments from path
+		//var segments = path.pathSegList; //deprecated (http://stackoverflow.com/questions/34352624/alternative-for-deprecated-svg-pathseglist)
+		//delete all segments
+		//segments.clear();
+		//build up path
+		for (var i = 0; i< coords.length;i++){
+			if (i == 0){
+				var seg = path.createSVGPathSegMovetoAbs(Math.round(coords[i][0]), Math.round(coords[i][1]));
+			}
+			//else if (i == coords.length-1){
+			//	var seg = path.createSVGPathSegClosePath();
+			//}
+			else{
+				var seg = path.createSVGPathSegLinetoAbs(Math.round(coords[i][0]), Math.round(coords[i][1]));
+			}
+			segments.appendItem(seg);
+		}
+		//close path
+		segments.appendItem(path.createSVGPathSegClosePath());
+		*/
+		
+		/*
+		var segments = path.pathSegList;
+		for (var i=0;i<segments.numberOfItems -1 ;++i){
+			item = segments.getItem(i);
+			item.x  = coords[i][0];
+			item.y  = coords[i][1];
+		}
+		/**/
+	}
+	
+	function animatePathChange(){
+		//set running on click (see startup)
+		//(without moving animation) change path
+		if (!running) return;
+		
+		for (var row = 0; row< mazesRows; row++){
+			for (var col = 0; col< mazesCols; col++){
+				var path = document.getElementById("M"+row+col);
+				coords = getRandomMazeCoordsScaled(xScale, yScale);
+				changePathCoords(path, coords);
+			}
+		}
+		window.setTimeout("animatePathChange()",1000);//when creating a loop, it is important that the setTimeout is included in the called function in setTimeout
+	}
+	
+	function startup(evt) {
+		//O=evt.target;
+		//O.setAttribute("onclick","running=!running;animatePathChange()");
+	}
+	
+	function onClickEvent(evt){
+		//test function
+		var element = evt.target;
+		var name = element.getAttribute("maze");
+		console.log(name);
+		var property = element.getAttribute("stroke");
+		if (property == "blue"){ 
+			newProp = "black";
+		}
+		else{
+			newProp = "blue";
+		}
+		element.setAttribute("stroke", newProp);
+		
+		console.log("clicked");
+	}	
+	
+	function removeElementById(name){
+		el = document.getElementById(name);
+		//console.log(el); //(prints the svg element as string)
+		removeElement(el);
+	}
+	
+	function getElementById(ID){
+	//http://www.carto.net/svg/manipulating_svg_with_dom_ecmascript/
+		return document.getElementById(ID);
+	}
+	
+	function removeElement(element) {
+		//http://www.carto.net/svg/manipulating_svg_with_dom_ecmascript/
+		//var element = evt.target;
+		element.parentNode.removeChild(element);
+	}
+	
+	function animatePathMove(path,coords, animateSteps, changeCoordsSteps, step, totalTimeStep){
+		for (var coord in coords){
+			coords[coord][0] +=  changeCoordsSteps[coord][0];
+			coords[coord][1] +=  changeCoordsSteps[coord][1];
+		}
+		step++;
+		
+		changePathCoords(path, coords);
+		
+		//console.log(totalTimeStep/animateSteps *1.0);
+		//console.log(totalTimeStep);
+		
+		if (step< animateSteps ){
+			//////window.setTimeout(animatePathMove,1000,[path, coords, animateSteps, changeCoordsSteps, step]);//when creating a loop, it is important that the setTimeout is included in the called function in setTimeout
+			/////window.setTimeout("animatePathMove("+path+"," +coords+", "+animateSteps+"," +changeCoordsSteps+"," +step+	")",2000);//when creating a loop, it is important that the setTimeout is included in the called function in setTimeout
+			//todo uncommentlode 20170204//
+			window.setTimeout(function(){animatePathMove(path, coords, animateSteps, changeCoordsSteps, step,totalTimeStep)}, totalTimeStep/animateSteps *1.0);
+		}
+	}
+	
+	function infinitePathLoop(path, mazeStringCurrent, xScale, yScale, steps, milliSecondsPerMaze){
+		
+		var nextMazeString = getRandomLinkFromMazeName(mazeStringCurrent);
+		
+		//lode tmp:
+		var links = getMazeLinkNamesFromMazeName(mazeStringCurrent)
+		//for (let i of links){
+		//	console.log(i);
+		//}
+		//nextMazeString = links[2]; //working
+		//nextMazeString = links[1]; //malfunctioning
+		
+		
+		//console.log("****");	
+		//console.log(path.getAttribute("id"));
+		//console.log(mazeStringCurrent);		
+		//
+		//console.log(nextMazeString);		
+		//console.log("startMaze = \"" + mazeStringCurrent +"\" ");
+		//console.log("endMaze =   \"" + nextMazeString +"\"");
+		
+		
+		var animatePath  = getTransformationsFromMazeNames(mazeStringCurrent,nextMazeString,xScale, yScale, steps);
+		//console.log("path length= " + animatePath[0].length);
+		//for (let i=0;i<animatePath[0].length;i++){
+		//	console.log( ""+i+": " + animatePath[0][i] +"  " + animatePath[1][i]);
+		//}
+		animatePathMove(path,animatePath[0],steps,animatePath[1],0, milliSecondsPerMaze );
+		
+		//tmplode todo uncomment
+		window.setTimeout(function(){infinitePathLoop(path, nextMazeString, xScale, yScale, steps,milliSecondsPerMaze)}, milliSecondsPerMaze);
+		
+	}
+	
+	function changePathIdOneStep(pathId, endMaze, xScale, yScale, milliSecondsTransformTime){
+		//change a path defined by its ID one step (if no animation of the stepmove is wanted, set milliSecondsTransformTime to zero
+		var path = getElementById(pathId);
+		changePathOneStep(path, endMaze, xScale, yScale, milliSecondsTransformTime);
+	}
+	
+	function changePathOneStep(path, endMaze, xScale, yScale, milliSecondsTransformTime){
+		//your start to change a path one step (if no animation of the stepmove is wanted, set milliSecondsTransformTime to zero
+		
+		var startMaze = path.getAttribute("maze");
+		
+		var stepsPerSecond = 40;
+		var steps = Math.floor(stepsPerSecond * milliSecondsTransformTime / 1000);
+		
+		if (endMaze != startMaze){
+			if (steps == 0) {
+				//change right away!
+				changePathMaze(path, endMaze);
+				//var coords = getPathcoordsScaledFromMazeString(endMaze, xScale, yScale);
+				//changePathCoords(path, coords);
+				
+			}else{
+				var animationData = getTransformationsFromMazeNames(startMaze, endMaze, xScale, yScale, steps);
+				animatePathMove(path, animationData[0], steps, animationData[1], 0, milliSecondsTransformTime);
+			}
+		}
+		path.setAttribute("maze", endMaze);
+	}
+	
+	
+	
+	//---------------------game functions---------------------
+	function mazeClicked(evt){
+		var pathElement = evt.target;
+		var clickedName = pathElement.getAttribute("maze");
+		
+		
+		var rootPath = getElementById("root");
+		var rootPathName = rootPath.getAttribute("maze");
+	
+		//animate root to link
+		//animationData = getTransformationsFromMazeNames(rootPathName, clickedName, xScale, yScale, 10);
+		//animatePathMove(rootPath, animationData[0], 10, animationData[1], 0, 1000);
+		
+		
+		//remove other mazes
+		var newRoot;
+		for (var i = 0; i< links.length; i++){
+			if (links[i] != clickedName){
+				removeElementById("link"+i);
+			}else{
+				newRoot = links[i];
+				
+				newRootPreviousLinkId = "link" + i;
+				//removeElementById("link"+i);
+			}
+		}
+		
+		changePathOneStep(rootPath, clickedName, xScale,yScale,500);
+		window.setTimeout(function(){mazeClickedDelayed(newRoot, newRootPreviousLinkId)},500);
+	
+	}	
+	
+	function mazeClickedDelayed(newRoot, newRootPreviousLinkId){	
+		
+		//remove last link path
+		removeElementById(newRootPreviousLinkId);
+		
+		//replace root by link
+		removeElementById("root");
+		
+		//add new maze to list 
+		steps.push(newRoot);
+	
+		displayActiveMazeWithLinks(newRoot);	
+		
+		updateSteps();
+		
+	}
+
+	function displayActiveMazeWithLinks(root){
+		//root = mazename ("1010101010....")
+		
+		links = getMazeLinkNamesFromMazeName(root); //links is a global variable that we are changing here!!!
+		mazeStringToSvgPath(svg, "root" ,root , xScale, yScale, 0, 0, "black", width, "white");
+		
+		
+		for (var row=0; row < links.length; row++){
+			//mazeStringToSvgPath(svg, "link" + row ,links[row] , xScale, yScale, 7 * (row+2) * xScale, 0 , "black", width, "white","mazeClicked(evt)"); //
+			mazeStringToSvgPath(svg, "link" + row ,root , xScale, yScale, 7 * (row+2) * xScale, 0 , "black", width, "white","mazeClicked(evt)"); //
+			changePathIdOneStep("link" + row, links[row], xScale,yScale,1000);
+			
+		}
+		return links;
+	}
+	
+	function updateSteps(){
+	//bar with steps taken.
+		//console.log(steps);
+		for (var i=0; i < steps.length; i++){
+			el = getElementById("step" + i);
+			if (el == null){ //if not yet existing add 
+				mazeStringToSvgPath(svg, "step" + i ,steps[i] , xScale, yScale, 7 * (i+2) * xScale, 7 * 1 * yScale , "black", width, "white"); //
+			}
+			if (steps[i] == goalMaze){
+				console.log("You win!!!")
+				el = getElementById("step" + i);
+				el.setAttribute("stroke","red");
+			}
+			//console.log(el);
+		}
+	}
+	
+	function animateLoopMazes(pathId, mazes, index, transformationTimeMilliSecs,backAndForth){
+		
+		index += 1;
+		
+		if (index >= mazes.length) { 
+			index = 0;
+			//changePathMazeById(pathId, mazes[0]);
+			//console.log("zero" + index + mazes[index]);
+			changePathIdOneStep(pathId, mazes[0], xScale, yScale, 0);
+			
+			//changePathIdOneStep(pathId, mazes[0], xScale,yScale,transformationTimeMilliSecs);
+			window.setTimeout(function(){animateLoopMazes(pathId, mazes, index, transformationTimeMilliSecs)},transformationTimeMilliSecs * 2);
+		
+		}
+		else{
+			//changePathIdOneStep(pathId, mazes[index], xScale,yScale,0);
+			//console.log(mazes[index]);	
+			changePathIdOneStep(pathId, mazes[index], xScale,yScale,transformationTimeMilliSecs);
+			window.setTimeout(function(){animateLoopMazes(pathId, mazes, index, transformationTimeMilliSecs)},transformationTimeMilliSecs);
+		
+		}
+		
+	
+	}
+	
+	//-----------------------------end functions----------------------------------------------------------
+	var svg  = document.getElementsByTagName('svg')[0];
+	var svgNS = svg.getAttribute('xmlns');
+    console.log(svgNS);
+	console.log ("lode test");
+	var running = true;
+	var mazesRows = 3;
+	var mazesCols = 5;
+	var xScale = 12;
+	var yScale = 12;
+	
+	var colours= [ "blue", "yellow","black"];
+	var colour = colours[2];
+	var width = xScale *1.0/2	;
+	//var width = 2	;
+	//createSvgElement( svg, 'circle', { id:"hoi", cx:60, cy:50, r:20, fill:'#060' });
+	//createSvgElement( svg, 'text', { id:"hoi", cx:60, cy:50, r:20, fill:'#060' });
+
+	
+	/*
+	//lots of paths... changing over time
+	for (var row = 0; row< mazesRows; row++){
+		for (var col = 0; col< mazesCols; col++){
+			for (var k = 0; k < 1; k++){
+				var mazeName = getRandomMazeName();
+				//console.log(mazeName);
+				mazeStringToSvgPath(svg, "M" + row + col ,mazeName , xScale, yScale, 6*xScale*col, 6*yScale*row, "black", width, "white");
+				
+			}
+		}
+	}
+	//working animation of paths
+	animatePathChange();
+	/**/
+	
+	/*superloop*/
+	
+	//startMaze = "1111100100111110010011111";
+	//startMaze = "1110100101111111000110111";
+	startMaze = getRandomMazeName();
+	mazeStringToSvgPath(svg, "changer" ,startMaze , xScale, yScale, 7 * (12) * xScale, 6 * 0 * yScale , "blue", width, "white"); 
+	var path = getElementById("changer");
+	infinitePathLoop(path, startMaze, xScale, yScale, 10, 1000);
+	
+	//tweedemaze ="1010111111010001111110101";
+	//mazeStringToSvgPath(svg, "changer2" ,tweedemaze , xScale, yScale, 6 * (1) * xScale, 6 * 0 * yScale , "black", width,"black"); 
+	//var path2 = getElementById("changer2");
+	//infinitePathLoop(path2, startMaze, xScale, yScale, 10, 1000);
+	//
+	//startMaze = "1111100100111110010011111";
+	//mazeStringToSvgPath(svg, "changer3" ,startMaze , xScale, yScale, 6 * (2) * xScale, 6 * 0 * yScale , "black", width,"white"); 
+	//var path = getElementById("changer3");
+	//infinitePathLoop(path, startMaze, xScale, yScale, 10, 1000);
+	//
+	//tweedemaze ="1010111111010001111110101";
+	//mazeStringToSvgPath(svg, "changer4" ,tweedemaze , xScale, yScale, 6 * (3) * xScale, 6 * 0 * yScale , "black", width,"white"); 
+	//var path2 = getElementById("changer4");
+	//infinitePathLoop(path2, startMaze, xScale, yScale, 10, 1000);
+	/**/
+	
+	
+	/* maze corner transformation
+	var animateSteps = 20;
+	
+
+	////unsolved ones:
+	
+	//endMaze = "1110100101101111110010111" 
+	//startMaze=   "1010110101101111110010111"
+	
+	endMaze = "1101110001101111001011111" ;
+	startMaze =   "1011110001101111001011111";
+    
+	endMaze = 		"1101110001111111010110101" ;
+	startMaze =   	"1110110001111111010110101";
+   
+	mazeStringToSvgPath(svg, "beta" ,startMaze , xScale, yScale, 7 * (0) * xScale, 7 * 0 * yScale , "red", width, "white"); 
+	mazeStringToSvgPath(svg, "start" ,startMaze , xScale, yScale, 7 * (0) * xScale, 7 * 1 * yScale , "red", width, "white"); 
+	mazeStringToSvgPath(svg, "end" ,endMaze , xScale, yScale, 7 * (1) * xScale, 7 * 1 * yScale , "red", width, "white"); 
+	path = getElementById("start");
+	
+	var animatePath  = getTransformationsFromMazeNames(startMaze,endMaze,xScale, yScale, animateSteps);
+	//console.log(animatePath);
+	//for (var j = 0; j< animatePath[0].length; j++){
+	//
+	//	console.log(animatePath[0][j]);
+	//	console.log("step" + animatePath[1][j]);
+	//}
+	animatePathMove(path,animatePath[0],animateSteps,animatePath[1],0, 500);
+	
+	
+	/* transformation test
+	startMaze = "1111101000111111000011111";
+	endMaze   = "1111100100111111000011111";
+	startMaze="1111110010101111000111101";
+	endMaze="1111110010101111000111011";
+	mazeStringToSvgPath(svg, "start" ,startMaze , xScale, yScale, 7 * (1) * xScale, 7 * 1 * yScale , "red", width, "white"); 
+	mazeStringToSvgPath(svg, "end" ,endMaze , xScale, yScale, 7 * (2) * xScale, 7 * 1 * yScale , "red", width, "white"); 
+	
+	var animateSteps = 10;
+	var path = getElementById("start");
+	console.log(path.getAttribute("d"));
+	var animatePath  = getTransformationsFromMazeNames(startMaze,endMaze,xScale, yScale, animateSteps);
+	
+	animatePathMove(path,animatePath[0],animateSteps,animatePath[1],0,1000);
+	console.log(path.getAttribute("d"));
+	
+	mazeStringToSvgPath(svg, "startPos" ,startMaze , xScale, yScale, 7 * (0) * xScale, 7 * 1 * yScale , "red", width, "white"); 
+	
+	
+	/**/
+	
+	/* 20170204 lode uncomment*/
+	// The game, set up:
+	var root = getRandomMazeName();
+	//var root = "1110100101111111010010111"
+	
+	
+	var links = displayActiveMazeWithLinks(root);
+	var steps = new Array();
+	var goalMaze = getRandomMazeName();
+	
+	mazeStringToSvgPath(svg, "goalMaze" ,goalMaze , xScale, yScale, 7 * (0) * xScale, 7 * 1 * yScale , "red", width, "white"); 
+	
+	steps.push(root);
+	
+	
+	mazeStringToSvgPath(svg, "stepsLoop" ,root , xScale, yScale, 7 * (0) * xScale, 7 * 2 * yScale , "red", width, "white"); 
+	animateLoopMazes("stepsLoop", steps, 0, 1000);
+	
+	//mazeStringToSvgPath(svg, "stepsLoop2" ,root , xScale, yScale, 7 * (0) * xScale, 7 * 3 * yScale , "red", width, "white"); 
+	//animateLoopMazes("stepsLoop2", steps, 0, 0);
+	
+	updateSteps();
+	
+	/**/
+	
+	/*
+	//path timed
+	i = 2;
+	setTimeout(	function() {
+		mazeStringToSvgPath( svg,  name =  "lode", pathB , xScale, yScale, 6*xScale*i,0 *yScale*i 	);//"class":"face",
+	
+		//( svg, 'path', {id: "lode", fill:"none",   transform:"translate(100 ,0)", stroke:"blue", 'stroke-width':yScale/2,d:pathString});//"class":"face",
+	}, 1000);
+	*/
+	
+	/* animation test, moving circle
+	createSvgElementSvgDom( svg, 'circle', { id:"C1", cx:60, cy:50, r:20, fill:'#066' });
+	var incr = 3;
+	var xlow = 20;
+	var xhigh = 200;
+	var dir = 1;
+	var x;
+	x = Math.floor((xlow + xhigh)/2);
+	console.log(x);
+	animateCircle();
+	/**/
+	
+  ]]></script>
+  </svg>
+
+</body></html>

@@ -1,0 +1,86 @@
+
+.main {
+	background-color : red;
+	width : 100%;
+	font-family: Verdana;
+	
+}
+.header {
+	position: relative;
+	margin-left: auto;
+    margin-right: auto;
+}
+
+.title {
+	
+}
+
+.opening {
+	
+}
+
+.centered{
+	background-color: white;
+	position:absolute;
+	text-align:center;
+	top:0px;
+	left:15%;
+	width:70%;
+	/*height:1000px;*/
+}
+
+.li_DONE,  .li_TODO{
+	/*float:left;*/
+	margin-bottom:1em;
+	text-align:left;
+}
+
+
+.header img{
+	display:block;
+	left:20%;
+	top:0px;
+	
+	width:60%;
+   
+	position: absolute;
+}
+.content {
+	text-align:left;
+
+}
+
+.content H1, H2{
+	text-align: center;
+}
+
+.content img{
+	display:block;
+	margin-left:auto;
+	margin-right:auto;
+	height:60%;
+	width:60%;
+   
+	position: absolute;
+
+}
+.li_p{
+	text-align:left;
+	margin-left:2em;
+}
+.content ul li{
+	
+	list-style:none;
+}
+.content ul{
+	margin-bottom: 4em;
+}
+
+.content img{ /*only for checkbox*/
+	float:left;
+	height: 1.2em;
+    margin-right: 0.6em;
+    width: 1.2em;
+	margin-top: 0.1em;
+}
+

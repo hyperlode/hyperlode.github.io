@@ -1,0 +1,15 @@
+	<html>
+<body>
+	<!-- http://www.w3schools.com/php/php_file_upload.asp -->
+	
+	<p> Only png images with a smaller than 40kb are accepted. After uploading the images will be added to the icons to chose from. </p>
+	<a href= "index.html" > To the forecast home page </a>
+	
+	<form action="upload_file.php" method="post"
+		enctype="multipart/form-data">
+		<label for="file">Filename:</label>
+		<input type="file" name="file" id="file">
+		<input type="submit" name="submit" value="Submit">
+	</form>
+	</html>
+</body>

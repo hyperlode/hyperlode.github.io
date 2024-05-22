@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<title>sevenSeg</title>
+		 <link rel='stylesheet' type='text/css' href='style.css'/>
+<!-- 		
+		<link href="http://fonts.googleapis.com/css?family=Iceberg" rel="stylesheet">
+		<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/ui-darkness/jquery-ui.css" rel="stylesheet">   
+		<link href="prettify.css" rel="stylesheet"> -->
+		
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+		<!-- <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script> -->
+		<!-- <script src="sevenSeg.js"></script> -->
+				
+	  
+ 		<!-- <script type='text/javascript' src="sevenSeg.js"></script> -->
+		<script type='text/javascript' src="sevSegClickable.js"></script>
+		<script type='text/javascript' src="saveSvgAsPng.js"></script>
+		<script type='text/javascript' src="svgOperations.js"></script>
+		<script type='text/javascript' src="domFunctions.js"></script>
+		<script type='text/javascript' src="fifteenSeg.js"></script>
+		<script type='text/javascript' src="sevSeg.js"></script>
+		<script type='text/javascript' src="circle.js"></script>
+		<!-- <script type='text/javascript' src="sevSegBare.js"></script> -->
+		
+		
+		  <!-- Bootstrap core CSS -->
+		<link href="/bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+		<!-- Bootstrap theme -->
+		<link href="/bootstrap-3.3.2-dist/css/bootstrap-theme.min.css" rel="stylesheet">
+
+		<!-- Custom styles for this template -->
+		<link href="theme.css" rel="stylesheet">
+
+		<!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+		<!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+		<script src="../../assets/js/ie-emulation-modes-warning.js"></script>
+
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!--[if lt IE 9]>
+		  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+		
+		<!-- Bootstrap special select -->
+		<script src="/silviomoreto-bootstrap-select-83d5a1b/js/bootstrap-select.js"></script>
+		<script src="/silviomoreto-bootstrap-select-83d5a1b/dist/js/bootstrap-select.min.css"></script>
+		<link href="/silviomoreto-bootstrap-select-83d5a1b/dist/css/bootstrap-select.min.css" rel="stylesheet">
+			
+		
+	</head>
+<body>
+	<p>http://silviomoreto.github.io/bootstrap-select/</p>
+
+
+<!-- <p>Kind of shape:</p> -->
+	<select class="selectpicker" id="shapeModeBootstrap">
+	  <option value="circle">Circle</option>
+	  <option value = "sevSeg">7 Segment digits</option>
+	  <option value="fifteenSeg">15 Segment digits</option>
+	</select>
+
+	<!-- <div id="shapeModeDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"> -->
+		<!-- <p>Kind of shape:</p> -->
+		<!-- <input type="radio" id="shapeModeCircle" name="shapeMode" value="circle"  /> -->
+		<!-- <label for="shapeModeCircle">Circle</label> -->
+		<!-- <input type="radio" id="shapeModeSevSeg" name="shapeMode"  value="sevSeg" checked="checked"/> -->
+		<!-- <label for="shapeModeSevSeg">7 Segment digits</label> -->
+		<!-- <input type="radio" id="shapeModeFifteenSeg" name="shapeMode"  value="fifteenSeg"/> -->
+		<!-- <label for="shapeModeFifteenSeg">15 Segment digits</label> -->
+	<!-- </div> -->
+	
+	<!-- <div id="controls"> -->
+	<!--  -->
+		<!-- <div id="mouseOverMode"> -->
+		<!-- <p>Change digits on:</p> -->
+		<!-- <input type="radio" id="segmentToggleByHover" name="segmentToggleTrigger" value="hover" checked="checked" /> -->
+		<!-- <label for="segmentToggleByHover">Hover</label> -->
+		<!-- <input type="radio" id="segmentToggleByClick" name="segmentToggleTrigger" value="click" /> -->
+		<!-- <label for="segmentToggleByClick">Click</label> -->
+	<!-- </div> -->
+	<p>Change digits on:</p>
+	<select class="selectpicker" id="segmentToggleTriggerBootstrap">
+	  <option value="hover" > Hover</option>
+	  <option value = "click">Click</option>
+	</select>
+	
+
+	
+	
+	<!-- <div id="digitsToChangeMode"> -->
+		<!-- <p>Which digits will change:</p> -->
+		<!-- <input type="radio" id="digitChangeSingle" name="digitChangeMode" value="single" checked="checked" /> -->
+		<!-- <label for="digitChangeSingle">Single</label> -->
+		<!-- <input type="radio" id="digitChangeRow" name="digitChangeMode" value="row"  /> -->
+		<!-- <label for="digitChangeRow">Row</label> -->
+		<!-- <input type="radio" id="digitChangeColumn" name="digitChangeMode" value="column"  /> -->
+		<!-- <label for="digitChangeColumn">Column</label> -->
+		<!-- <input type="radio" id="digitChangeCross" name="digitChangeMode" value="cross"  /> -->
+		<!-- <label for="digitChangeCross">RowAndColumn</label> -->
+		<!-- <input type="radio" id="digitChangeAll" name="digitChangeMode" value="all" /> -->
+		<!-- <label for="digitChangeAll">All</label> -->
+	<!-- </div> -->
+	<p>Which digits will change:</p>
+	<select class="selectpicker" id="digitChangeModeBootstrap">
+	  <option value = "single">Single</option>
+	  <option value = "row">Row</option>
+	  <option value = "column">Column</option>
+	  <option value="cross" >RowAndColumn</option>
+	  <option value = "all" >All</option>
+	</select>
+
+	
+	
+	<!-- <div id="changeMode"> -->
+	<!-- <p>Type Of Change:</p> -->
+	<!-- <input type="radio" id="segmentChangeModeOn" name="segmentChangeMode" value="on" /> -->
+	<!-- <label for="segmentChangeModeOn">On</label> -->
+	<!-- <input type="radio" id="segmentChangeModeOff" name="segmentChangeMode" value="off" /> -->
+	<!-- <label for="segmentChangeModeOff">Off</label> -->
+	<!-- <input type="radio" id="segmentChangeModeToggle" name="segmentChangeMode" value="toggle" checked="checked"/> -->
+	<!-- <label for="segmentChangeModeToggle">Toggle</label> -->
+	<!-- </div> -->
+	<p>Type Of Change:</p>
+	<select class="selectpicker" id="segmentChangeModeBootstrap">
+	  <option value = "on">On</option>
+	  <option value = "off">Off</option>
+	  <option value = "toggle">Toggle</option>
+	</select>
+
+	
+	
+	
+	<div id="saveAsPng">
+		<input id="buttonSaveAsPng" type="button" value="saveAsPng" onclick="saveAsPng();" />
+	</div>
+	<div id="reset">
+		<!-- <input id="" type="button" value="" onclick=";" /> -->
+		<input id="allSegmentsOff" type="button" value="All Off" onclick="digit_changeAll_AllSegments(false);" />
+		<input id="allSegmentsOn" type="button" value="All On" onclick="digit_changeAll_AllSegments(true);" />
+		<input id="allDecPointsOff" type="button" value="All Dec Off" onclick="digit_changeAll_SingleSegment('P',false);" />
+		<input id="allDecPointsOn" type="button" value="All Dec On" onclick="digit_changeAll_SingleSegment('P',true);" />
+	</div>
+	
+	<div id="fieldSettings">
+		<input name="rows" type="text" maxlength="512" id="input_field_rows" />lines
+		<input name="colums" type="text" maxlength="512" id="input_field_columns" />digits per line
+		<input id="updateFieldSize" type="button" value="update" onclick="digits_redefineQuantity();" />
+	</div>
+		<div id="importExport">
+			<textarea cols="40" rows="5" name="imageAsTxt" id="textArea_imageAsText">
+				
+			</textarea>
+			<input id="stringToText" type="button" value="from text" onclick="importString();" />
+			<input id="textToImage" type="button" value="import" onclick="importImage();" />
+			<input id="imageToText" type="button" value="export" onclick="exportImage();" />
+			
+		</div>
+	
+	</div>
+	
+
+	<div id="drawing">
+	</div>
+	
+	<!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="/bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+    <script src="/bootstrap-3.3.2-dist/js/docs.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="/bootstrap-3.3.2-dist/assets/js/ie10-viewport-bug-workaround.js"></script>
+	
+</body>
+</html>

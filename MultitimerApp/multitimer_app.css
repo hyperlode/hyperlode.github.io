@@ -1,0 +1,24 @@
+
+//#timerfield,#multitimer{
+//	border:1px solid black;
+//	padding: 10px;
+//	margin: 10px;
+//}
+
+ #global_TimeSetting,#multitimer_parameters,#global_addTimer{
+padding-left: 30px;
+padding-top: 15px;
+padding-bottom: 15px;
+
+}
+.row-centered{
+	text-align:center;
+
+}
+
+.timer,  #global_buttons, #global_start, #global_endTimeField, #activeTimer{
+	padding: 15px;
+	//border: 1px solid black;
+	margin: 5px;
+	
+}
