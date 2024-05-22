@@ -1,0 +1,261 @@
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Quoridor Rules</title>
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<link rel="stylesheet" href="quoridor_rules.css">
+		
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+	</head>
+	<body>
+		<!-- <div class="container" id="quoridor rules"> -->
+		
+	
+	
+		<!-- NOTATION  --------------------------------------------------------------  --> 
+	
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-6 col-xs-12">
+				<h1>
+					Quoridor Notation
+				</h1>
+				<p> An easy and novel way to record and replay Quoridor games.</p>
+				<!-- <div class="alert alert-info"> -->
+				  <!-- <strong> Five minutes to learn, a lifetime to master.</strong> -->
+				<!-- </div> -->
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-6 col-xs-12">
+				<h2>
+					Layout
+				</h2>
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+					Similar to chess notation, there is a column for each player. 
+					A each row contains a turn for each player.
+					A turn is a wall placement or a pawn move. 
+					
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				<img src="images/notation list.png" class="img-fluid" alt="Jump allowed">
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-6 col-xs-12">
+				<h2>
+					Wall placement 
+				</h2>
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+					All lines on the board are numbered. The first character is the line on which the wall will be placed. The second character is line crossing the wall at the midpoint. It's unambiguous and easy! 
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				<img src="images/notation wall north south annotated.png" class="img-fluid" alt="Jump allowed">
+				<img src="images/notation wall east west annotated.png" class="img-fluid" alt="Jump allowed" >
+				
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-6 col-xs-12">
+				<h2>
+					Pawn movement
+				</h2>
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+					Use compass direction for pawn movement.<br>
+					N is North, E is East, S is South and W is West. <br> 
+					Directions are always notated in capitals. <br>Optionally, the crossed lines are indicated for easy of reading. 
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				<img src="images/notation compass rose.png" class="img-fluid" alt="Jump allowed">
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-6 col-xs-12">
+				<h2>
+					Pawn straight move
+				</h2>
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+					The direction of movement is the notation.<br>Optionally, the jumped line can be added for clarity.
+					<br>Direction in capitals, jumped line in lower case.
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				<img src="images/notation pawn ortho simple.png" class="img-fluid" alt="Jump allowed">
+				<img src="images/notation pawn ortho.png" class="img-fluid" alt="Jump allowed">
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-6 col-xs-12">
+				<h2>
+					Pawn straight jump
+				</h2>
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+					A jump is indicated by the repetition of the direction. <br>Both of the jumped lines can be added, in sequence of crossing.
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				<img src="images/notation pawn ortho jump simple.png" class="img-fluid" alt="Jump allowed">
+				<img src="images/notation pawn ortho jump.png" class="img-fluid" alt="Jump allowed">
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-6 col-xs-12">
+				<h2>
+					Pawn diagonal jump
+				</h2>
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+					NE, SE, SW and NW could sometimes indicate moves EN, ES, WS and WN respectively. But the latter notation is not used.
+					<br>Both of the jumped lines can be added, in sequence of crossing. 
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				<img src="images/notation pawn diag simple.png" class="img-fluid" alt="Jump allowed">
+				<img src="images/notation pawn diag.png" class="img-fluid" alt="Jump allowed">
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-6 col-xs-12">
+				<h2>
+					Extra characters
+				</h2>
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+					X stands for "gave up". A game is often abandoned before a player reaches the other side because the outcome is clear.
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				<!-- <img src="images/notation pawn diag simple.png" class="img-fluid" alt="Jump allowed"> -->
+				<!-- <img src="images/notation pawn diag.png" class="img-fluid" alt="Jump allowed"> -->
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		<!-- Optional JavaScript -->
+		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
+	
+	</body>
+</html>

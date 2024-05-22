@@ -1,0 +1,26 @@
+/* body { */
+	/* text-align:center; */
+/* } */
+
+/* .row { */
+  /* width: 100%; */
+  /* text-align: center; // center the content of the container */
+/* } */
+
+/* .quoridor-field { */
+	/* overflow:hidden; */
+	/* width: 100%; */
+/* } */
+
+/* .board { */
+	/* float: left; */
+/* } */
+
+/* .stats{ */
+	
+/* } */
+/* <div style="width: 100%; overflow: hidden;"> */
+    /* <div style="width: 600px; float: left;"> Left </div> */
+    /* <div style="margin-left: 620px;"> Right </div> */
+/* </div> */
+

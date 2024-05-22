@@ -1,0 +1,223 @@
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Philippe Ameije</title>
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<link rel="stylesheet" href="quoridor_rules.css">
+		
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+	</head>
+	<body>
+		<div class="container" id="portfolio">
+			<h2>Quoridor Rules</h2>
+			<p> The complete rules of Quoridor for two players.</p>
+		</div>	
+		
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				
+				<p>At the start of the game, each player has one pawn, placed in the middle square of the closest row. Each player gets 10 walls.
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				
+				<p> <img src="images/start situation.png" class="img-fluid" alt="Responsive image"  ></p>
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			
+		</div>
+	
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+				The game is won by the first player who gets his pawn on one of the nine squares on the opposite side of the board. The game then ends immediately.
+			
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				<p> <img src="images/winning squares.png" class="img-fluid" alt="Responsive image" ></p>
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+	
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+					Players play in turns. At every turn a player MUST move its pawn OR place one of its unplaced walls.
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+					Once a wall is placed, it can never be moved.
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				<p> <img src="images/wall placed.png" class="img-fluid" alt="Responsive image" ></p>
+			
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+					Walls have to face two squares and can never overlap other walls.
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				<img src="images/wall not allowed 1.png" class="img-fluid" alt="Wall placement"  >
+				
+		    </div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+					All players must always be able to reach at least one of their winning squares. A player can never be completely blocked.
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				<img src="images/wall not allowed 2.png" class="img-fluid" alt="Wall placement" >
+				
+		    </div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+					Walls can NEVER be crossed by pawns. The edges of the board are considered walls.
+		 		</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				<img src="images/pawn move wall.png" class="img-fluid" alt="Wall placement" >
+				<img src="images/pawn move edge.png" class="img-fluid" alt="Wall placement" >
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+					A pawn can move to one of the four adjacent squares of the current position, if it does not cross a wall and if the adjacent square is unoccupied.
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				<img src="images/pawn move ortho.png" class="img-fluid" alt="Grey wall not allowed" >
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+					A pawn is allowed to jump orthogonally in a straight line over another pawn in a neighbouring square in one move, if no walls are crossed.
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				<img src="images/pawn move jump ortho.png" class="img-fluid" alt="Grey wall not allowed" >
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+					If a wall is behind the pawn to be jumped, a jump is allowed to one of the free squares adjacent to the jumped pawn, if no walls are crossed.
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+				<img src="images/pawn move jump diag 1.png" class="img-fluid" alt="Jump allowed">
+				<img src="images/pawn move jump diag 2.png" class="img-fluid" alt="Jump allowed" >
+				<img src="images/pawn move jump diag 3.png" class="img-fluid" alt="Jump allowed" >
+				<img src="images/pawn move jump edge 1.png" class="img-fluid" alt="Jump allowed" >
+				<img src="images/pawn move jump edge 2.png" class="img-fluid" alt="Jump allowed" >
+				
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+				
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-3 col-xs-4">
+				<p>
+				
+				</p>
+			</div>
+			<div class="col-sm-3 col-xs-8">
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+	
+					
+			 <footer class="footer">
+				<div class="container">
+					<span class="text-muted"> <p>Info, feedback or remarks appreciated. Email Philippe: <a href="http://www.google.com/recaptcha/mailhide/d?k=01M2bZG972U_UVUGPv4GDEaA==&amp;c=mUsnFvCW10Y3zyCovdBSlyDDs0_NM79brVlnRGY-0HI=" onclick="window.open('http://www.google.com/recaptcha/mailhide/d?k\x3d01M2bZG972U_UVUGPv4GDEaA\x3d\x3d\x26c\x3dmUsnFvCW10Y3zyCovdBSlyDDs0_NM79brVlnRGY-0HI\x3d', '', 'toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=0,width=500,height=300'); return false;" title="Reveal this e-mail address">p...</a>@gmail.com
+							(click "...")
+							</p></span>
+				</div>
+			</footer>
+			 
+			
+		</div>
+
+		<!-- Optional JavaScript -->
+		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
+	
+	</body>
+</html>
