@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>SET Game Fan Page</title>
+	<link rel='stylesheet' type='text/css' href='index.css' />
+
+	<!-- Bootstrap core CSS -->
+	<link href="../bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+	<!-- Bootstrap theme -->
+	<link href="../bootstrap-3.3.2-dist/css/bootstrap-theme.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+	<div class="row">
+		<div class="col-sm-3 col-xs-0">
+		</div>
+		<div class="col-sm-6 col-xs-12">
+			<div class="page-header">
+				<h1>SET Game Fan Page</h1>
+			</div>
+		</div>
+		<div class="col-sm-3 col-xs-0">
+		</div>
+	</div>
+
+	
+	<a href="src/set-trainer.html">
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-2 col-xs-4">
+				<br />
+				<img src="images/set_play.png" class="icon" alt="Click To Choose">
+			</div>
+			<div class="col-sm-4 col-xs-8">
+				<div class="col-sm-12 col-xs-12">
+					<h1>Play SET </h1>
+				</div>
+				<div class="col-sm-12 col-xs-12">
+					<p> Play by yourself or with other people if you don't have a deck of cards handy. Especially fun on a big touch screen. The function to not let you draw new cards if there is a SET available is great for making progress. </p>
+				</div>
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+	</a>
+
+	<a href="set-house-rules.html">
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-2 col-xs-4">
+				<br />
+				<img src="images/set_drama.png" class="icon" alt="Click To Choose">
+			</div>
+			<div class="col-sm-4 col-xs-8">
+				<div class="col-sm-12 col-xs-12">
+					<h1>SET Super Rules</h1>
+				</div>
+				<div class="col-sm-12 col-xs-12">
+					<p>Because the offical rules make no sense, we had to make our own. </p>
+				</div>
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+	</a>
+
+	<a href="javascript:void(0)" onclick="toggleImage()">
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0"></div>
+	
+			<div class="col-sm-2 col-xs-4">
+				<br />
+				<img src="images/set_statistics.png" class="icon" alt="Click To Choose">
+			</div>
+	
+			<div class="col-sm-4 col-xs-8">
+				<div class="col-sm-12 col-xs-12">
+					<h1>SET Statistics</h1>
+				</div>
+				<div class="col-sm-12 col-xs-12">
+					<p>What's the chance there will be a SET in the next draw?!?</p>
+	
+					<!-- SVG container; initially hidden -->
+				</div>
+			</div>
+	
+			<div class="col-sm-3 col-xs-0"></div>
+
+			<div class="col-sm-12 col-xs-12">
+				<div id="imageContainer" style="display: none;text-align: center;">
+                    <img src="SET_draw_statistics.png" alt="Statistics Image" style="width: 100%; max-width: 1000px;">
+                </div>
+			</div>
+		</div>
+	</a>
+
+	<a href="src/set-trainer.html">
+		<div class="row top-buffer">
+			<div class="col-sm-3 col-xs-0">
+			</div>
+			<div class="col-sm-2 col-xs-4">
+				<br />
+				<img src="images/set_train.png" class="icon" alt="Click To Choose">
+			</div>
+			<div class="col-sm-4 col-xs-8">
+				<div class="col-sm-12 col-xs-12">
+					<h1>Train Your SET Skills</h1>
+				</div>
+				<div class="col-sm-12 col-xs-12">
+					<p> Become better at recognizing SET patterns. Different training levels allow you to complete SETs starting with two, one or zero cards. </p>
+				</div>
+			</div>
+			<div class="col-sm-3 col-xs-0">
+			</div>
+		</div>
+	</a>
+	<script>
+		function toggleImage() {
+			var imageContainer = document.getElementById("imageContainer");
+			imageContainer.style.display = (imageContainer.style.display === "none") ? "block" : "none";
+		}
+	</script>
+	
+
+</body>
+
+</html>
