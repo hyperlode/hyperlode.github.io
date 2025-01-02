@@ -99,6 +99,7 @@ def take_cards_off_deck_until_set(deck):
         #     break
     print ("No Set found")
     raise AssertionError
+
 def display_probabilities(frequency_list):
     tests_count = sum(frequency_list)
     percentages = [f/tests_count for f in frequency_list]
