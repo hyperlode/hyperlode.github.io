@@ -2,6 +2,7 @@
 
 import itertools
 import random
+from pathlib import Path
 
 
 # Set
@@ -93,6 +94,8 @@ PATTERN_ROWS = 9
 
 WINDOW_ROWS = 3
 WINDOW_COLS = 4
+
+
                               
 class SET(): 
     
@@ -105,8 +108,11 @@ class SET():
         self.pattern_extended = {(row,col):None for col in range(PATTERN_COLS*2) for row in range(PATTERN_ROWS *2)}
         
         # top left corner of a cards window in the pattern.  
-        self.set_counts_window = {(row,col):0 for col in range(PATTERN_COLS) for row in range(PATTERN_ROWS)}
-    
+        self.set_counts_pattern = {(row,col):0 for col in range(PATTERN_COLS) for row in range(PATTERN_ROWS)}
+
+        self.pattern_total_sets_count = None
+        self.sets_count_window_distribution= None
+         
     def get_all_basic_pattern_positions(self):
         return [(row, col) for col in range(PATTERN_COLS) for row in range(PATTERN_ROWS) ]
       
@@ -135,18 +141,8 @@ class SET():
     def get_card_from_pattern(self, position):
         return self.pattern_extended[position]
     
-    
-    def print_set_counts_windows(self):
-        for row in range (PATTERN_ROWS):
-            
-            line_string = ""
-            for col in range (PATTERN_COLS):
-                sets = self.set_counts_window[(row,col)]
-                line_string += "{:<4}".format(sets) 
-            print(line_string)
-            
-            
-    def print_pattern(self, print_extended=False):
+    def get_pattern_as_string(self, print_extended=False):
+        pattern_str = ""
         for row in range(PATTERN_ROWS + print_extended * PATTERN_ROWS):
             line_string = ""
             for col in range(PATTERN_COLS + print_extended * PATTERN_COLS):
@@ -162,9 +158,12 @@ class SET():
                 
                 line_string += "{:<8}".format(str(card_string))
 
-            print(line_string + "\n")
+            pattern_str += line_string + "\n"
+        return pattern_str
+            
+    def print_pattern(self, print_extended=False):
+        print(self.get_pattern_as_string(print_extended))
     
-   
     def get_pattern_positions_from_window_position(self, window_position):
         return [ (window_position[0] + row ,window_position[1] + col) for row in range (WINDOW_ROWS) for col in range(WINDOW_COLS) ]
         
@@ -185,19 +184,65 @@ class SET():
     def calculate_all_windows_sets_count(self):
         window_positions = self.get_all_basic_pattern_positions()
         for position in window_positions:
-            self.set_counts_window[position] = self.get_set_count_in_window(position)            
-        
+            self.set_counts_pattern[position] = self.get_set_count_in_window(position)            
+    
+    
+    
+    def get_set_counts_pattern_as_string(self):
+        window_set_counts_str = ""
+        for row in range (PATTERN_ROWS):
+            line_string = ""
+            for col in range (PATTERN_COLS):
+                sets = self.set_counts_pattern[(row,col)]
+                line_string += "{:<4}".format(sets) 
+            window_set_counts_str += line_string + "\n"
+        return(window_set_counts_str)
             
+    def print_set_counts_pattern(self):
+            print(self.get_set_counts_pattern_as_string())
+            
+    def pattern_stats(self):
+        sets_count = 0
+        sets_count_window_distribution= [0 for i in range(20)]
+        
+        for row in range(PATTERN_ROWS ):
+            for col in range(PATTERN_COLS):
+                set_count = self.set_counts_pattern[(row,col)]
+                sets_count += set_count
+                sets_count_window_distribution[set_count]+=1
+        print("Total sets: {}" .format(sets_count))
+        print("Sets per window distribution: {}" .format(sets_count_window_distribution))
+        check_count = 0
+        for i,count in enumerate(sets_count_window_distribution):
+            check_count += i*count
+        print("check: {}".format(check_count))
+        self.pattern_total_sets_count = sets_count
+        self.sets_count_window_distribution= sets_count_window_distribution 
+        return sets_count_window_distribution
+    
+    def save_pattern_to_file(self, base_path):
+        base_path = Path(base_path)
+        single_set_windows = self.sets_count_window_distribution[1]
+        name = "SET_pattern_{}_{}_{}.txt".format(str(single_set_windows),str(self.pattern_total_sets_count),str(self.sets_count_window_distribution) )
+        
+        with open(Path(base_path,name), 'w') as file:
+            pattern_string = self.get_pattern_as_string()
+            file.write(f"{pattern_string}\n")
+            sets_counts_windows_as_string = self.get_set_counts_pattern_as_string()
+            file.write(f"{sets_counts_windows_as_string}\n")
+                    
 if __name__ == "__main__":
-    deck = create_deck(parameters, False, True)
-    setgame = SET()
-    positions = setgame.get_all_basic_pattern_positions()
-    for pos in positions:
-        setgame.add_card_to_pattern(deck.pop(), pos)
-    setgame.calculate_all_windows_sets_count()
-    setgame.print_pattern(False)
-    setgame.print_set_counts_windows()
-    # window_positions = setgame.get_pattern_positions_from_window_position((0,0))
-    
-    
+    for i in range (10000):
+        deck = create_deck(parameters, False, True)
+        setgame = SET()
+        positions = setgame.get_all_basic_pattern_positions()
+        for pos in positions:
+            setgame.add_card_to_pattern(deck.pop(), pos)
+        setgame.calculate_all_windows_sets_count()
+        setgame.print_pattern(False)
+        setgame.print_set_counts_pattern()
+        # window_positions = setgame.get_pattern_positions_from_window_position((0,0))
+        setgame.pattern_stats()
+        setgame.save_pattern_to_file("C:\Data\generated_program_data\SET_pattern")
+        
     # print(window_positions)
