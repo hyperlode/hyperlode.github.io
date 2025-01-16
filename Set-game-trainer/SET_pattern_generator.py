@@ -32,7 +32,9 @@ def create_deck(parameters, formatted=False, shuffled=True):
         
     if shuffled:
         random.shuffle(combinations)
-
+    
+    # print("faefeieieijijeeijeijeij {}".format(combinations))
+    
     return combinations
 
 def is_set(three_cards, verbose=False):
@@ -179,12 +181,14 @@ class SET():
         
         # normal pattern: 9x9. But, to handle the edge cases: we extend the 9x9 pattern 2x2  so: 18x18. where (0,0) == (9,0) == (0,9) == (9,9)
         self.pattern_extended = {(row,col):None  for row in range(PATTERN_ROWS *2) for col in range(PATTERN_COLS*2)}
+        self.pattern_tagged_positions = {(row,col):False  for row in range(PATTERN_ROWS *2 ) for col in range(PATTERN_COLS *2)}
         
         # top left corner of a cards window in the pattern. every position contains the amount of sets in the window with position as upper left corner of this window.
         self.set_counts_pattern = {(row,col):0 for row in range(PATTERN_ROWS) for col in range(PATTERN_COLS) }
-
+        self.basic_pattern_positions = self.get_all_basic_pattern_positions()
         self.pattern_total_sets_count = None
         self.sets_count_window_distribution= None
+        self.i = 0
         
     def card_compact_to_normal(self, compact_card):
        
@@ -230,10 +234,63 @@ class SET():
         self.reset_pattern()
         positions = self.get_all_basic_pattern_positions()
         for pos in positions:
-            self.add_card_to_pattern(self.deck.pop(), pos)
+            self.add_card_to_pattern(None, pos)
     
-    def add_card_to_pattern(self, card, position):
+    
+    def print_pattern_tags(self):
+        print(self.get_pattern_values_as_string(self.pattern_tagged_positions))
+    
+    def get_tag_card_at_pattern_position(self, position):
+        return self.pattern_tagged_positions[position] 
+    
+    def set_tag_card_at_pattern_position(self, position, value):
+        initial_row = position[0]
+        initial_col = position[1]
         
+        extended_col = initial_col
+        extended_row = initial_row
+        if (initial_col < PATTERN_COLS):
+            extended_col += PATTERN_COLS
+        else:
+            extended_col -= PATTERN_COLS
+        
+        if (initial_row < PATTERN_ROWS):
+            extended_row += PATTERN_ROWS
+        else:
+            extended_row -= PATTERN_ROWS
+        
+        self.pattern_tagged_positions[(initial_row, initial_col)] = value
+        self.pattern_tagged_positions[(initial_row, extended_col)] = value
+        self.pattern_tagged_positions[(extended_row, initial_col)] = value
+        self.pattern_tagged_positions[(extended_row, extended_col)] = value
+        
+    def remove_card_from_pattern(self, position):
+        initial_row = position[0]
+        initial_col = position[1]
+        
+        extended_col = initial_col
+        extended_row = initial_row
+        if (initial_col < PATTERN_COLS):
+            extended_col += PATTERN_COLS
+        else:
+            extended_col -= PATTERN_COLS
+        
+        if (initial_row < PATTERN_ROWS):
+            extended_row += PATTERN_ROWS
+        else:
+            extended_row -= PATTERN_ROWS
+        
+        self.deck.append( self.pattern_extended[(initial_row, initial_col)] )
+            
+        self.pattern_extended[(initial_row, initial_col)] = None
+        self.pattern_extended[(initial_row, extended_col)] = None
+        self.pattern_extended[(extended_row, initial_col)] = None
+        self.pattern_extended[(extended_row, extended_col)] = None
+        
+    def add_card_to_pattern(self, card, position):
+        if card is None:
+            card = self.deck.pop(random.randrange(len(self.deck)))
+
         initial_row = position[0]
         initial_col = position[1]
         
@@ -307,17 +364,23 @@ class SET():
     def get_pattern_positions_from_window_position(self, window_position):
         return [ (window_position[0] + row ,window_position[1] + col) for row in range (PATTERN_WINDOW_ROWS) for col in range(PATTERN_WINDOW_COLS) ]
         
+    def get_cards_from_basic_pattern(self):
+        cards = []
+        for pos in self.get_all_basic_pattern_positions():
+            cards.append(self.get_card_from_pattern(pos))
+        return cards
+            
     def get_window_cards_from_pattern(self, window_position ):
         positions = self.get_pattern_positions_from_window_position(window_position)
-        
+        # print("feijiejf{}".format(positions))
         cards = []
         for position in positions:
             cards.append(self.get_card_from_pattern(position))
         return cards
     
     def get_set_count_in_window(self, window_position):
-        
         cards = self.get_window_cards_from_pattern(window_position)
+        # print("a;ee;eaia;e{}".format(cards))
         sets_count = set_in_cards(cards, False, True)
         return sets_count
 
@@ -326,20 +389,18 @@ class SET():
         for position in window_positions:
             self.set_counts_pattern[position] = self.get_set_count_in_window(position)            
     
-    
-    
-    def get_set_counts_pattern_as_string(self):
-        window_set_counts_str = ""
+    def get_pattern_values_as_string(self, pattern_values):
+        values_str = ""
         for row in range (PATTERN_ROWS):
             line_string = ""
             for col in range (PATTERN_COLS):
-                sets = self.set_counts_pattern[(row,col)]
-                line_string += "{:<4}".format(sets) 
-            window_set_counts_str += line_string + "\n"
-        return(window_set_counts_str)
-            
+                val = pattern_values[(row,col)]
+                line_string += "{:<4}".format(val) 
+            values_str += line_string + "\n"
+        return(values_str)
+        
     def print_set_counts_pattern(self):
-            print(self.get_set_counts_pattern_as_string())
+        print(self.get_pattern_values_as_string(self.set_counts_pattern))
             
     def pattern_stats(self, verbose=False):
         sets_count = 0
@@ -372,10 +433,134 @@ class SET():
             file.write(f"{pattern_string}\n")
             sets_counts_windows_as_string = self.get_set_counts_pattern_as_string()
             file.write(f"{sets_counts_windows_as_string}\n")
-            
-    # def erase_multi_set_windows(self):
-        
     
+    
+    
+    def start_recursive_single_set_window_pattern_search(self):
+        
+        # 1 create start situation
+            #   - get window. fill up
+            #             if one set: next position
+            #             - if not one set, take away the recent cards and try again with another card from the deck
+            #   -                 - if all options are exhausted: go up one level and try again. 
+                    # if all position full: END condition
+        self.reset_pattern()
+        window_index = 0    # go over all positions. #self.basic_pattern_positions()    
+
+        success = self.recursive_single_set_window_pattern_search(window_index)
+        if success:
+            print ("SEARCH FINISHED successfully")
+        
+            self.calculate_all_windows_sets_count()
+            self.print_set_counts_pattern()
+        else:
+            print ("SEARCH FINISHED. Fail!!!")
+            
+        
+        self.print_pattern()
+        
+        # fill in missing cards
+    def recursive_single_set_window_pattern_search(self, window_index):
+        # print("--------next level---------{}".format(window_index))
+        if window_index >= 81:
+            self.print_pattern()
+            return True
+        
+        # sanity check:
+        
+        
+        # free_spots_count = sum(card is None for card in self.get_cards_from_basic_pattern())
+        # if (81-index) != free_spots_count:
+        #     self.print_pattern()
+        #     print("assert error. there should be equally cards  as the recursion level. ")
+        #     raise
+
+        
+        window_position = self.basic_pattern_positions[window_index]
+        positions_in_window = self.get_pattern_positions_from_window_position(window_position)
+        
+        # check which positions have no cards in the window
+        empty_positions_in_window = []
+        for pos in positions_in_window:
+            if self.pattern_extended[pos] is None:
+                empty_positions_in_window.append(pos)
+        
+        attempts = 10
+        self.print_pattern()
+        while attempts > 0:
+            self.i += 1
+            if self.i%100 == 0:
+                self.print_pattern()
+                print("iteration {}, level: {}".format(self.i, window_index)) 
+                # raise
+            # print("attempt{}".format(attempts))
+            
+            # fill up window with random cards from deck
+            for ep in empty_positions_in_window:
+                self.add_card_to_pattern(None, ep)
+                
+            # print("filled up pattern")
+            # self.print_pattern()
+            
+            # check if there is exactly one SET in window
+            set_count = self.get_set_count_in_window(window_position)
+            # if set_count <= 4:
+            if set_count == 1:
+                # print("single set found")
+                # fine, go to next level
+                is_finished = self.recursive_single_set_window_pattern_search(window_index + 1)
+                if is_finished:
+                    # return success!!
+                    return True
+                attempts -= 1
+                    
+            else:
+                attempts -= 1
+        
+            # undo situation
+            for ep in empty_positions_in_window:
+                self.remove_card_from_pattern(ep)
+        
+        # no success
+        return False
+            
+    def tag_multiset_window_cards(self):
+        
+        pattern_positions = self.get_all_basic_pattern_positions()
+        
+        # window_positions = self.get_all_basic_pattern_positions()
+        # SCAN 1: tag cards to REMAIN if only one set in a particular window.
+        
+        for position in pattern_positions:
+            set_count_in_window = self.set_counts_pattern[position]     
+            print("{}: set count: {}".format(position, set_count_in_window))  
+            if set_count_in_window != 1:
+                row,col = position
+                window_top_right_position = (row, col + 3)
+                self.set_tag_card_at_pattern_position(window_top_right_position, True)
+                # window_positions = self.get_pattern_positions_from_window_position(position)
+                # for wp in window_positions:
+                #     self.set_tag_card_at_pattern_position(wp, True)
+                
+            # else:
+                
+    
+    
+    # def tag_multiset_window_cards(self):
+          # MISERABLE FAILED THEORY. Basically: almost all positions tagged as "preserve", while they shouldn't....
+    #     pattern_positions = self.get_all_basic_pattern_positions()
+        
+    #     # window_positions = self.get_all_basic_pattern_positions()
+    #     # SCAN 1: tag cards to REMAIN if only one set in a particular window.
+        
+    #     for position in pattern_positions:
+    #         set_count_in_window = self.set_counts_pattern[position]     
+    #         print("{}: set count: {}".format(position, set_count_in_window))  
+    #         if set_count_in_window == 1:
+                
+    #             window_positions = self.get_pattern_positions_from_window_position(position)
+    #             for wp in window_positions:
+    #                 self.set_tag_card_at_pattern_position(wp, True)
                
                
 def generate_set_patterns_to_file():
@@ -417,16 +602,36 @@ def retrieve_most_promising_pattern(db_path):
     setgame.calculate_all_windows_sets_count()
     setgame.pattern_stats(True)
     setgame.print_set_counts_pattern()
+    setgame.tag_multiset_window_cards()
+    setgame.print_pattern_tags()
     
 if __name__ == "__main__":
     # print(window_positions)
-    db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns.db"
-    # generate_set_patterns_to_db(db_path, attempts=100000)
-    # retrieve_most_promising_pattern(db_path)
+    
     setgame = SET()
-    setgame.create_full_pattern()
-    setgame.print_pattern()
-    setgame.calculate_all_windows_sets_count()
-    setgame.pattern_stats(True)
-    setgame.print_set_counts_pattern()
-    # setgame.card_compact_to_normal("2GoD")    
+    # for i in range(81):
+    #     print("{} : {}".format(i, setgame.get_all_basic_pattern_positions()[i]))
+    setgame.start_recursive_single_set_window_pattern_search()
+    
+    
+    # db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns.db"
+    # generate_set_patterns_to_db(db_path, attempts=100000)
+        
+    
+    # retrieve_most_promising_pattern(db_path)
+     
+    
+    # setgame = SET()
+    # setgame.create_full_pattern()
+    # setgame.print_pattern()
+    # setgame.print_set_counts_pattern()
+    # setgame.calculate_all_windows_sets_count()
+    # setgame.pattern_stats(True)
+    # setgame.remove_card_from_pattern((0,0))
+    # setgame.remove_card_from_pattern((5,6))
+    
+    
+    # setgame.print_pattern()
+    # setgame.tag_multiset_window_cards()
+    # setgame.print_pattern_tags()
+    
