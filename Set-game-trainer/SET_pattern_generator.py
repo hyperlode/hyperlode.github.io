@@ -454,7 +454,7 @@ class SET():
             self.calculate_all_windows_sets_count()
             self.print_set_counts_pattern()
         else:
-            print ("SEARCH FINISHED. Fail!!!")
+            print ("SEARCH FINISHED. No pattern found....")
             
         
         self.print_pattern()
@@ -484,9 +484,12 @@ class SET():
         for pos in positions_in_window:
             if self.pattern_extended[pos] is None:
                 empty_positions_in_window.append(pos)
+                
+        
+            
         
         attempts = 10
-        self.print_pattern()
+        # self.print_pattern()
         while attempts > 0:
             self.i += 1
             if self.i%100 == 0:
@@ -507,7 +510,7 @@ class SET():
             # if set_count <= 4:
             if set_count == 1:
                 # print("single set found")
-                # fine, go to next level
+                # conditions met, go to next level
                 is_finished = self.recursive_single_set_window_pattern_search(window_index + 1)
                 if is_finished:
                     # return success!!
@@ -515,6 +518,11 @@ class SET():
                 attempts -= 1
                     
             else:
+                # if there are no spots to fill in, return right away
+                if len(empty_positions_in_window) == 0:
+                    # print("feieijiijijijijij")
+                    return False
+                    
                 attempts -= 1
         
             # undo situation
