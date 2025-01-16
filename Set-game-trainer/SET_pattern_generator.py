@@ -174,6 +174,7 @@ class SET():
        self.reset_pattern(); 
         
     def reset_pattern(self):
+        self.deck = create_deck(parameters, False, True)
         #self.base_pattern_positions = self.get_all_basic_pattern_positions()
         
         # normal pattern: 9x9. But, to handle the edge cases: we extend the 9x9 pattern 2x2  so: 18x18. where (0,0) == (9,0) == (0,9) == (9,9)
@@ -223,7 +224,14 @@ class SET():
          
     def get_all_basic_pattern_positions(self):
         return [(row, col) for row in range(PATTERN_ROWS) for col in range(PATTERN_COLS)  ]
-      
+    
+    def create_full_pattern(self):
+        # reset and fill full pattern. 
+        self.reset_pattern()
+        positions = self.get_all_basic_pattern_positions()
+        for pos in positions:
+            self.add_card_to_pattern(self.deck.pop(), pos)
+    
     def add_card_to_pattern(self, card, position):
         
         initial_row = position[0]
@@ -364,15 +372,16 @@ class SET():
             file.write(f"{pattern_string}\n")
             sets_counts_windows_as_string = self.get_set_counts_pattern_as_string()
             file.write(f"{sets_counts_windows_as_string}\n")
+            
+    # def erase_multi_set_windows(self):
+        
+    
                
                
 def generate_set_patterns_to_file():
     for i in range (1):
-        deck = create_deck(parameters, False, True)
         setgame = SET()
-        positions = setgame.get_all_basic_pattern_positions()
-        for pos in positions:
-            setgame.add_card_to_pattern(deck.pop(), pos)
+        setgame.create_full_pattern()
         setgame.calculate_all_windows_sets_count()
         setgame.print_pattern(False)
         setgame.print_set_counts_pattern()
@@ -386,11 +395,8 @@ def generate_set_patterns_to_db(db_path,attempts=100):
     db_set = db_SET_analytics(db_path)
     
     for i in range (attempts):
-        deck = create_deck(parameters, False, True)
         setgame = SET()
-        positions = setgame.get_all_basic_pattern_positions()
-        for pos in positions:
-            setgame.add_card_to_pattern(deck.pop(), pos)
+        setgame.create_full_pattern()
         setgame.calculate_all_windows_sets_count()
         # setgame.print_pattern(False)
         # print(setgame.pattern_extended)
@@ -415,7 +421,12 @@ def retrieve_most_promising_pattern(db_path):
 if __name__ == "__main__":
     # print(window_positions)
     db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns.db"
-    # generate_set_patterns_to_db(db_path, attempts=1)
-    retrieve_most_promising_pattern(db_path)
-    # setgame = SET()
+    # generate_set_patterns_to_db(db_path, attempts=100000)
+    # retrieve_most_promising_pattern(db_path)
+    setgame = SET()
+    setgame.create_full_pattern()
+    setgame.print_pattern()
+    setgame.calculate_all_windows_sets_count()
+    setgame.pattern_stats(True)
+    setgame.print_set_counts_pattern()
     # setgame.card_compact_to_normal("2GoD")    
