@@ -40,9 +40,11 @@ def create_deck(parameters, formatted=False, shuffled=True):
 def is_set(three_cards, verbose=False):
     # cards as lists
     
-    #check
+    #check for none cards:
+    if None in three_cards:
+        return False
     
-    #bundle
+    #bundle per property
     separated_per_property = list(zip(*three_cards))
     
     #check
@@ -110,15 +112,23 @@ class db_SET_analytics():
         self.check_integrity()
         
     def execute_sql(self, sql_str):
-        self.cursor.execute(sql_str)
-        self.conn.commit()
         
+        try:
+            self.cursor.execute(sql_str)
+            self.conn.commit()
+        except sqlite3.IntegrityError as e:
+            if "UNIQUE constraint failed" in str(e):
+                print(f"Duplicate entry ignored: {e}")
+            else:
+                raise  # Reraise other IntegrityErrors
+        except Exception as e:
+            print(f"An error occurred, not saved to db. Program will continue.: {e}")
+            
     def check_integrity(self):
         # Function to check if a table exists
         if not (self.table_exists("set_patterns")):
             # print("DB not OK. Uncomment next lines to create table. ")
             self.create_table_set_patterns()
-    
         
     def add_pattern(self, set_pattern_dict):
         # Function to store a list in the database
@@ -173,7 +183,16 @@ class db_SET_analytics():
 class SET(): 
     
     def __init__(self):
-       self.reset_pattern(); 
+       self.reset_pattern()
+       
+    def setup_db(self, db_path):
+        self.db_set = db_SET_analytics(db_path)
+        
+    def add_current_situation_to_db(self):
+        self.calculate_all_windows_sets_count()
+        self.pattern_stats()
+        onepattern_dict = self.get_pattern_as_dict()
+        self.db_set.add_pattern(onepattern_dict)
         
     def reset_pattern(self):
         self.deck = create_deck(parameters, False, True)
@@ -325,7 +344,10 @@ class SET():
         compacted_dict = {}
         if compacted:
             for k,v in return_pattern.items():
-                compacted_dict[k] = "".join(item[0] for item in v)  # take first char from each value
+                if v is None:
+                    compacted_dict[k] = "****"
+                else:    
+                    compacted_dict[k] = "".join(item[0] for item in v)  # take first char from each value
             return_pattern = compacted_dict
         
         pattern_as_list =[]
@@ -488,13 +510,19 @@ class SET():
         
             
         
-        attempts = 10
+        attempts = 11
         # self.print_pattern()
         while attempts > 0:
             self.i += 1
-            if self.i%100 == 0:
+            if self.i%10000 == 0:
                 self.print_pattern()
+                
+                if (window_index > 10):
+                    self.add_current_situation_to_db()
+                self.calculate_all_windows_sets_count()
+                self.print_set_counts_pattern()
                 print("iteration {}, level: {}".format(self.i, window_index)) 
+                
                 # raise
             # print("attempt{}".format(attempts))
             
@@ -509,7 +537,6 @@ class SET():
             set_count = self.get_set_count_in_window(window_position)
             # if set_count <= 4:
             if set_count == 1:
-                # print("single set found")
                 # conditions met, go to next level
                 is_finished = self.recursive_single_set_window_pattern_search(window_index + 1)
                 if is_finished:
@@ -520,7 +547,6 @@ class SET():
             else:
                 # if there are no spots to fill in, return right away
                 if len(empty_positions_in_window) == 0:
-                    # print("feieijiijijijijij")
                     return False
                     
                 attempts -= 1
@@ -614,15 +640,15 @@ def retrieve_most_promising_pattern(db_path):
     setgame.print_pattern_tags()
     
 if __name__ == "__main__":
-    # print(window_positions)
+    db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns.db"
     
     setgame = SET()
+    setgame.setup_db(db_path)
     # for i in range(81):
     #     print("{} : {}".format(i, setgame.get_all_basic_pattern_positions()[i]))
     setgame.start_recursive_single_set_window_pattern_search()
     
     
-    # db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns.db"
     # generate_set_patterns_to_db(db_path, attempts=100000)
         
     
