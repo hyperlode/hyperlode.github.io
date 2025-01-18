@@ -413,7 +413,6 @@ class SET():
     
     def get_set_count_in_window(self, window_position):
         cards = self.get_window_cards_from_pattern(window_position)
-        # print("a;ee;eaia;e{}".format(cards))
         sets_count = set_in_cards(cards, False, True)
         return sets_count
 
@@ -489,27 +488,44 @@ class SET():
                 else:
                     score = set_count_in_window
                 self.set_tag_card_at_pattern_position(wp, score)
-
-        
+                
+                
         # get highest score positions
-        # amount_of_swappable_positions = 15 # gets to a score of about 23
-        amount_of_swappable_positions = 10
+        # AMOUNT_OF_SWAPPABLE_POSITIONS = 15 # best pattern_weight of about 23
+        # AMOUNT_OF_SWAPPABLE_POSITIONS = 20 # best pattern weight of about 15
+        AMOUNT_OF_SWAPPABLE_POSITIONS = 81 # best pattern_weight of about 23
         
         tagged_position_basic_pattern = self.get_pattern_tagged_positions_basic()
-        # swappable_positions = sorted(tagged_position_basic_pattern, key=lambda item: item[1], reverse=True)[:5]
-        # https://stackoverflow.com/questions/13070461/get-indices-of-the-top-n-values-of-a-list
+        # print(tagged_position_basic_pattern)
+        swappable_positions = [k for k, v in sorted(tagged_position_basic_pattern.items(), key=lambda item: item[1], reverse=True)[:AMOUNT_OF_SWAPPABLE_POSITIONS]]
+        # print(swappable_positions)
         
-        swappable_positions = [k for k, v in sorted(tagged_position_basic_pattern.items(), key=lambda item: item[1], reverse=True)[:amount_of_swappable_positions]]
-            
+        # print(values_of_swappable_positions)
+        # select swap positions: unweighted.
+        # swap_pos_1 = swappable_positions.pop(random.randint(0, len(swappable_positions) - 1))
+        # swap_pos_2 = swappable_positions.pop(random.randint(0, len(swappable_positions) - 1))
+        
+        # select swap positions: weighted.
+        # then higher the score, the more probability to be picked
+        
+        PROBABILITY_MULTIPLIER = 50
+        values_of_swappable_positions = [PROBABILITY_MULTIPLIER*tagged_position_basic_pattern[p] for p in swappable_positions]
+        swap_pos_1_index = random.choices(range(len(swappable_positions)), weights=values_of_swappable_positions, k=1)[0]
+        swap_pos_2_index = swap_pos_1_index
+        while  swap_pos_2_index == swap_pos_1_index:
+            swap_pos_2_index = random.choices(range(len(swappable_positions)), weights=values_of_swappable_positions, k=1)[0]
+        
+        swap_pos_1 = swappable_positions[swap_pos_1_index]
+        swap_pos_2 = swappable_positions[swap_pos_2_index]
         
         # print(swappable_positions)
+        
         # we now have a weighted array for all card positions --> i12 means, all windows containing this card have exactly one SET. 
         pre_swap_pattern_weight = self.get_full_pattern_weight()
         
-        # select and swap two cards
-        swap_pos_1 = swappable_positions.pop(random.randint(0, len(swappable_positions) - 1))
-        swap_pos_2 = swappable_positions.pop(random.randint(0, len(swappable_positions) - 1))
+    
         
+        # do the swap
         orig_card_pos_1 = self.get_card_from_pattern(swap_pos_1)
         orig_card_pos_2 = self.get_card_from_pattern(swap_pos_2)
         self.remove_card_from_pattern(swap_pos_1)
@@ -521,32 +537,39 @@ class SET():
         self.calculate_all_windows_sets_count()
         post_swap_pattern_weight = self.get_full_pattern_weight()
         
-        if post_swap_pattern_weight > pre_swap_pattern_weight:
-            
-            # undo if the score didn't improve 
+        if post_swap_pattern_weight > pre_swap_pattern_weight:   # todo > or >=  (Lode thinks > )
+            # undo if the weight didn't improve 
             self.remove_card_from_pattern(swap_pos_1)
             self.remove_card_from_pattern(swap_pos_2)
             self.add_card_to_pattern(orig_card_pos_1, swap_pos_1 )
             self.add_card_to_pattern(orig_card_pos_2, swap_pos_2 ) 
-            return pre_swap_pattern_weight
+            return pre_swap_pattern_weight, post_swap_pattern_weight, False
+        
         else:
-            # if score is equal, be ok with the changes. Prevents from being stuck in a situation for too long?! OK or not ?!
-            
-            return post_swap_pattern_weight
+            # if weight is equal, be ok with the changes. Prevents from being stuck in a situation for too long?! OK or not ?!
+            return pre_swap_pattern_weight, post_swap_pattern_weight,True
+            # return post_swap_pattern_weight
         
     def get_full_pattern_weight(self, verbose=False):
         # 1 set per window is what we want. their weight is zero. 2 set windows add weight of 1, 3 set windows asdd weight of 2, ....    AND 0 set window add weight of 1
          
         distribution = self.get_pattern_stats()
-        total_pattern_weight = 0 
-        for i,count in enumerate(distribution):
+        total_pattern_weight = 0   
+        
+        # zero set windows get a punish point. 
+        # one set windows: no punish points
+        # two  set windows: two punish points
+        # ... 
+        if verbose:
+            print(distribution)
+        for i,set_count in enumerate(distribution):
             if i == 0:
-                total_pattern_weight += 1* count 
+                total_pattern_weight += 1* set_count 
             elif i == 1:
                 # add zero
                 pass 
             else:
-                total_pattern_weight += (i-1) * count
+                total_pattern_weight += (i-1) * set_count
         if verbose:
             print ("Pattern weigth = {} ".format(total_pattern_weight))
         return total_pattern_weight
@@ -732,24 +755,51 @@ def improve_single_set_windows(setgame):
     # setgame = SET()
     
     i = 0
+    pattern_weigth_pre_swap = 99999999
+    pattern_weigth_post_swap = pattern_weigth_pre_swap
+    
     while True:
         i+=1 
-        if i%100 == 0:
-            
+        pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped  = setgame.swap_improve_single_set_window()
+        if i%1000 == 0:
+            print ("Swap Cycle {}".format(i))
+        if is_swapped and pattern_weigth_pre_swap != pattern_weigth_post_swap:
+        # if i%100 == 0:
+            print ("--------SET PATTERN STATS after {} cycles:-----------".format(i))
             # setgame.calculate_all_windows_sets_count()
             # setgame.print_set_counts_pattern()
             setgame.print_pattern()
-            print ("total one set per window score (0= all windows one set): {}".format(score))
+            
+            # "not swapped. keep weight at: {}".format(pre_swap_pattern_weight)
+            # "swapped. New weight is: {}".format(post_swap_pattern_weight)
+            print("swapped. New weight is: {}, old weight was {}".format(pattern_weigth_post_swap, pattern_weigth_pre_swap))
+            
+            # print ("total one set per window score (0= all windows one set): {}".format(pattern_weigth))
+            setgame.calculate_all_windows_sets_count()
             setgame.get_pattern_stats(True)
             setgame.print_set_counts_pattern()
-        score = setgame.swap_improve_single_set_window()
+            setgame.get_full_pattern_weight(verbose=True)
+           
     # setgame.tag_multiset_window_cards()
     # setgame.print_pattern_tags()
     
     
-    
+def test():
+    import random
+
+    # List of values
+    values = [3, 4, 40, 2]
+
+    # Pick multiple indices
+    k = 2  # Number of indices to pick
+    random_indices = random.choices(range(len(values)), weights=values, k=2)
+
+    print(f"Picked indices: {random_indices}")
     
 if __name__ == "__main__":
+    # test()
+    # exit()
+     
     db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns.db"
     
     # setgame = SET()
