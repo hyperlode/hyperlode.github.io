@@ -466,6 +466,40 @@ class SET():
             sets_counts_windows_as_string = self.get_set_counts_pattern_as_string()
             file.write(f"{sets_counts_windows_as_string}\n")
     
+    def start_search_all_windows_single_set(self):
+        
+        self.create_full_pattern()
+        self.cyclic_swapping_single_set_improvement()
+        
+    def cyclic_swapping_single_set_improvement(self):
+        # pattern_weigth_post_swap = 666666666666666
+        # # pattern_weigth_pre_swap = None
+        # while pattern_weigth_post_swap > 0:
+        #     pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped  = self.swap_improve_single_set_window(pattern_weigth_pre_swap)
+
+        
+        
+        i = 0
+        pattern_weigth_pre_swap = 99999999
+        pattern_weigth_post_swap = pattern_weigth_pre_swap
+        
+        while True:
+            i+=1 
+            pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped  = self.swap_improve_single_set_window()
+            if i%1000 == 0:
+                print ("Swap Cycle {}".format(i))
+            if is_swapped and pattern_weigth_pre_swap != pattern_weigth_post_swap:
+                print ("--------SET PATTERN STATS after {} cycles:-----------".format(i))
+                self.print_pattern()
+                print("swapped. New weight is: {}, old weight was {}".format(pattern_weigth_post_swap, pattern_weigth_pre_swap))
+                
+                # print ("total one set per window score (0= all windows one set): {}".format(pattern_weigth))
+                self.calculate_all_windows_sets_count()
+                self.get_pattern_stats(True)
+                self.print_set_counts_pattern()
+                self.get_full_pattern_weight(verbose=True)
+            
+       
     def swap_improve_single_set_window(self):
         # improve the amount of single set windows by swapping cards and analysing.
         
@@ -766,12 +800,7 @@ def improve_single_set_windows(setgame):
         if is_swapped and pattern_weigth_pre_swap != pattern_weigth_post_swap:
         # if i%100 == 0:
             print ("--------SET PATTERN STATS after {} cycles:-----------".format(i))
-            # setgame.calculate_all_windows_sets_count()
-            # setgame.print_set_counts_pattern()
             setgame.print_pattern()
-            
-            # "not swapped. keep weight at: {}".format(pre_swap_pattern_weight)
-            # "swapped. New weight is: {}".format(post_swap_pattern_weight)
             print("swapped. New weight is: {}, old weight was {}".format(pattern_weigth_post_swap, pattern_weigth_pre_swap))
             
             # print ("total one set per window score (0= all windows one set): {}".format(pattern_weigth))
@@ -779,10 +808,6 @@ def improve_single_set_windows(setgame):
             setgame.get_pattern_stats(True)
             setgame.print_set_counts_pattern()
             setgame.get_full_pattern_weight(verbose=True)
-           
-    # setgame.tag_multiset_window_cards()
-    # setgame.print_pattern_tags()
-    
     
 def test():
     import random
@@ -802,7 +827,9 @@ if __name__ == "__main__":
      
     db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns.db"
     
-    # setgame = SET()
+    setgame = SET()
+    setgame.start_search_all_windows_single_set()
+    exit()
     # setgame.setup_db(db_path)
     # setgame.start_recursive_single_set_window_pattern_search()
     
