@@ -4,6 +4,8 @@ import itertools
 import random
 from pathlib import Path
 
+import time
+
 import sqlite3
 import json
 
@@ -472,23 +474,28 @@ class SET():
         self.cyclic_swapping_single_set_improvement()
         
     def cyclic_swapping_single_set_improvement(self):
-        # pattern_weigth_post_swap = 666666666666666
-        # # pattern_weigth_pre_swap = None
-        # while pattern_weigth_post_swap > 0:
-        #     pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped  = self.swap_improve_single_set_window(pattern_weigth_pre_swap)
-
-        
-        
         i = 0
         pattern_weigth_pre_swap = 99999999
         pattern_weigth_post_swap = pattern_weigth_pre_swap
+        now_ms_epoch = int(time.time() * 1000)
+        previous_time_stamp = now_ms_epoch
+        
+        INTERVAL_CHECK_CYCLE_COUNT = 10
         
         while True:
             i+=1 
+            
+            
             pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped  = self.swap_improve_single_set_window()
-            if i%1000 == 0:
-                print ("Swap Cycle {}".format(i))
-            if is_swapped and pattern_weigth_pre_swap != pattern_weigth_post_swap:
+            if i%INTERVAL_CHECK_CYCLE_COUNT == 0:
+                now_ms_epoch = int(time.time() * 1000)
+                dt = now_ms_epoch - previous_time_stamp
+                swaps_per_second = (INTERVAL_CHECK_CYCLE_COUNT / dt * 1000 )
+                previous_time_stamp = now_ms_epoch
+                
+                print ("Swap Cycle {}. Swaps per second: {:.3f} . pattern weight: {}".format(i, swaps_per_second,pattern_weigth_pre_swap ))
+                
+            if pattern_weigth_pre_swap < 20 and is_swapped and pattern_weigth_pre_swap != pattern_weigth_post_swap:
                 print ("--------SET PATTERN STATS after {} cycles:-----------".format(i))
                 self.print_pattern()
                 print("swapped. New weight is: {}, old weight was {}".format(pattern_weigth_post_swap, pattern_weigth_pre_swap))
@@ -498,7 +505,9 @@ class SET():
                 self.get_pattern_stats(True)
                 self.print_set_counts_pattern()
                 self.get_full_pattern_weight(verbose=True)
-            
+
+        
+        
        
     def swap_improve_single_set_window(self):
         # improve the amount of single set windows by swapping cards and analysing.
