@@ -264,14 +264,10 @@ class SET():
         # pattern_dict --> contains "pattern" key with compacted pattern value. e.g. ['2RoP', '2RsP', '2GoS', '2RhP', '1RhD', '2RsD', '2GoD', '2GoP', '3RoS', '1RsD', '3BhD', '3BsS', '1BoP', '2RsS', '2BoP', '3RoP', '2GhP', '1RoD', '3BoD', '1RhP', '1RsP', '1BoD', '2BoS', '2BhS', '2GhS', '3RhD', '1RoP', '1GoS', '3GsP', '2BsD', '3RsS', '2GhD', '1RoS', '3BsD', '1BsD', '3GoP', '1BhS', '3BoP', '1RhS', '2BsS', '2GsS', '1GhS', '2BsP', '2BoD', '2GsD', '1GsP', '3GhS', '2RhD', '1GsD', '1GoP', '2BhP', '1GhD', '1BoS', '3GsD', '1GsS', '3GoD', '1GhP', '2BhD', '3GhP', '2GsP', '2RoS', '3GsS', '3GoS', '1BsS', '3BoS', '1GoD', '1RsS', '3GhD', '2RhS', '1BhD', '3RoD', '1BhP', '2RoD', '1BsP', '3BhS', '3RsD', '3RhS', '3RhP', '3BhP', '3BsP', '3RsP']
         self.reset_pattern()
         compact_pattern = pattern_dict["pattern"]
-            
-        positions = self.get_all_basic_pattern_positions()
-        for card_str,position in zip(compact_pattern,positions):
-            # print("origin card string and position: {} , {}".format(card_str,position))
-            card_tuple = self.card_compact_to_normal(card_str)
-            self.add_card_to_pattern(card_tuple, position)
-        
+        self.load_from_compact_pattern(compact_pattern)
         self.print_pattern()
+    
+   
         
     def get_pattern_as_dict(self):
         return {"pattern":self.get_pattern_compact(False, True, True), "window_stats":self.sets_count_window_distribution}
@@ -286,7 +282,14 @@ class SET():
         for pos in positions:
             self.add_card_to_pattern(None, pos)
     
-    
+    def load_from_compact_pattern(self, compact_pattern):
+        self.reset_pattern()
+        positions = self.get_all_basic_pattern_positions()
+        for card_str,position in zip(compact_pattern,positions):
+            # print("origin card string and position: {} , {}".format(card_str,position))
+            card_tuple = self.card_compact_to_normal(card_str)
+            self.add_card_to_pattern(card_tuple, position)
+            
     def print_pattern_tags(self):
         print(self.get_pattern_values_as_string(self.pattern_tagged_positions))
     
@@ -495,9 +498,13 @@ class SET():
             sets_counts_windows_as_string = self.get_set_counts_pattern_as_string()
             file.write(f"{sets_counts_windows_as_string}\n")
     
-    def start_search_all_windows_single_set(self):
+    def start_search_all_windows_single_set(self, compact_pattern=None):
         
-        self.create_full_pattern()
+        if compact_pattern is None:
+            self.create_full_pattern()
+        else:
+            self.load_from_compact_pattern(compact_pattern)
+            
         self.cyclic_swapping_single_set_improvement()
         
     def cyclic_swapping_single_set_improvement(self):
@@ -516,8 +523,6 @@ class SET():
         
         while True:
             i+=1 
-            
-            # pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped, recorded_set_counts_pattern, swapped_positions  = self.swap_improve_single_set_window(recorded_set_counts_pattern, None)
             pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped, recorded_set_counts_pattern, swapped_positions  = self.swap_improve_single_set_window(recorded_set_counts_pattern, previously_failed_swapped_positions_for_this_pattern)
             
             pattern_compact = self.get_pattern_compact(extended=False, compacted=True, as_list=True, as_JSON_string=True )
@@ -888,29 +893,29 @@ def retrieve_most_promising_pattern(db_path):
     setgame.get_pattern_stats(True)
     improve_single_set_windows(setgame)
     
-def improve_single_set_windows(setgame):
-    # setgame = SET()
+# def improve_single_set_windows(setgame):
+#     # setgame = SET()
     
-    i = 0
-    pattern_weigth_pre_swap = 99999999
-    pattern_weigth_post_swap = pattern_weigth_pre_swap
+#     i = 0
+#     pattern_weigth_pre_swap = 99999999
+#     pattern_weigth_post_swap = pattern_weigth_pre_swap
     
-    while True:
-        i+=1 
-        pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped  = setgame.swap_improve_single_set_window()
-        if i%1000 == 0:
-            print ("----------------------Swap Cycle {}".format(i))
-        if is_swapped and pattern_weigth_pre_swap != pattern_weigth_post_swap:
-        # if i%100 == 0:
-            print ("--------SET PATTERN STATS after {} cycles:-----------".format(i))
-            setgame.print_pattern()
-            print("swapped. New weight is: {}, old weight was {}".format(pattern_weigth_post_swap, pattern_weigth_pre_swap))
+#     while True:
+#         i+=1 
+#         pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped  = setgame.swap_improve_single_set_window()
+#         if i%1000 == 0:
+#             print ("----------------------Swap Cycle {}".format(i))
+#         if is_swapped and pattern_weigth_pre_swap != pattern_weigth_post_swap:
+#         # if i%100 == 0:
+#             print ("--------SET PATTERN STATS after {} cycles:-----------".format(i))
+#             setgame.print_pattern()
+#             print("swapped. New weight is: {}, old weight was {}".format(pattern_weigth_post_swap, pattern_weigth_pre_swap))
             
-            # print ("total one set per window score (0= all windows one set): {}".format(pattern_weigth))
-            setgame.calculate_all_windows_sets_count()
-            setgame.get_pattern_stats(True)
-            setgame.print_set_counts_pattern()
-            setgame.get_full_pattern_weight(verbose=True)
+#             # print ("total one set per window score (0= all windows one set): {}".format(pattern_weigth))
+#             setgame.calculate_all_windows_sets_count()
+#             setgame.get_pattern_stats(True)
+#             setgame.print_set_counts_pattern()
+#             setgame.get_full_pattern_weight(verbose=True)
     
 def test():
     import random
@@ -931,7 +936,8 @@ if __name__ == "__main__":
     db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns.db"
     
     setgame = SET()
-    setgame.start_search_all_windows_single_set()
+    single_set_pattern_weight_5 = ["2GoP", "3BoS", "2BhS", "1RhS", "1GoP", "1BhD", "1BoS", "1BsD", "1GoD", "2BoD", "1BhP", "3GhD", "1BsP", "3BhS", "3RsS", "2BoS", "2GoD", "3RsD", "3GoS", "3RoP", "1BoD", "3GhS", "2BsS", "3RoS", "3BoD", "2GhD", "2RhD", "3GsP", "2BsD", "3GoP", "1GhD", "1GsD", "3BhP", "3GhP", "2RhS", "1RhD", "2GhS", "1RsP", "1GsS", "1GhP", "2RoP", "2BhD", "2BsP", "1RhP", "1RoD", "1RoS", "3BsD", "3RhP", "1RoP", "2GsD", "1RsS", "3BhD", "2RoS", "1GhS", "3GsD", "2RsS", "3RsP", "3BoP", "3RoD", "1GoS", "2GhP", "1BoP", "2GoS", "1BhS", "2GsS", "2BhP", "3GoD", "3GsS", "1RsD", "2RoD", "1BsS", "2GsP", "3BsP", "3RhD", "2BoP", "1GsP", "3BsS", "2RsP", "3RhS", "2RsD", "2RhP"]
+    setgame.start_search_all_windows_single_set(single_set_pattern_weight_5)
     exit()
     # setgame.setup_db(db_path)
     # setgame.start_recursive_single_set_window_pattern_search()
