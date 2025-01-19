@@ -210,6 +210,7 @@ class SET():
         self.pattern_total_sets_count = None
         self.sets_count_window_distribution= None
         self.i = 0
+        self.buffer_pre_swap_pattern_weight = 100
         
     def card_compact_to_normal(self, compact_card):
        
@@ -482,11 +483,12 @@ class SET():
         
         INTERVAL_CHECK_CYCLE_COUNT = 10
         
+        recorded_set_counts_pattern = None
         while True:
             i+=1 
             
+            pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped, recorded_set_counts_pattern  = self.swap_improve_single_set_window(recorded_set_counts_pattern)
             
-            pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped  = self.swap_improve_single_set_window()
             if i%INTERVAL_CHECK_CYCLE_COUNT == 0:
                 now_ms_epoch = int(time.time() * 1000)
                 dt = now_ms_epoch - previous_time_stamp
@@ -509,7 +511,7 @@ class SET():
         
         
        
-    def swap_improve_single_set_window(self):
+    def swap_improve_single_set_window(self, buffered_set_counts_pattern=None):
         # improve the amount of single set windows by swapping cards and analysing.
         
         # 1. analyse 
@@ -518,7 +520,12 @@ class SET():
         # 3. analyse again
         # 4. if situation improved--> safe. If not, undo.
         
-        self.calculate_all_windows_sets_count()
+        if buffered_set_counts_pattern is not None:
+            self.set_counts_pattern = buffered_set_counts_pattern.copy()
+        else:
+            self.calculate_all_windows_sets_count()
+            
+        pre_swap_set_counts_pattern = self.set_counts_pattern.copy()
         
         # assigning card position weights 
         for position in self.basic_pattern_positions:
@@ -536,11 +543,19 @@ class SET():
         # get highest score positions
         # AMOUNT_OF_SWAPPABLE_POSITIONS = 15 # best pattern_weight of about 23
         # AMOUNT_OF_SWAPPABLE_POSITIONS = 20 # best pattern weight of about 15
-        AMOUNT_OF_SWAPPABLE_POSITIONS = 81 # best pattern_weight of about 23
+        # AMOUNT_OF_SWAPPABLE_POSITIONS = 81 # best pattern_weight of about 23
+        
+        # if (self.buffer_pre_swap_pattern_weight > 15):
+        #     AMOUNT_OF_SWAPPABLE_POSITIONS = self.buffer_pre_swap_pattern_weight +  10
+        # else:
+        
+        # AMOUNT_OF_SWAPPABLE_POSITIONS = 20 #  weight 26 after 2500 cycles (multplier power = 1)  multiplier=2 : weight23 (at 2500 cycles)
+        AMOUNT_OF_SWAPPABLE_POSITIONS = 81 # weight 26 after 2500 cycles (multplier power = 1), multiplier=2 : weight21 (at 2500 cycles), multiplier=3 : weight25 (at 2500 cycles) weight 13 after 5000 cycles, 
+        # AMOUNT_OF_SWAPPABLE_POSITIONS = 10 # weight 35 after 2500 cycles (multplier power = 1), not improving with hight power multiplier
         
         tagged_position_basic_pattern = self.get_pattern_tagged_positions_basic()
         # print(tagged_position_basic_pattern)
-        swappable_positions = [k for k, v in sorted(tagged_position_basic_pattern.items(), key=lambda item: item[1], reverse=True)[:AMOUNT_OF_SWAPPABLE_POSITIONS]]
+        swappable_positions = [k for k, v in sorted(tagged_position_basic_pattern.items(), key=lambda item: (item[1],random.random()), reverse=True)[:AMOUNT_OF_SWAPPABLE_POSITIONS]]
         # print(swappable_positions)
         
         # print(values_of_swappable_positions)
@@ -549,10 +564,20 @@ class SET():
         # swap_pos_2 = swappable_positions.pop(random.randint(0, len(swappable_positions) - 1))
         
         # select swap positions: weighted.
-        # then higher the score, the more probability to be picked
+        # then higher the weight, the more probability to be picked. The multiplier enforces these probabilities
         
-        PROBABILITY_MULTIPLIER = 50
-        values_of_swappable_positions = [PROBABILITY_MULTIPLIER*tagged_position_basic_pattern[p] for p in swappable_positions]
+        # PROBABILITY_MULTIPLIER = 50
+        # PROBABILITY_POWER = self.buffer_pre_swap_pattern_weight + 1
+        
+        
+        # higher: faster weight optimizing at start, but then stops quickly. 
+        if self.buffer_pre_swap_pattern_weight > 15:
+            PROBABILITY_POWER = 4
+        else:
+            PROBABILITY_POWER = 4
+        
+        # weight 27 -->2500
+        values_of_swappable_positions = [tagged_position_basic_pattern[p]^PROBABILITY_POWER for p in swappable_positions]
         swap_pos_1_index = random.choices(range(len(swappable_positions)), weights=values_of_swappable_positions, k=1)[0]
         swap_pos_2_index = swap_pos_1_index
         while  swap_pos_2_index == swap_pos_1_index:
@@ -565,8 +590,7 @@ class SET():
         
         # we now have a weighted array for all card positions --> i12 means, all windows containing this card have exactly one SET. 
         pre_swap_pattern_weight = self.get_full_pattern_weight()
-        
-    
+        self.buffer_pre_swap_pattern_weight = pre_swap_pattern_weight
         
         # do the swap
         orig_card_pos_1 = self.get_card_from_pattern(swap_pos_1)
@@ -576,8 +600,11 @@ class SET():
         self.add_card_to_pattern(orig_card_pos_2, swap_pos_1 )
         self.add_card_to_pattern(orig_card_pos_1, swap_pos_2 )
         
+        
         # do analysis again
         self.calculate_all_windows_sets_count()
+        post_swap_set_counts_pattern = self.set_counts_pattern.copy()
+        
         post_swap_pattern_weight = self.get_full_pattern_weight()
         
         if post_swap_pattern_weight > pre_swap_pattern_weight:   # todo > or >=  (Lode thinks > )
@@ -586,11 +613,11 @@ class SET():
             self.remove_card_from_pattern(swap_pos_2)
             self.add_card_to_pattern(orig_card_pos_1, swap_pos_1 )
             self.add_card_to_pattern(orig_card_pos_2, swap_pos_2 ) 
-            return pre_swap_pattern_weight, post_swap_pattern_weight, False
+            return pre_swap_pattern_weight, post_swap_pattern_weight, False, pre_swap_set_counts_pattern
         
         else:
             # if weight is equal, be ok with the changes. Prevents from being stuck in a situation for too long?! OK or not ?!
-            return pre_swap_pattern_weight, post_swap_pattern_weight,True
+            return pre_swap_pattern_weight, post_swap_pattern_weight,True, post_swap_set_counts_pattern
             # return post_swap_pattern_weight
         
     def get_full_pattern_weight(self, verbose=False):
