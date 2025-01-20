@@ -3,6 +3,7 @@
 import itertools
 import random
 from pathlib import Path
+from collections import defaultdict
 
 import time
 
@@ -147,11 +148,13 @@ class db_SET_analytics():
         single_set_windows = window_stats[1]
         pattern_weight = set_pattern_dict["pattern_weight"]
 
+  
+    
         # Convert the list to JSON
-        json_pattern = json.dumps(pattern)
+        # json_pattern = json.dumps(pattern)
+        json_pattern = pattern
         json_window_stats = json.dumps(window_stats)
         json_tried_position_swaps = json.dumps(tried_position_swaps)
-
         pattern_dict = self.get_pattern_if_existing(json_pattern)
         if pattern_dict is None:
             self.execute_sql(
@@ -159,7 +162,14 @@ class db_SET_analytics():
                     json_pattern, json_window_stats, single_set_windows, pattern_weight, json_tried_position_swaps
                 ))
         else:
-            print(pattern_dict)
+            # update json_tried_position swaps
+            
+            sql = "UPDATE set_patterns SET tried_position_swaps='{}' WHERE pattern = '{}'".format(
+                    json_tried_position_swaps, json_pattern 
+                )
+            self.execute_sql( sql )
+             
+            # print(pattern_dict)
 
             # print ("exists in table : {} ".format(json_pattern))
             #  update the pattern positions "tried_positions_swap"
@@ -212,7 +222,6 @@ class db_SET_analytics():
             return self.convert_record_to_pattern_dict(record)
 
     def convert_record_to_pattern_dict(self, record):
-        print(record)
 
         pattern_json, window_stats_json, single_set_windows, pattern_weight, tried_position_swaps = record
         pattern = json.loads(pattern_json)
@@ -255,8 +264,10 @@ class SET():
         self.db_set.add_pattern(onepattern_dict)
 
     def reset_pattern(self):
+        
         self.deck = create_deck(parameters, False, True)
         self.total_pattern_weight = 0
+        self.patterns_and_swapped_positions_memory = defaultdict(list)
         # normal pattern: 9x9. But, to handle the edge cases: we extend the 9x9 pattern 2x2  so: 18x18. where (0,0) == (9,0) == (0,9) == (9,9)
         self.pattern_extended = {(row, col): None for row in range(
             PATTERN_ROWS * 2) for col in range(PATTERN_COLS*2)}
@@ -303,14 +314,13 @@ class SET():
         self.print_pattern()
 
     def get_pattern_as_dict(self):
-        print("feeijeij")
-        print(tried_position_swaps)
-
+        
+        pattern_compact = self.get_pattern_compact(False, True, True, True)
         return {
-            "pattern": self.get_pattern_compact(False, True, True),
+            "pattern": pattern_compact,
             "window_stats": self.sets_count_window_distribution,
-            "tried_position_swaps": "",
-            "pattern_weight": 666
+            "tried_position_swaps": self.patterns_and_swapped_positions_memory[pattern_compact],
+            "pattern_weight": self.total_pattern_weight
         }
 
     def get_all_basic_pattern_positions(self):
@@ -554,6 +564,7 @@ class SET():
         return (values_str)
 
     def print_pattern_stats(self):
+        print(self.get_pattern_compact())
         print(self.get_pattern_values_as_string(self.set_counts_pattern))
         print("Total sets: {}" .format(self.get_pattern_total_sets_count()))
         print("Sets per window distribution: {}" .format(
@@ -598,32 +609,41 @@ class SET():
         INTERVAL_CHECK_CYCLE_COUNT = 10
 
         recorded_set_counts_pattern = None
-        previously_failed_swapped_positions_for_this_pattern = []
-
-        previous_pattern_compact = None
+        pattern_compact = self.get_pattern_compact(
+                extended=False, compacted=True, as_list=True, as_JSON_string=True)
 
         while True:
             i += 1
             pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped, recorded_set_counts_pattern, swapped_positions = self.swap_improve_single_set_window(
-                recorded_set_counts_pattern, previously_failed_swapped_positions_for_this_pattern)
+                recorded_set_counts_pattern, self.patterns_and_swapped_positions_memory[pattern_compact] )
 
             pattern_compact = self.get_pattern_compact(
                 extended=False, compacted=True, as_list=True, as_JSON_string=True)
-            if previous_pattern_compact == pattern_compact:
-                # print("same")
-
-                if swapped_positions not in previously_failed_swapped_positions_for_this_pattern:
-                    previously_failed_swapped_positions_for_this_pattern.append(
-                        swapped_positions)
-                else:
-                    print(swapped_positions)
-                    print(previously_failed_swapped_positions_for_this_pattern)
-                    AssertionError(
-                        "swapped positions should not have been tried if they were in the already tried list.")
+            
+            # save pattern update (with the tried swap positions)
+            self.db_set.add_pattern(self.get_pattern_as_dict())
+            
+            if len(self.patterns_and_swapped_positions_memory[pattern_compact]) >=3238:
+                # exhausted attempts, no improvement possibilities for swapping. 
+                # change pattern
+                pattern_compact = random.choice(list(self.patterns_and_swapped_positions_memory.keys()))
+                self.load_from_compact_pattern(pattern_compact)
+                self.calculate_all_pattern_stats()
+                recorded_set_counts_pattern = None
+                
             else:
-                previously_failed_swapped_positions_for_this_pattern = []
-
-            previous_pattern_compact = pattern_compact
+                self.patterns_and_swapped_positions_memory[pattern_compact].append(
+                    swapped_positions)
+                  
+            # else: swapped_positions not in self.patterns_and_swapped_positions_memory[pattern_compact]:
+                
+            # else:
+            #     print(swapped_positions)
+            #     print(self.patterns_and_swapped_positions_memory[pattern_compact])
+            #     AssertionError(
+            #         "swapped positions should not have been tried if they were in the already tried list.")
+            # else:
+            #     previously_failed_swapped_positions_for_this_pattern = []
 
             if i % INTERVAL_CHECK_CYCLE_COUNT == 0:
                 now_ms_epoch = int(time.time() * 1000)
@@ -634,7 +654,7 @@ class SET():
                 print("Swap Cycle {}. Swaps per second: {:.3f} . pattern weight: {}".format(
                     i, swaps_per_second, pattern_weigth_pre_swap))
 
-            if pattern_weigth_pre_swap < 20 and is_swapped and pattern_weigth_pre_swap != pattern_weigth_post_swap:
+            if pattern_weigth_pre_swap < 100 and is_swapped and pattern_weigth_pre_swap != pattern_weigth_post_swap:
                 print("--------SET PATTERN STATS after {} cycles:-----------".format(i))
                 self.print_pattern()
                 print("swapped. New weight is: {}, old weight was {}".format(
@@ -655,7 +675,7 @@ class SET():
 
         if buffered_set_counts_pattern is not None:
             self.set_counts_pattern = buffered_set_counts_pattern.copy()
-            self.calculate_all_pattern_stats(False)
+            self.calculate_all_pattern_stats(False) # saves heaps of time (not recalculate every set count per window)
         else:
             self.calculate_all_pattern_stats()
 
@@ -733,6 +753,7 @@ class SET():
             swapped_positions = sorted((swap_pos_1, swap_pos_2))
 
             if previously_failed_swapped_positions_for_this_pattern is not None:
+               
                 if swapped_positions not in previously_failed_swapped_positions_for_this_pattern:
                     swap_positions_chosen = True
                     attempts -= 1
@@ -740,11 +761,13 @@ class SET():
                         print("all swap positions have been tried before without success. {} ".format(
                             previously_failed_swapped_positions_for_this_pattern))
                         raise
+                else:
+                    pass
+                    # print("repeat swap position, will not redo. ")
             else:
                 swap_positions_chosen = True
 
         # we now have a weighted array for all card positions --> i12 means, all windows containing this card have exactly one SET.
-
 
         # do the swap
         orig_card_pos_1 = self.get_card_from_pattern(swap_pos_1)
@@ -985,17 +1008,22 @@ def test():
 if __name__ == "__main__":
     single_set_pattern_weight_5 = ["2GoP", "3BoS", "2BhS", "1RhS", "1GoP", "1BhD", "1BoS", "1BsD", "1GoD", "2BoD", "1BhP", "3GhD", "1BsP", "3BhS", "3RsS", "2BoS", "2GoD", "3RsD", "3GoS", "3RoP", "1BoD", "3GhS", "2BsS", "3RoS", "3BoD", "2GhD", "2RhD", "3GsP", "2BsD", "3GoP", "1GhD", "1GsD", "3BhP", "3GhP", "2RhS", "1RhD", "2GhS", "1RsP", "1GsS",
                                    "1GhP", "2RoP", "2BhD", "2BsP", "1RhP", "1RoD", "1RoS", "3BsD", "3RhP", "1RoP", "2GsD", "1RsS", "3BhD", "2RoS", "1GhS", "3GsD", "2RsS", "3RsP", "3BoP", "3RoD", "1GoS", "2GhP", "1BoP", "2GoS", "1BhS", "2GsS", "2BhP", "3GoD", "3GsS", "1RsD", "2RoD", "1BsS", "2GsP", "3BsP", "3RhD", "2BoP", "1GsP", "3BsS", "2RsP", "3RhS", "2RsD", "2RhP"]
+    single_set_pattern_weight_2 = ["3RoP", "2BsP", "3GsS", "3RoS", "3GhS", "1GhP", "3BsP", "2BsS", "2GhS", "1RsS", "1RoS", "2BhD", "3RhS", "2GsD", "1RsD", "2BoS", "2BoP", "3BsD", "2RhS", "1GoD", "3GhP", "2GoP", "2RhD", "3GoP", "1RsP", "1RhP", "3BhD", "2BoD", "3GsD", "1GsS", "1GsD", "3RhD", "3GhD", "3GoS", "2GhD", "2RoS", "1GhS", "2RoP", "1BoD", "2RoD", "1BhP", "3RoD", "2BhP", "1RoD", "1GoP", "1BsD", "2BhS", "1BsP", "3RhP", "1GhD", "1BoP", "1BhS", "3GoD", "1BhD", "2GoS", "2BsD", "2RsD", "3BhS", "3RsD", "2RsP", "2RhP", "3BsS", "2GsS", "3BoS", "1RoP", "1RhS", "3BhP", "2GoD", "1GoS", "3BoD", "1GsP", "3RsS", "1BoS", "3GsP", "3BoP", "3RsP", "2GsP", "1RhD", "1BsS", "2GhP", "2RsS"]
 
     db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns.db"
-    setgame = SET()
-    setgame.setup_db(db_path)
-    # setgame.create_full_pattern()
-    setgame.load_from_compact_pattern(single_set_pattern_weight_5)
+    # setgame = SET()
+    # setgame.setup_db(db_path)
+    # # setgame.create_full_pattern()
+    # setgame.load_from_compact_pattern(single_set_pattern_weight_5)
     # setgame.add_current_situation_to_db()
     # exit()
-
+# [(2, 7), (8, 5)]
+# [(5, 3), (6, 1)]
+# [(0, 5), (8, 0)]
+# [(2, 5), (5, 8)]
     setgame = SET()
-    setgame.start_search_all_windows_single_set(single_set_pattern_weight_5)
+    setgame.setup_db(db_path)
+    setgame.start_search_all_windows_single_set(single_set_pattern_weight_2)
     exit()
     # setgame.setup_db(db_path)
     # setgame.start_recursive_single_set_window_pattern_search()
