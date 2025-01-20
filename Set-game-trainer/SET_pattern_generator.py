@@ -1009,8 +1009,9 @@ if __name__ == "__main__":
     single_set_pattern_weight_5 = ["2GoP", "3BoS", "2BhS", "1RhS", "1GoP", "1BhD", "1BoS", "1BsD", "1GoD", "2BoD", "1BhP", "3GhD", "1BsP", "3BhS", "3RsS", "2BoS", "2GoD", "3RsD", "3GoS", "3RoP", "1BoD", "3GhS", "2BsS", "3RoS", "3BoD", "2GhD", "2RhD", "3GsP", "2BsD", "3GoP", "1GhD", "1GsD", "3BhP", "3GhP", "2RhS", "1RhD", "2GhS", "1RsP", "1GsS",
                                    "1GhP", "2RoP", "2BhD", "2BsP", "1RhP", "1RoD", "1RoS", "3BsD", "3RhP", "1RoP", "2GsD", "1RsS", "3BhD", "2RoS", "1GhS", "3GsD", "2RsS", "3RsP", "3BoP", "3RoD", "1GoS", "2GhP", "1BoP", "2GoS", "1BhS", "2GsS", "2BhP", "3GoD", "3GsS", "1RsD", "2RoD", "1BsS", "2GsP", "3BsP", "3RhD", "2BoP", "1GsP", "3BsS", "2RsP", "3RhS", "2RsD", "2RhP"]
     single_set_pattern_weight_2 = ["3RoP", "2BsP", "3GsS", "3RoS", "3GhS", "1GhP", "3BsP", "2BsS", "2GhS", "1RsS", "1RoS", "2BhD", "3RhS", "2GsD", "1RsD", "2BoS", "2BoP", "3BsD", "2RhS", "1GoD", "3GhP", "2GoP", "2RhD", "3GoP", "1RsP", "1RhP", "3BhD", "2BoD", "3GsD", "1GsS", "1GsD", "3RhD", "3GhD", "3GoS", "2GhD", "2RoS", "1GhS", "2RoP", "1BoD", "2RoD", "1BhP", "3RoD", "2BhP", "1RoD", "1GoP", "1BsD", "2BhS", "1BsP", "3RhP", "1GhD", "1BoP", "1BhS", "3GoD", "1BhD", "2GoS", "2BsD", "2RsD", "3BhS", "3RsD", "2RsP", "2RhP", "3BsS", "2GsS", "3BoS", "1RoP", "1RhS", "3BhP", "2GoD", "1GoS", "3BoD", "1GsP", "3RsS", "1BoS", "3GsP", "3BoP", "3RsP", "2GsP", "1RhD", "1BsS", "2GhP", "2RsS"]
+    single_set_pattern_weight_7 = ["3BoD", "2RsP", "3BoS", "3RhD", "1BoP", "2BoS", "2RhP", "1GsD", "1BsP", "2GsP", "2RhD", "1RsD", "3BsS", "3BoP", "3GoS", "2BhD", "1GoD", "3BsP", "3BhD", "1BhS", "3RoS", "2BsD", "2RsS", "2RsD", "3RoP", "3RsS", "1BsS", "3BhP", "2GsD", "3RsD", "2RoS", "3GhD", "2GoS", "2GsS", "3RoD", "1GhP", "1RsP", "2BsP", "1RhD", "3GsP", "3GoP", "1BoS", "3GhS", "1RoS", "1GsP", "2GhP", "2BoD", "3GsS", "1RsS", "3BsD", "2BhS", "3RsP", "1RoD", "2BhP", "1GsS", "1GhD", "2GhD", "2GoD", "1BsD", "1RhP", "2RoD", "3BhS", "3RhP", "1RhS", "1RoP", "2RoP", "2GhS", "2RhS", "2BoP", "2GoP", "3GhP", "1GhS", "3RhS", "1BhD", "3GoD", "1GoS", "1BhP", "1GoP", "1BoD", "2BsS", "3GsD"]
 
-    db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns.db"
+    db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns_{}.db".format(random.randint(1,10000))
     # setgame = SET()
     # setgame.setup_db(db_path)
     # # setgame.create_full_pattern()
@@ -1023,7 +1024,7 @@ if __name__ == "__main__":
 # [(2, 5), (5, 8)]
     setgame = SET()
     setgame.setup_db(db_path)
-    setgame.start_search_all_windows_single_set(single_set_pattern_weight_2)
+    setgame.start_search_all_windows_single_set(single_set_pattern_weight_7)
     exit()
     # setgame.setup_db(db_path)
     # setgame.start_recursive_single_set_window_pattern_search()
@@ -1032,12 +1033,12 @@ if __name__ == "__main__":
 
     # retrieve_most_promising_pattern(db_path)
 
-    setgame = SET()
-    setgame.create_full_pattern()
-    setgame.print_pattern()
-    setgame.calculate_all_pattern_stats()
-    setgame.print_pattern_stats()
-    improve_single_set_windows(setgame)
+    # setgame = SET()
+    # setgame.create_full_pattern()
+    # setgame.print_pattern()
+    # setgame.calculate_all_pattern_stats()
+    # setgame.print_pattern_stats()
+    # improve_single_set_windows(setgame)
 
     # setgame.print_pattern()
     # setgame.tag_multiset_window_cards()
