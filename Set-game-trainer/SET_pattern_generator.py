@@ -143,6 +143,7 @@ class db_SET_analytics():
 
         window_stats = set_pattern_dict["window_stats"]
         tried_position_swaps = set_pattern_dict["tried_position_swaps"]
+
         single_set_windows = window_stats[1]
         pattern_weight = set_pattern_dict["pattern_weight"]
 
@@ -151,10 +152,20 @@ class db_SET_analytics():
         json_window_stats = json.dumps(window_stats)
         json_tried_position_swaps = json.dumps(tried_position_swaps)
 
-        self.execute_sql(
-            "INSERT INTO set_patterns (pattern, window_stats, single_set_windows, pattern_weight,tried_position_swaps) VALUES ('{}','{}','{}','{}','{}')".format(
-                json_pattern, json_window_stats, single_set_windows, pattern_weight, json_tried_position_swaps
-            ))
+        pattern_dict = self.get_pattern_if_existing(json_pattern)
+        if pattern_dict is None:
+            self.execute_sql(
+                "INSERT INTO set_patterns (pattern, window_stats, single_set_windows, pattern_weight,tried_position_swaps) VALUES ('{}','{}','{}','{}','{}')".format(
+                    json_pattern, json_window_stats, single_set_windows, pattern_weight, json_tried_position_swaps
+                ))
+        else:
+            print(pattern_dict)
+
+            # print ("exists in table : {} ".format(json_pattern))
+            #  update the pattern positions "tried_positions_swap"
+
+            # update the record with the
+            pass
 
     def table_exists(self, table_name):
         self.cursor.execute("""
@@ -183,9 +194,27 @@ class db_SET_analytics():
             LIMIT 1
             """)
 
-        row = self.cursor.fetchone()
-        pattern_json, window_stats_json, single_set_windows, pattern_weight, tried_position_swaps = row
+        record = self.cursor.fetchone()
+        if record is None:
+            return None
+        else:
+            return self.convert_record_to_pattern_dict(record)
 
+    def get_pattern_if_existing(self, compact_pattern):
+        query = "SELECT * FROM set_patterns WHERE pattern = '{}' LIMIT 1".format(
+            compact_pattern)
+
+        self.cursor.execute(query)
+        record = self.cursor.fetchone()
+        if record is None:
+            return None
+        else:
+            return self.convert_record_to_pattern_dict(record)
+
+    def convert_record_to_pattern_dict(self, record):
+        print(record)
+
+        pattern_json, window_stats_json, single_set_windows, pattern_weight, tried_position_swaps = record
         pattern = json.loads(pattern_json)
         window_stats_json = json.loads(window_stats_json)
         single_set_windows = int(single_set_windows)
@@ -220,15 +249,14 @@ class SET():
         self.db_set = db_SET_analytics(db_path)
 
     def add_current_situation_to_db(self):
-        self.calculate_all_windows_sets_count()
-        self.get_full_pattern_weight()
-        
+        self.calculate_all_pattern_stats()
+
         onepattern_dict = self.get_pattern_as_dict()
         self.db_set.add_pattern(onepattern_dict)
 
     def reset_pattern(self):
         self.deck = create_deck(parameters, False, True)
-
+        self.total_pattern_weight = 0
         # normal pattern: 9x9. But, to handle the edge cases: we extend the 9x9 pattern 2x2  so: 18x18. where (0,0) == (9,0) == (0,9) == (9,9)
         self.pattern_extended = {(row, col): None for row in range(
             PATTERN_ROWS * 2) for col in range(PATTERN_COLS*2)}
@@ -240,9 +268,7 @@ class SET():
             PATTERN_ROWS) for col in range(PATTERN_COLS)}
         self.basic_pattern_positions = self.get_all_basic_pattern_positions()
         self.sets_count_window_distribution = None
-        self.pattern_weight = None
         self.i = 0
-        self.buffer_pre_swap_pattern_weight = 100
 
     def card_compact_to_normal(self, compact_card):
 
@@ -277,11 +303,14 @@ class SET():
         self.print_pattern()
 
     def get_pattern_as_dict(self):
+        print("feeijeij")
+        print(tried_position_swaps)
+
         return {
             "pattern": self.get_pattern_compact(False, True, True),
             "window_stats": self.sets_count_window_distribution,
-            "tried_position_swaps":"",
-            "pattern_weight":666
+            "tried_position_swaps": "",
+            "pattern_weight": 666
         }
 
     def get_all_basic_pattern_positions(self):
@@ -462,16 +491,23 @@ class SET():
         sets_count = set_in_cards(cards, False, True)
         return sets_count
 
-    def calculate_all_windows_sets_count(self, verbose = False):
-        window_positions = self.get_all_basic_pattern_positions()
-        for position in window_positions:
-            self.set_counts_pattern[position] = self.get_set_count_in_window(
-                position)
-            
-        self.calculate_sets_count_window_distribution(verbose)
+    def calculate_all_pattern_stats(self, recalculate_set_count_per_window=True, recalculate_sets_window_distribution=True):
+        if recalculate_set_count_per_window:
+            # calculate amountn of sets per window
+            window_positions = self.get_all_basic_pattern_positions()
+            for position in window_positions:
+                self.set_counts_pattern[position] = self.get_set_count_in_window(
+                    position)
 
-    def calculate_sets_count_window_distribution(self, verbose=False):
-        # set count distribution for all windows. 
+        if recalculate_sets_window_distribution:
+            # calculate the distrubtion of set counts per window
+            self.calculate_sets_count_window_distribution()
+            
+        # calculate the total weight of the pattern (=score to understand how far away from our target we are (amount of sets per window))
+        self.calculate_full_pattern_weight()
+
+    def calculate_sets_count_window_distribution(self):
+        # set count distribution for all windows.
         sets_count = 0
         sets_count_window_distribution = [0 for i in range(20)]
 
@@ -480,18 +516,33 @@ class SET():
                 set_count = self.set_counts_pattern[(row, col)]
                 sets_count += set_count
                 sets_count_window_distribution[set_count] += 1
-        if verbose:
-            print("Total sets: {}" .format(sets_count))
-            print("Sets per window distribution: {}" .format(
-                sets_count_window_distribution))
+
         check_count = 0
         for i, count in enumerate(sets_count_window_distribution):
             check_count += i*count
-        if verbose:
-            print("check: {}".format(check_count))
+
         self.sets_count_window_distribution = sets_count_window_distribution
-        # return sets_count_window_distribution
-        
+
+    def calculate_full_pattern_weight(self):
+        # 1 set per window is what we want. their weight is zero. 2 set windows add weight of 1, 3 set windows asdd weight of 2, ....    AND 0 set window add weight of 1
+
+        distribution = self.sets_count_window_distribution
+
+        self.total_pattern_weight = 0
+
+        # zero set windows get a punish point.
+        # one set windows: no punish points
+        # two  set windows: two punish points
+        # ...
+        for i, set_count in enumerate(distribution):
+            if i == 0:
+                self.total_pattern_weight += 1 * set_count
+            elif i == 1:
+                # add zero
+                pass
+            else:
+                self.total_pattern_weight += (i-1) * set_count
+
     def get_pattern_values_as_string(self, pattern_values):
         values_str = ""
         for row in range(PATTERN_ROWS):
@@ -502,18 +553,24 @@ class SET():
             values_str += line_string + "\n"
         return (values_str)
 
-    def print_set_counts_pattern(self):
+    def print_pattern_stats(self):
         print(self.get_pattern_values_as_string(self.set_counts_pattern))
+        print("Total sets: {}" .format(self.get_pattern_total_sets_count()))
+        print("Sets per window distribution: {}" .format(
+            self.sets_count_window_distribution))
+
+        print("Pattern weigth = {} ".format(self.total_pattern_weight))
+        
 
     def get_pattern_total_sets_count(self):
-        return sum([ i*v for i,v in enumerate(self.sets_count_window_distribution) ])
-        
+        return sum([i*v for i, v in enumerate(self.sets_count_window_distribution)])
+
     def save_pattern_to_file(self, base_path):
         base_path = Path(base_path)
         single_set_windows = self.sets_count_window_distribution[1]
-        
+
         get_pattern_total_sets_count = get_pattern_total_sets_count()
-        
+
         name = "SET_pattern_{}_{}_{}.txt".format(str(single_set_windows), str(
             get_pattern_total_sets_count), str(self.sets_count_window_distribution))
 
@@ -524,7 +581,6 @@ class SET():
             file.write(f"{sets_counts_windows_as_string}\n")
 
     def start_search_all_windows_single_set(self, compact_pattern=None):
-
         if compact_pattern is None:
             self.create_full_pattern()
         else:
@@ -585,9 +641,8 @@ class SET():
                     pattern_weigth_post_swap, pattern_weigth_pre_swap))
 
                 # print ("total one set per window score (0= all windows one set): {}".format(pattern_weigth))
-                self.calculate_all_windows_sets_count(True)
-                self.print_set_counts_pattern()
-                self.get_full_pattern_weight(verbose=True)
+                self.calculate_all_pattern_stats()
+                self.print_pattern_stats()
 
     def swap_improve_single_set_window(self, buffered_set_counts_pattern=None, previously_failed_swapped_positions_for_this_pattern=None):
         # improve the amount of single set windows by swapping cards and analysing.
@@ -600,11 +655,12 @@ class SET():
 
         if buffered_set_counts_pattern is not None:
             self.set_counts_pattern = buffered_set_counts_pattern.copy()
-            self.calculate_sets_count_window_distribution()
+            self.calculate_all_pattern_stats(False)
         else:
-            self.calculate_all_windows_sets_count()
+            self.calculate_all_pattern_stats()
 
         pre_swap_set_counts_pattern = self.set_counts_pattern.copy()
+        pre_swap_pattern_weight = self.total_pattern_weight
 
         # assigning card position weights
         for position in self.basic_pattern_positions:
@@ -651,7 +707,7 @@ class SET():
         # PROBABILITY_POWER = self.buffer_pre_swap_pattern_weight + 1
 
         # higher: faster weight optimizing at start, but then stops quickly.
-        if self.buffer_pre_swap_pattern_weight > 15:
+        if pre_swap_pattern_weight > 15:
             PROBABILITY_POWER = 4
         else:
             PROBABILITY_POWER = 4
@@ -688,8 +744,7 @@ class SET():
                 swap_positions_chosen = True
 
         # we now have a weighted array for all card positions --> i12 means, all windows containing this card have exactly one SET.
-        pre_swap_pattern_weight = self.get_full_pattern_weight()
-        self.buffer_pre_swap_pattern_weight = pre_swap_pattern_weight
+
 
         # do the swap
         orig_card_pos_1 = self.get_card_from_pattern(swap_pos_1)
@@ -700,11 +755,10 @@ class SET():
         self.add_card_to_pattern(orig_card_pos_1, swap_pos_2)
 
         # do analysis again
-        self.calculate_all_windows_sets_count()
+        self.calculate_all_pattern_stats()
         post_swap_set_counts_pattern = self.set_counts_pattern.copy()
-
-        post_swap_pattern_weight = self.get_full_pattern_weight()
-        # print("before888888? {}: {}, {},  pre swap weight:  post swap weight: ".format(success, post_swap_pattern_weight, pre_swap_pattern_weight) )
+        post_swap_pattern_weight = self.total_pattern_weight
+        
         # todo > or >=  (Lode thinks > )
         if post_swap_pattern_weight > pre_swap_pattern_weight:
             # print("Post bigger score than pre. ---> succes false.")
@@ -718,35 +772,6 @@ class SET():
         else:
             # if weight is equal, be ok with the changes. Prevents from being stuck in a situation for too long?! OK or not ?!
             return pre_swap_pattern_weight, post_swap_pattern_weight, True, post_swap_set_counts_pattern, swapped_positions
-
-        # print("swapped? {}: {}, {},  pre swap weight, post swap weight, success ".format(success, pre_swap_pattern_weight, post_swap_pattern_weight) )
-
-            # return post_swap_pattern_weight
-
-    def get_full_pattern_weight(self, verbose=False):
-        # 1 set per window is what we want. their weight is zero. 2 set windows add weight of 1, 3 set windows asdd weight of 2, ....    AND 0 set window add weight of 1
-
-        distribution = self.sets_count_window_distribution 
-        
-        total_pattern_weight = 0
-
-        # zero set windows get a punish point.
-        # one set windows: no punish points
-        # two  set windows: two punish points
-        # ...
-        if verbose:
-            print(distribution)
-        for i, set_count in enumerate(distribution):
-            if i == 0:
-                total_pattern_weight += 1 * set_count
-            elif i == 1:
-                # add zero
-                pass
-            else:
-                total_pattern_weight += (i-1) * set_count
-        if verbose:
-            print("Pattern weigth = {} ".format(total_pattern_weight))
-        return total_pattern_weight
 
     def start_recursive_single_set_window_pattern_search(self):
         # DEPRECATED
@@ -764,8 +789,8 @@ class SET():
         if success:
             print("SEARCH FINISHED successfully")
 
-            self.calculate_all_windows_sets_count()
-            self.print_set_counts_pattern()
+            self.calculate_all_pattern_stats()
+            self.print_pattern_stats()
         else:
             print("SEARCH FINISHED. No pattern found....")
 
@@ -806,8 +831,8 @@ class SET():
 
                 if (window_index > 10):
                     self.add_current_situation_to_db()
-                self.calculate_all_windows_sets_count()
-                self.print_set_counts_pattern()
+                self.calculate_all_pattern_stats()
+                self.print_pattern_stats()
                 print("iteration {}, level: {}".format(self.i, window_index))
 
                 # raise
@@ -887,9 +912,9 @@ def generate_set_patterns_to_file():
     for i in range(1):
         setgame = SET()
         setgame.create_full_pattern()
-        setgame.calculate_all_windows_sets_count()
+        setgame.calculate_all_pattern_stats()
         setgame.print_pattern(False)
-        setgame.print_set_counts_pattern()
+        setgame.print_pattern_stats()
         setgame.save_pattern_to_file(
             "C:\Data\generated_program_data\SET_pattern")
 
@@ -901,10 +926,10 @@ def generate_set_patterns_to_db(db_path, attempts=100):
     for i in range(attempts):
         setgame = SET()
         setgame.create_full_pattern()
-        setgame.calculate_all_windows_sets_count()
+        setgame.calculate_all_pattern_stats()
         # setgame.print_pattern(False)
         # print(setgame.pattern_extended)
-        # setgame.print_set_counts_pattern()
+        # setgame.print_pattern_stats()
         # window_positions = setgame.get_pattern_positions_from_window_position((0,0))
         onepattern_dict = setgame.get_pattern_as_dict()
 
@@ -918,8 +943,8 @@ def retrieve_most_promising_pattern(db_path):
     print(pattern_dict)
     setgame.restore_archived_pattern(pattern_dict)
     setgame.print_pattern()
-    setgame.calculate_all_windows_sets_count(True)
-    setgame.print_set_counts_pattern()
+    setgame.calculate_all_pattern_stats()
+    setgame.print_pattern_stats()
 
 # def improve_single_set_windows(setgame):
 #     # setgame = SET()
@@ -940,9 +965,8 @@ def retrieve_most_promising_pattern(db_path):
 #             print("swapped. New weight is: {}, old weight was {}".format(pattern_weigth_post_swap, pattern_weigth_pre_swap))
 
 #             # print ("total one set per window score (0= all windows one set): {}".format(pattern_weigth))
-#             setgame.calculate_all_windows_sets_count(True)
-#             setgame.print_set_counts_pattern()
-#             setgame.get_full_pattern_weight(verbose=True)
+#             setgame.calculate_all_pattern_stats(True)
+#             setgame.print_pattern_stats()
 
 
 def test():
@@ -967,7 +991,7 @@ if __name__ == "__main__":
     setgame.setup_db(db_path)
     # setgame.create_full_pattern()
     setgame.load_from_compact_pattern(single_set_pattern_weight_5)
-    setgame.add_current_situation_to_db()
+    # setgame.add_current_situation_to_db()
     # exit()
 
     setgame = SET()
@@ -983,8 +1007,8 @@ if __name__ == "__main__":
     setgame = SET()
     setgame.create_full_pattern()
     setgame.print_pattern()
-    setgame.print_set_counts_pattern()
-    setgame.calculate_all_windows_sets_count(True)
+    setgame.calculate_all_pattern_stats()
+    setgame.print_pattern_stats()
     improve_single_set_windows(setgame)
 
     # setgame.print_pattern()
