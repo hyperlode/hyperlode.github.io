@@ -16,6 +16,9 @@ PATTERN_COLS = 9
 PATTERN_WINDOW_ROWS = 3
 PATTERN_WINDOW_COLS = 4
 
+window_set_count_buffer = {}
+window_set_count_buffer_hits = 0
+window_set_count_buffer_non_hits = 0
 # Set
 # card options
 PROPERTIES_COUNT = 3
@@ -43,7 +46,6 @@ def create_deck(parameters, formatted=False, shuffled=True):
 
     return combinations
 
-
 def is_set(three_cards, verbose=False):
     # cards as lists
 
@@ -51,29 +53,46 @@ def is_set(three_cards, verbose=False):
     if None in three_cards:
         return False
 
-    # bundle per property
-    separated_per_property = list(zip(*three_cards))
-
-    # check
-    for p in separated_per_property:
-        assert len(p) == PROPERTIES_COUNT, "Incorrect card "
-
-    separated_per_property_as_different_values = [
-        set(p) for p in separated_per_property]
-
-    is_set = True
-    # check for all values diff or all equal per parameter SET fulfillment requirement
-    for diff_values in separated_per_property_as_different_values:
-        diff_count = len(diff_values)
-        if diff_count == 1 or diff_count == PROPERTIES_COUNT:
+    for property_value_1,property_value_2,property_value_3 in zip(*three_cards):
+        if property_value_1 == property_value_2 == property_value_3:
+            # no need to count, if even one property does not pass, returns False right away
+            pass
+        elif property_value_1 != property_value_2 and  property_value_1 != property_value_3 and property_value_2 != property_value_3:
+            # no need to count, if even one property does not pass, returns False right away
             pass
         else:
-            is_set = False
-    if verbose:
-        print("SET") if is_set else print("No SET")
+            return False
+    return True
+# def is_set(three_cards, verbose=False):
+#     # cards as lists
 
-    # for card in three_cards:
-    return is_set
+#     # check for none cards:
+#     if None in three_cards:
+#         return False
+
+#     # bundle per property
+#     separated_per_property = list(zip(*three_cards))
+
+#     # check
+#     for p in separated_per_property:
+#         assert len(p) == PROPERTIES_COUNT, "Incorrect card "
+
+#     separated_per_property_as_different_values = [
+#         set(p) for p in separated_per_property]
+
+#     is_set = True
+#     # check for all values diff or all equal per parameter SET fulfillment requirement
+#     for diff_values in separated_per_property_as_different_values:
+#         diff_count = len(diff_values)
+#         if diff_count == 1 or diff_count == PROPERTIES_COUNT:
+#             pass
+#         else:
+#             is_set = False
+#     if verbose:
+#         print("SET") if is_set else print("No SET")
+
+#     # for card in three_cards:
+#     return is_set
 
 
 def check_random_draw_from_full_deck(deck):
@@ -87,12 +106,24 @@ def check_random_draw_from_full_deck(deck):
     is_set(random_cards)
 
 
-def set_in_cards(cards, verbose=False, count_sets=False):
+def set_in_cards(cards, verbose=False, count_sets=False, if_more_than_one_return_high=False):
+    global window_set_count_buffer_hits
+    global window_set_count_buffer_non_hits
+
+    if count_sets:
+        cards_tuple = tuple(cards)
+        value = window_set_count_buffer.get(cards_tuple)
+        if value is not None:
+            window_set_count_buffer_hits += 1
+            return value
+        else:
+            window_set_count_buffer_non_hits += 1 
+            
     if len(cards) < 3:
         return False
-
     # check if there is a set in cards
     combinations_of_three_cards = list(itertools.combinations(cards, 3))
+    # 220 for 12 cards print(len(combinations_of_three_cards))
     sets_count = 0
     for three_cards in combinations_of_three_cards:
         if verbose:
@@ -105,10 +136,17 @@ def set_in_cards(cards, verbose=False, count_sets=False):
 
         if not count_sets:
             return True
+        # else:
+        #     if if_more_than_one_return_high:
+        #         if sets_count > 1:
+        #             # optimizes slightly, but not worth it...
+        #             return 10
+            
 
     if not count_sets:
         return False
     else:
+        window_set_count_buffer[cards_tuple] = sets_count
         return sets_count
 
 
@@ -507,7 +545,7 @@ class SET():
 
     def get_set_count_in_window(self, window_position):
         cards = self.get_window_cards_from_pattern(window_position)
-        sets_count = set_in_cards(cards, False, True)
+        sets_count = set_in_cards(cards, False, True, False)
         return sets_count
 
     def calculate_all_pattern_stats(self, recalculate_set_count_per_window=True, recalculate_sets_window_distribution=True):
@@ -615,7 +653,7 @@ class SET():
         now_ms_epoch = int(time.time() * 1000)
         previous_time_stamp = now_ms_epoch
 
-        INTERVAL_CHECK_CYCLE_COUNT = 10
+        INTERVAL_CHECK_CYCLE_COUNT = 100
 
         recorded_set_counts_pattern = None
         pattern_compact = self.get_pattern_compact(
@@ -634,11 +672,21 @@ class SET():
             # save pattern update (with the tried swap positions)
             self.db_set.add_pattern(self.get_pattern_as_dict())
             
+            # 3238 = swapped positions lenght until swapping exhausted (all single swaps in a pattern tried)
             if len(self.patterns_and_swapped_positions_memory[pattern_compact]) >=3238:
                 # exhausted attempts, no improvement possibilities for swapping. 
                 # change pattern
-                pattern_compact = random.choice(list(self.patterns_and_swapped_positions_memory.keys()))
-                self.load_from_compact_pattern(pattern_compact)
+                success = False
+                while not success:
+                    pattern_compact = random.choice(list(self.patterns_and_swapped_positions_memory.keys()))
+                    try:
+                        self.load_from_compact_pattern(pattern_compact)
+                        success = True
+                    except Exception as e:
+                        print("error when loading new pattern.  {}".format(e))
+                        print(self.patterns_and_swapped_positions_memory.keys())
+                    
+                        
                 self.calculate_all_pattern_stats()
                 recorded_set_counts_pattern = None
                 
@@ -662,8 +710,12 @@ class SET():
                 swaps_per_second = (INTERVAL_CHECK_CYCLE_COUNT / dt * 1000)
                 previous_time_stamp = now_ms_epoch
 
-                print("Swap Cycle {}. Swaps per second: {:.3f} . pattern weight: {}".format(
-                    i, swaps_per_second, pattern_weigth_pre_swap))
+                print("Swap Cycle {}. Swaps per second: {:.3f} . pattern weight: {}. (window set count buffer length: {} set count buffer hits - nohits = {} - {})".format(
+                    i, swaps_per_second, pattern_weigth_pre_swap, len(window_set_count_buffer), 
+                    window_set_count_buffer_hits,
+                    window_set_count_buffer_non_hits,
+                    )
+                      )
 
             if pattern_weigth_pre_swap < 100 and is_swapped and pattern_weigth_pre_swap != pattern_weigth_post_swap:
                 print("--------SET PATTERN STATS after {} cycles:-----------".format(i))
@@ -1020,13 +1072,12 @@ def test():
 
 
 if __name__ == "__main__":
-    single_set_pattern_weight_5 = ["2GoP", "3BoS", "2BhS", "1RhS", "1GoP", "1BhD", "1BoS", "1BsD", "1GoD", "2BoD", "1BhP", "3GhD", "1BsP", "3BhS", "3RsS", "2BoS", "2GoD", "3RsD", "3GoS", "3RoP", "1BoD", "3GhS", "2BsS", "3RoS", "3BoD", "2GhD", "2RhD", "3GsP", "2BsD", "3GoP", "1GhD", "1GsD", "3BhP", "3GhP", "2RhS", "1RhD", "2GhS", "1RsP", "1GsS",
-                                   "1GhP", "2RoP", "2BhD", "2BsP", "1RhP", "1RoD", "1RoS", "3BsD", "3RhP", "1RoP", "2GsD", "1RsS", "3BhD", "2RoS", "1GhS", "3GsD", "2RsS", "3RsP", "3BoP", "3RoD", "1GoS", "2GhP", "1BoP", "2GoS", "1BhS", "2GsS", "2BhP", "3GoD", "3GsS", "1RsD", "2RoD", "1BsS", "2GsP", "3BsP", "3RhD", "2BoP", "1GsP", "3BsS", "2RsP", "3RhS", "2RsD", "2RhP"]
+    single_set_pattern_weight_5 = ["2GoP", "3BoS", "2BhS", "1RhS", "1GoP", "1BhD", "1BoS", "1BsD", "1GoD", "2BoD", "1BhP", "3GhD", "1BsP", "3BhS", "3RsS", "2BoS", "2GoD", "3RsD", "3GoS", "3RoP", "1BoD", "3GhS", "2BsS", "3RoS", "3BoD", "2GhD", "2RhD", "3GsP", "2BsD", "3GoP", "1GhD", "1GsD", "3BhP", "3GhP", "2RhS", "1RhD", "2GhS", "1RsP", "1GsS", "1GhP", "2RoP", "2BhD", "2BsP", "1RhP", "1RoD", "1RoS", "3BsD", "3RhP", "1RoP", "2GsD", "1RsS", "3BhD", "2RoS", "1GhS", "3GsD", "2RsS", "3RsP", "3BoP", "3RoD", "1GoS", "2GhP", "1BoP", "2GoS", "1BhS", "2GsS", "2BhP", "3GoD", "3GsS", "1RsD", "2RoD", "1BsS", "2GsP", "3BsP", "3RhD", "2BoP", "1GsP", "3BsS", "2RsP", "3RhS", "2RsD", "2RhP"]
     single_set_pattern_weight_2 = ["3RoP", "2BsP", "3GsS", "3RoS", "3GhS", "1GhP", "3BsP", "2BsS", "2GhS", "1RsS", "1RoS", "2BhD", "3RhS", "2GsD", "1RsD", "2BoS", "2BoP", "3BsD", "2RhS", "1GoD", "3GhP", "2GoP", "2RhD", "3GoP", "1RsP", "1RhP", "3BhD", "2BoD", "3GsD", "1GsS", "1GsD", "3RhD", "3GhD", "3GoS", "2GhD", "2RoS", "1GhS", "2RoP", "1BoD", "2RoD", "1BhP", "3RoD", "2BhP", "1RoD", "1GoP", "1BsD", "2BhS", "1BsP", "3RhP", "1GhD", "1BoP", "1BhS", "3GoD", "1BhD", "2GoS", "2BsD", "2RsD", "3BhS", "3RsD", "2RsP", "2RhP", "3BsS", "2GsS", "3BoS", "1RoP", "1RhS", "3BhP", "2GoD", "1GoS", "3BoD", "1GsP", "3RsS", "1BoS", "3GsP", "3BoP", "3RsP", "2GsP", "1RhD", "1BsS", "2GhP", "2RsS"]
     single_set_pattern_weight_7 = ["3BoD", "2RsP", "3BoS", "3RhD", "1BoP", "2BoS", "2RhP", "1GsD", "1BsP", "2GsP", "2RhD", "1RsD", "3BsS", "3BoP", "3GoS", "2BhD", "1GoD", "3BsP", "3BhD", "1BhS", "3RoS", "2BsD", "2RsS", "2RsD", "3RoP", "3RsS", "1BsS", "3BhP", "2GsD", "3RsD", "2RoS", "3GhD", "2GoS", "2GsS", "3RoD", "1GhP", "1RsP", "2BsP", "1RhD", "3GsP", "3GoP", "1BoS", "3GhS", "1RoS", "1GsP", "2GhP", "2BoD", "3GsS", "1RsS", "3BsD", "2BhS", "3RsP", "1RoD", "2BhP", "1GsS", "1GhD", "2GhD", "2GoD", "1BsD", "1RhP", "2RoD", "3BhS", "3RhP", "1RhS", "1RoP", "2RoP", "2GhS", "2RhS", "2BoP", "2GoP", "3GhP", "1GhS", "3RhS", "1BhD", "3GoD", "1GoS", "1BhP", "1GoP", "1BoD", "2BsS", "3GsD"]
     
     
-    single_set_pattern_weight_3 =["2GoP", "3BhS", "1GhD", "3RsD", "3GoD", "2RsD", "1GoS", "2RoS", "3RoD", "2RsS", "2GoS", "2GoD", "2GhD", "3RsS", "3RhD", "2BoP", "2BhP", "1BhD", "2GhS", "1GsD", "3BsD", "2BsS", "3RoS", "2RhD", "1BoD", "1BoP", "1GhP", "3GsP", "1BsD", "3GhS", "1RsS", "1BhS", "2GsP", "1RhD", "1GoP", "2RhS", "1RhP", "1GoD", "2GhP", "3GsD", "3GhD", "3GoS", "3BoP", "2BoD", "2BsD", "1GsP", "1RsD", "3BsP", "3RhP", "2RhP", "3GsS", "1RsP", "2RoD", "3BhD", "3BsS", "3RoP", "2BhD", "1BhP", "1RhS", "2GsD", "2BhS", "1GsS", "2BoS", "3RsP", "3RhS", "3BhP", "3BoS", "1RoP", "2BsP", "1RoS", "2RsP", "3BoD", "1BsS", "1RoD", "2RoP", "1BoS", "1GhS", "3GoP", "1BsP", "2GsS", "3GhP"]
+    single_set_pattern_weight_8 = ["2GoP", "3BhS", "1GhD", "3RsD", "3GoD", "2RsD", "1GoS", "2RoS", "3RoD", "2RsS", "2GoS", "2GoD", "2GhD", "3RsS", "3RhD", "2BoP", "2BhP", "1BhD", "2GhS", "1GsD", "3BsD", "2BsS", "3RoS", "2RhD", "1BoD", "1BoP", "1GhP", "3GsP", "1BsD", "3GhS", "1RsS", "1BhS", "2GsP", "1RhD", "1GoP", "2RhS", "1RhP", "1GoD", "2GhP", "3GsD", "3GhD", "3GoS", "3BoP", "2BoD", "2BsD", "1GsP", "1RsD", "3BsP", "3RhP", "2RhP", "3GsS", "1RsP", "2RoD", "3BhD", "3BsS", "3RoP", "2BhD", "1BhP", "1RhS", "2GsD", "2BhS", "1GsS", "2BoS", "3RsP", "3RhS", "3BhP", "3BoS", "1RoP", "2BsP", "1RoS", "2RsP", "3BoD", "1BsS", "1RoD", "2RoP", "1BoS", "1GhS", "3GoP", "1BsP", "2GsS", "3GhP"]
      
 
     db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns_{}.db".format(random.randint(1,10000))
@@ -1042,8 +1093,7 @@ if __name__ == "__main__":
 # [(2, 5), (5, 8)]
     setgame = SET()
     setgame.setup_db(db_path)
-    setgame.start_search_all_windows_single_set(single_set_pattern_weight_3)
-    exit()
+    setgame.start_search_all_windows_single_set()
     # setgame.setup_db(db_path)
     # setgame.start_recursive_single_set_window_pattern_search()
 
