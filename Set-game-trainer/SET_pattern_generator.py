@@ -299,7 +299,16 @@ class SET():
             # print(parameters.keys())
             property = list(parameters.keys())[property_index]
             # print(parameters[property])
-            value_index = parameters_single_char[property].index(value)
+            
+            try:
+                value_index = parameters_single_char[property].index(value)
+            except Exception as e:
+                print(
+                    "error when trying to parse: .:{}".format(e)
+                    )
+                print (compact_card)
+                raise
+
 
             # card[property] = parameters[property][value_index]
             card.append(parameters[property][value_index])
@@ -612,7 +621,9 @@ class SET():
         pattern_compact = self.get_pattern_compact(
                 extended=False, compacted=True, as_list=True, as_JSON_string=True)
 
+        
         while True:
+        # while i < 5:
             i += 1
             pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped, recorded_set_counts_pattern, swapped_positions = self.swap_improve_single_set_window(
                 recorded_set_counts_pattern, self.patterns_and_swapped_positions_memory[pattern_compact] )
@@ -663,6 +674,8 @@ class SET():
                 # print ("total one set per window score (0= all windows one set): {}".format(pattern_weigth))
                 self.calculate_all_pattern_stats()
                 self.print_pattern_stats()
+                
+        print(self.patterns_and_swapped_positions_memory[pattern_compact])
 
     def swap_improve_single_set_window(self, buffered_set_counts_pattern=None, previously_failed_swapped_positions_for_this_pattern=None):
         # improve the amount of single set windows by swapping cards and analysing.
@@ -677,6 +690,7 @@ class SET():
             self.set_counts_pattern = buffered_set_counts_pattern.copy()
             self.calculate_all_pattern_stats(False) # saves heaps of time (not recalculate every set count per window)
         else:
+            pass
             self.calculate_all_pattern_stats()
 
         pre_swap_set_counts_pattern = self.set_counts_pattern.copy()
@@ -1010,6 +1024,10 @@ if __name__ == "__main__":
                                    "1GhP", "2RoP", "2BhD", "2BsP", "1RhP", "1RoD", "1RoS", "3BsD", "3RhP", "1RoP", "2GsD", "1RsS", "3BhD", "2RoS", "1GhS", "3GsD", "2RsS", "3RsP", "3BoP", "3RoD", "1GoS", "2GhP", "1BoP", "2GoS", "1BhS", "2GsS", "2BhP", "3GoD", "3GsS", "1RsD", "2RoD", "1BsS", "2GsP", "3BsP", "3RhD", "2BoP", "1GsP", "3BsS", "2RsP", "3RhS", "2RsD", "2RhP"]
     single_set_pattern_weight_2 = ["3RoP", "2BsP", "3GsS", "3RoS", "3GhS", "1GhP", "3BsP", "2BsS", "2GhS", "1RsS", "1RoS", "2BhD", "3RhS", "2GsD", "1RsD", "2BoS", "2BoP", "3BsD", "2RhS", "1GoD", "3GhP", "2GoP", "2RhD", "3GoP", "1RsP", "1RhP", "3BhD", "2BoD", "3GsD", "1GsS", "1GsD", "3RhD", "3GhD", "3GoS", "2GhD", "2RoS", "1GhS", "2RoP", "1BoD", "2RoD", "1BhP", "3RoD", "2BhP", "1RoD", "1GoP", "1BsD", "2BhS", "1BsP", "3RhP", "1GhD", "1BoP", "1BhS", "3GoD", "1BhD", "2GoS", "2BsD", "2RsD", "3BhS", "3RsD", "2RsP", "2RhP", "3BsS", "2GsS", "3BoS", "1RoP", "1RhS", "3BhP", "2GoD", "1GoS", "3BoD", "1GsP", "3RsS", "1BoS", "3GsP", "3BoP", "3RsP", "2GsP", "1RhD", "1BsS", "2GhP", "2RsS"]
     single_set_pattern_weight_7 = ["3BoD", "2RsP", "3BoS", "3RhD", "1BoP", "2BoS", "2RhP", "1GsD", "1BsP", "2GsP", "2RhD", "1RsD", "3BsS", "3BoP", "3GoS", "2BhD", "1GoD", "3BsP", "3BhD", "1BhS", "3RoS", "2BsD", "2RsS", "2RsD", "3RoP", "3RsS", "1BsS", "3BhP", "2GsD", "3RsD", "2RoS", "3GhD", "2GoS", "2GsS", "3RoD", "1GhP", "1RsP", "2BsP", "1RhD", "3GsP", "3GoP", "1BoS", "3GhS", "1RoS", "1GsP", "2GhP", "2BoD", "3GsS", "1RsS", "3BsD", "2BhS", "3RsP", "1RoD", "2BhP", "1GsS", "1GhD", "2GhD", "2GoD", "1BsD", "1RhP", "2RoD", "3BhS", "3RhP", "1RhS", "1RoP", "2RoP", "2GhS", "2RhS", "2BoP", "2GoP", "3GhP", "1GhS", "3RhS", "1BhD", "3GoD", "1GoS", "1BhP", "1GoP", "1BoD", "2BsS", "3GsD"]
+    
+    
+    single_set_pattern_weight_3 =["2GoP", "3BhS", "1GhD", "3RsD", "3GoD", "2RsD", "1GoS", "2RoS", "3RoD", "2RsS", "2GoS", "2GoD", "2GhD", "3RsS", "3RhD", "2BoP", "2BhP", "1BhD", "2GhS", "1GsD", "3BsD", "2BsS", "3RoS", "2RhD", "1BoD", "1BoP", "1GhP", "3GsP", "1BsD", "3GhS", "1RsS", "1BhS", "2GsP", "1RhD", "1GoP", "2RhS", "1RhP", "1GoD", "2GhP", "3GsD", "3GhD", "3GoS", "3BoP", "2BoD", "2BsD", "1GsP", "1RsD", "3BsP", "3RhP", "2RhP", "3GsS", "1RsP", "2RoD", "3BhD", "3BsS", "3RoP", "2BhD", "1BhP", "1RhS", "2GsD", "2BhS", "1GsS", "2BoS", "3RsP", "3RhS", "3BhP", "3BoS", "1RoP", "2BsP", "1RoS", "2RsP", "3BoD", "1BsS", "1RoD", "2RoP", "1BoS", "1GhS", "3GoP", "1BsP", "2GsS", "3GhP"]
+     
 
     db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns_{}.db".format(random.randint(1,10000))
     # setgame = SET()
@@ -1024,7 +1042,7 @@ if __name__ == "__main__":
 # [(2, 5), (5, 8)]
     setgame = SET()
     setgame.setup_db(db_path)
-    setgame.start_search_all_windows_single_set(single_set_pattern_weight_7)
+    setgame.start_search_all_windows_single_set(single_set_pattern_weight_3)
     exit()
     # setgame.setup_db(db_path)
     # setgame.start_recursive_single_set_window_pattern_search()
