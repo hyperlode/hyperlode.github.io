@@ -687,7 +687,7 @@ class SET():
                         
                     except Exception as e:
                         print("error when loading new pattern.  {}".format(e))
-                        print(self.patterns_and_swapped_positions_memory.keys())
+                        # print(self.patterns_and_swapped_positions_memory.keys())
                         # error when loading new pattern.  Cannot choose from an empty sequence
                         # dict_keys([])
                         # error when loading new pattern.  Cannot choose from an empty sequence
