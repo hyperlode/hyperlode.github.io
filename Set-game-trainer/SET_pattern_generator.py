@@ -291,6 +291,8 @@ class SET():
 
     def __init__(self):
         self.reset_pattern()
+        self.patterns_and_swapped_positions_memory = defaultdict(list)
+        
 
     def setup_db(self, db_path):
         self.db_set = db_SET_analytics(db_path)
@@ -305,7 +307,7 @@ class SET():
         
         self.deck = create_deck(parameters, False, True)
         self.total_pattern_weight = 0
-        self.patterns_and_swapped_positions_memory = defaultdict(list)
+        
         # normal pattern: 9x9. But, to handle the edge cases: we extend the 9x9 pattern 2x2  so: 18x18. where (0,0) == (9,0) == (0,9) == (9,9)
         self.pattern_extended = {(row, col): None for row in range(
             PATTERN_ROWS * 2) for col in range(PATTERN_COLS*2)}
@@ -680,11 +682,16 @@ class SET():
                 while not success:
                     try:
                         pattern_compact = random.choice(list(self.patterns_and_swapped_positions_memory.keys()))
-                        self.load_from_compact_pattern(pattern_compact)
+                        self.load_from_compact_pattern(pattern_compact)  # resets pattern 
                         success = True
+                        
                     except Exception as e:
                         print("error when loading new pattern.  {}".format(e))
                         print(self.patterns_and_swapped_positions_memory.keys())
+                        # error when loading new pattern.  Cannot choose from an empty sequence
+                        # dict_keys([])
+                        # error when loading new pattern.  Cannot choose from an empty sequence
+                        # dict_keys([])
                     
                         
                 self.calculate_all_pattern_stats()
@@ -693,7 +700,7 @@ class SET():
             else:
                 self.patterns_and_swapped_positions_memory[pattern_compact].append(
                     swapped_positions)
-                  
+            
             # else: swapped_positions not in self.patterns_and_swapped_positions_memory[pattern_compact]:
                 
             # else:
@@ -1080,7 +1087,7 @@ if __name__ == "__main__":
     single_set_pattern_weight_8 = ["2GoP", "3BhS", "1GhD", "3RsD", "3GoD", "2RsD", "1GoS", "2RoS", "3RoD", "2RsS", "2GoS", "2GoD", "2GhD", "3RsS", "3RhD", "2BoP", "2BhP", "1BhD", "2GhS", "1GsD", "3BsD", "2BsS", "3RoS", "2RhD", "1BoD", "1BoP", "1GhP", "3GsP", "1BsD", "3GhS", "1RsS", "1BhS", "2GsP", "1RhD", "1GoP", "2RhS", "1RhP", "1GoD", "2GhP", "3GsD", "3GhD", "3GoS", "3BoP", "2BoD", "2BsD", "1GsP", "1RsD", "3BsP", "3RhP", "2RhP", "3GsS", "1RsP", "2RoD", "3BhD", "3BsS", "3RoP", "2BhD", "1BhP", "1RhS", "2GsD", "2BhS", "1GsS", "2BoS", "3RsP", "3RhS", "3BhP", "3BoS", "1RoP", "2BsP", "1RoS", "2RsP", "3BoD", "1BsS", "1RoD", "2RoP", "1BoS", "1GhS", "3GoP", "1BsP", "2GsS", "3GhP"]
      
 
-    db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns_{}.db".format(random.randint(1,10000))
+    db_path = "E:\set_patterns_{}.db".format(random.randint(1,10000))
     # setgame = SET()
     # setgame.setup_db(db_path)
     # # setgame.create_full_pattern()
