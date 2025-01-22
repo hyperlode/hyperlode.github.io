@@ -653,7 +653,7 @@ class SET():
         now_ms_epoch = int(time.time() * 1000)
         previous_time_stamp = now_ms_epoch
 
-        INTERVAL_CHECK_CYCLE_COUNT = 100
+        INTERVAL_CHECK_CYCLE_COUNT = 1000
 
         recorded_set_counts_pattern = None
         pattern_compact = self.get_pattern_compact(
@@ -678,8 +678,8 @@ class SET():
                 # change pattern
                 success = False
                 while not success:
-                    pattern_compact = random.choice(list(self.patterns_and_swapped_positions_memory.keys()))
                     try:
+                        pattern_compact = random.choice(list(self.patterns_and_swapped_positions_memory.keys()))
                         self.load_from_compact_pattern(pattern_compact)
                         success = True
                     except Exception as e:
