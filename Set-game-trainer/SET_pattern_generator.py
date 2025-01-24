@@ -177,6 +177,8 @@ class db_SET_analytics():
             self.create_table_set_patterns()
 
     def add_pattern(self, set_pattern_dict):
+        
+        # print(len(self.patterns_and_swapped_positions_memory[pattern_compact]))
         # Function to store a list in the database
         pattern = set_pattern_dict["pattern"]
 
@@ -185,8 +187,8 @@ class db_SET_analytics():
 
         single_set_windows = window_stats[1]
         pattern_weight = set_pattern_dict["pattern_weight"]
-
-  
+        
+        position_swap_length = len(tried_position_swaps)
     
         # Convert the list to JSON
         # json_pattern = json.dumps(pattern)
@@ -195,15 +197,18 @@ class db_SET_analytics():
         json_tried_position_swaps = json.dumps(tried_position_swaps)
         pattern_dict = self.get_pattern_if_existing(json_pattern)
         if pattern_dict is None:
-            self.execute_sql(
-                "INSERT INTO set_patterns (pattern, window_stats, single_set_windows, pattern_weight,tried_position_swaps) VALUES ('{}','{}','{}','{}','{}')".format(
-                    json_pattern, json_window_stats, single_set_windows, pattern_weight, json_tried_position_swaps
-                ))
+            
+            sql_str = "INSERT INTO set_patterns (pattern, window_stats, single_set_windows, pattern_weight, position_swap_length, tried_position_swaps) VALUES ('{}','{}','{}','{}','{}','{}')".format(
+                    json_pattern, json_window_stats, single_set_windows, pattern_weight, position_swap_length , json_tried_position_swaps
+                )
+            
+            self.execute_sql(sql_str
+                )
         else:
             # update json_tried_position swaps
             
-            sql = "UPDATE set_patterns SET tried_position_swaps='{}' WHERE pattern = '{}'".format(
-                    json_tried_position_swaps, json_pattern 
+            sql = "UPDATE set_patterns SET position_swap_length='{}',tried_position_swaps='{}' WHERE pattern = '{}'".format(
+                    position_swap_length,json_tried_position_swaps, json_pattern 
                 )
             self.execute_sql( sql )
              
@@ -231,6 +236,7 @@ class db_SET_analytics():
             window_stats TEXT,
             single_set_windows INTEGER,
             pattern_weight INTEGER,
+            position_swap_length INTEGER,
             tried_position_swaps TEXT
         )
         """)
@@ -247,7 +253,23 @@ class db_SET_analytics():
             return None
         else:
             return self.convert_record_to_pattern_dict(record)
+        
+    def get_pattern_with_best_weight_not_exhausted(self):
+        self.cursor.execute(f"""
+            SELECT * FROM set_patterns
+            WHERE position_swap_length < 3239
+            ORDER BY pattern_weight ASC
+            LIMIT 1
+            """)
 
+        record = self.cursor.fetchone()
+        # print(record)
+        if record is None:
+            return None
+        else:
+            return self.convert_record_to_pattern_dict(record)
+        
+        
     def get_pattern_if_existing(self, compact_pattern):
         query = "SELECT * FROM set_patterns WHERE pattern = '{}' LIMIT 1".format(
             compact_pattern)
@@ -261,12 +283,17 @@ class db_SET_analytics():
 
     def convert_record_to_pattern_dict(self, record):
 
-        pattern_json, window_stats_json, single_set_windows, pattern_weight, tried_position_swaps = record
+        pattern_json, window_stats_json, single_set_windows, pattern_weight, position_swap_length, tried_position_swaps = record
         pattern = json.loads(pattern_json)
         window_stats_json = json.loads(window_stats_json)
         single_set_windows = int(single_set_windows)
         pattern_weight = int(pattern_weight)
         tried_position_swaps = json.loads(tried_position_swaps)
+        position_swap_length =  int(position_swap_length)
+        if len(tried_position_swaps) != position_swap_length:
+            # print("ASERT ERROR : Anomaly in db. len of list not equal to stored length of list of swapped positions.".format(len(tried_position_swaps), position_swap_length))
+            AssertionError 
+            
         return {"pattern": pattern, "window_stats_json": window_stats_json, "single_set_windows": single_set_windows, "pattern_weight": pattern_weight, "tried_position_swaps": tried_position_swaps}
 
     def get_pattern_with_best_pattern_weight(self):
@@ -304,7 +331,7 @@ class SET():
         self.db_set.add_pattern(onepattern_dict)
 
     def reset_pattern(self):
-        
+        self.tried_position_swaps = []
         self.deck = create_deck(parameters, False, True)
         self.total_pattern_weight = 0
         
@@ -360,15 +387,17 @@ class SET():
         self.reset_pattern()
         compact_pattern = pattern_dict["pattern"]
         self.load_from_compact_pattern(compact_pattern)
-        self.print_pattern()
+        self.calculate_all_pattern_stats()
+        # self.print_pattern()
 
     def get_pattern_as_dict(self):
         
         pattern_compact = self.get_pattern_compact(False, True, True, True)
+        
         return {
             "pattern": pattern_compact,
             "window_stats": self.sets_count_window_distribution,
-            "tried_position_swaps": self.patterns_and_swapped_positions_memory[pattern_compact],
+            "tried_position_swaps": self.tried_position_swaps,
             "pattern_weight": self.total_pattern_weight
         }
 
@@ -644,7 +673,22 @@ class SET():
             file.write(f"{sets_counts_windows_as_string}\n")
 
     def start_search_all_windows_single_set(self, compact_pattern=None):
-        if compact_pattern is None:
+        
+        pattern_dict = self.db_set.get_pattern_with_best_weight_not_exhausted()
+        self.tried_position_swaps = []
+        if pattern_dict is not None:
+            self.restore_archived_pattern(pattern_dict)
+            self.print_pattern()
+            self.print_pattern_stats()
+            # print(pattern_dict)    
+            self.tried_position_swaps = pattern_dict["tried_position_swaps"]
+            print(len(self.tried_position_swaps))
+            # print(self.tried_position_swaps)
+            
+            # exit()
+            
+            
+        elif compact_pattern is None:
             self.create_full_pattern()
         else:
             self.load_from_compact_pattern(compact_pattern)
@@ -668,51 +712,61 @@ class SET():
         while True:
         # while i < 5:
             i += 1
-            pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped, recorded_set_counts_pattern, swapped_positions = self.swap_improve_single_set_window(
-                recorded_set_counts_pattern, self.patterns_and_swapped_positions_memory[pattern_compact] )
+            # 3240: = number of possible swaps for 81 cards
+            if len(self.tried_position_swaps) <3240:
+                pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped, recorded_set_counts_pattern, swapped_positions = self.swap_improve_single_set_window(
+                    recorded_set_counts_pattern, self.tried_position_swaps )
 
-            pattern_compact = self.get_pattern_compact(
-                extended=False, compacted=True, as_list=True, as_JSON_string=True)
+                # pattern_compact = self.get_pattern_compact(
+                #     extended=False, compacted=True, as_list=True, as_JSON_string=True)
+                
+                # if (pattern_weigth_post_swap != pattern_weigth_pre_swap):
+                #     self.db_set.add_pattern(self.get_pattern_as_dict())
+                self.db_set.add_pattern(self.get_pattern_as_dict())  # todo: limit db writes. by bundling...
+                # 3240 = swapped positions lenght until swapping exhausted (all single swaps in a pattern tried)   81cards in pattern.  80 + 79 + ... + 1
+                
+                # if len(self.patterns_and_swapped_positions_memory[pattern_compact]) >= 3321:  # 
+                # if len(self.tried_position_swaps) >= 3240:  # 
             
-            # save pattern update (with the tried swap positions)
-            self.db_set.add_pattern(self.get_pattern_as_dict())
-            
-            # 3238 = swapped positions lenght until swapping exhausted (all single swaps in a pattern tried)
-            if len(self.patterns_and_swapped_positions_memory[pattern_compact]) >=3238:
+                # self.patterns_and_swapped_positions_memory[pattern_compact].append(
+                #     swapped_positions)
+                self.tried_position_swaps.append(swapped_positions)
+            else:
+                # save pattern update (with the tried swap positions)
+                
                 # exhausted attempts, no improvement possibilities for swapping. 
                 # change pattern
                 success = False
                 while not success:
                     try:
-                        compact_patterns_stored = list(self.patterns_and_swapped_positions_memory.keys())
-                        if len(compact_patterns_stored) != 0:
-                            
-                            pattern_compact = random.choice(compact_patterns_stored)
+                        # self.patterns_and_swapped_positions_memory = defaultdict(list)
+                        
+                        # self.patterns_and_swapped_positions_memory[pattern_compact] 
+                        pattern_dict = self.db_set.get_pattern_with_best_weight_not_exhausted()
+                        if pattern_dict is None:
+                            raise "end of the road. Probably after the universe died"
+                        
+                        else:
+                            pattern_compact = pattern_dict["pattern"]
+                            swapped_positions = pattern_dict ["tried_position_swaps"] 
+                            self.tried_position_swaps = swapped_positions  # the already swapped positiosn are loaded, so they don't need to be rechecked again.
                             self.load_from_compact_pattern(pattern_compact)  # resets pattern 
                         
-                                
-                            
                         success = True
                         
                         self.calculate_all_pattern_stats()
                         
                     except Exception as e:
                         print("error when loading new pattern.  {}".format(e))
-                        print("length of patterns and swapped positions memory : {}".format(len(self.patterns_and_swapped_positions_memory.keys())))
+                        print("length of patterns and swapped positions memory : {}".format(len(self.tried_position_swaps.keys())))
                         print(pattern_compact)
-                        # error when loading new pattern.  Cannot choose from an empty sequence
-                        # dict_keys([])
-                        # error when loading new pattern.  Cannot choose from an empty sequence
-                        # dict_keys([])
-                        # self.create_full_pattern()
+               
                         
                 self.calculate_all_pattern_stats()
                 recorded_set_counts_pattern = None
                 
-            else:
-                self.patterns_and_swapped_positions_memory[pattern_compact].append(
-                    swapped_positions)
-            
+            # else:
+      
             # else: swapped_positions not in self.patterns_and_swapped_positions_memory[pattern_compact]:
                 
             # else:
@@ -848,7 +902,9 @@ class SET():
                         raise
                 else:
                     pass
-                    # print("repeat swap position, will not redo. ")
+                    if len(previously_failed_swapped_positions_for_this_pattern) > 3238:
+                        print("Nearing the end of the 3240 possible card swaps per pattern... ")
+                        print("repeat swap position, will not redo. amount of previous swap positions: {} ".format(len(previously_failed_swapped_positions_for_this_pattern)))
             else:
                 swap_positions_chosen = True
 
@@ -1099,6 +1155,8 @@ if __name__ == "__main__":
     single_set_pattern_weight_8 = ["2GoP", "3BhS", "1GhD", "3RsD", "3GoD", "2RsD", "1GoS", "2RoS", "3RoD", "2RsS", "2GoS", "2GoD", "2GhD", "3RsS", "3RhD", "2BoP", "2BhP", "1BhD", "2GhS", "1GsD", "3BsD", "2BsS", "3RoS", "2RhD", "1BoD", "1BoP", "1GhP", "3GsP", "1BsD", "3GhS", "1RsS", "1BhS", "2GsP", "1RhD", "1GoP", "2RhS", "1RhP", "1GoD", "2GhP", "3GsD", "3GhD", "3GoS", "3BoP", "2BoD", "2BsD", "1GsP", "1RsD", "3BsP", "3RhP", "2RhP", "3GsS", "1RsP", "2RoD", "3BhD", "3BsS", "3RoP", "2BhD", "1BhP", "1RhS", "2GsD", "2BhS", "1GsS", "2BoS", "3RsP", "3RhS", "3BhP", "3BoS", "1RoP", "2BsP", "1RoS", "2RsP", "3BoD", "1BsS", "1RoD", "2RoP", "1BoS", "1GhS", "3GoP", "1BsP", "2GsS", "3GhP"]
     
     db_path = "E:\set_patterns_{}.db".format(random.randint(1,10000))
+    # db_path = "E:\set_patterns_promising.db"
+    
     # setgame = SET()
     # setgame.setup_db(db_path)
     # # setgame.create_full_pattern()
