@@ -733,6 +733,7 @@ class SET():
     def cyclic_swapping_single_set_improvement(self):
         swap_count = 0
         
+        self.calculate_all_pattern_stats()
         pattern_dict_before_swap_attempt = copy.deepcopy(self.get_pattern_as_dict())
         
         now_ms_epoch = int(time.time() * 1000)
@@ -765,14 +766,14 @@ class SET():
                 # exhausted attempts, no improvement possibilities for swapping. 
                 
                 # write to db to tag it. 
-                d = pattern_dict_before_swap_attempt
-                l = len(d["tried_position_swaps"] )
-                d["tried_position_swaps"] = self.get_already_tried_positions_from_swap_positions_to_try(self.swap_positions_to_try)
-                tried = d["window_stats"]
+                # d = pattern_dict_before_swap_attempt
+                # l = len(d["tried_position_swaps"] )
+                # d["tried_position_swaps"] = self.get_already_tried_positions_from_swap_positions_to_try(self.swap_positions_to_try)
+                # tried = d["window_stats"]
                 # pattern_dict_before_swap_attempt["tried_position_swaps"]
                 pattern_dict_before_swap_attempt["tried_position_swaps"] = self.get_already_tried_positions_from_swap_positions_to_try(self.swap_positions_to_try)
                 self.db_set.add_pattern(pattern_dict_before_swap_attempt)  
-                print("dijeijjfijj added partterne . length pos tried: {}, windwo: {}".format(l, tried))
+                # print("dijeijjfijj added partterne . length pos tried: {}, windwo: {}".format(l, tried))
                 # change pattern
                 success = False
                 while not success:
