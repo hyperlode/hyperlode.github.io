@@ -192,7 +192,6 @@ class db_SET_analytics():
         position_swap_length = len(tried_position_swaps)
     
         # Convert the list to JSON
-        # json_pattern = json.dumps(pattern)
         json_pattern = pattern
         json_window_stats = json.dumps(window_stats)
         json_tried_position_swaps = json.dumps(tried_position_swaps)
@@ -242,6 +241,24 @@ class db_SET_analytics():
         )
         """)
 
+    
+    
+    def get_pattern_data(self, compact_pattern_json):
+        
+        self.cursor.execute("""
+            SELECT * FROM set_patterns
+            WHERE pattern='{}'
+            LIMIT 1
+            """.format(compact_pattern_json))
+        
+        record = self.cursor.fetchone()
+        # print(record)
+        if record is None:
+            return None
+        else:
+            return self.convert_record_to_pattern_dict(record)
+        
+        
     def get_pattern_with_most_single_set_windows(self):
         self.cursor.execute(f"""
             SELECT * FROM set_patterns
@@ -258,7 +275,7 @@ class db_SET_analytics():
     def get_pattern_with_best_weight_not_exhausted(self):
         self.cursor.execute(f"""
             SELECT * FROM set_patterns
-            WHERE position_swap_length < 3239
+            WHERE position_swap_length < 3240
             ORDER BY pattern_weight ASC
             LIMIT 1
             """)
@@ -286,16 +303,19 @@ class db_SET_analytics():
 
         pattern_json, window_stats_json, single_set_windows, pattern_weight, position_swap_length, tried_position_swaps = record
         pattern = json.loads(pattern_json)
-        window_stats_json = json.loads(window_stats_json)
+        window_stats = json.loads(window_stats_json)
         single_set_windows = int(single_set_windows)
         pattern_weight = int(pattern_weight)
-        tried_position_swaps = json.loads(tried_position_swaps)
+        tried_position_swaps_list_of_lists = json.loads(tried_position_swaps)
+        # print(tried_position_swaps)
+        tried_position_swaps = [tuple((tuple(pos1), tuple(pos2))) for pos1, pos2 in tried_position_swaps_list_of_lists]
+
         position_swap_length =  int(position_swap_length)
         if len(tried_position_swaps) != position_swap_length:
             # print("ASERT ERROR : Anomaly in db. len of list not equal to stored length of list of swapped positions.".format(len(tried_position_swaps), position_swap_length))
             AssertionError 
             
-        return {"pattern": pattern, "window_stats_json": window_stats_json, "single_set_windows": single_set_windows, "pattern_weight": pattern_weight, "tried_position_swaps": tried_position_swaps}
+        return {"pattern": pattern, "window_stats": window_stats_json, "single_set_windows": single_set_windows, "pattern_weight": pattern_weight, "tried_position_swaps": tried_position_swaps}
 
     def get_pattern_with_best_pattern_weight(self):
         self.cursor.execute(f"""
@@ -332,7 +352,6 @@ class SET():
         self.db_set.add_pattern(onepattern_dict)
 
     def reset_pattern(self):
-        self.tried_position_swaps = []
         self.deck = create_deck(parameters, False, True)
         self.total_pattern_weight = 0
         
@@ -389,6 +408,8 @@ class SET():
         compact_pattern = pattern_dict["pattern"]
         self.load_from_compact_pattern(compact_pattern)
         self.calculate_all_pattern_stats()
+        self.swap_positions_to_try = self.get_swap_positions_to_try_from_already_tried_positions(pattern_dict ["tried_position_swaps"] )
+              
         # self.print_pattern()
 
     def get_pattern_as_dict(self):
@@ -398,10 +419,9 @@ class SET():
         return {
             "pattern": pattern_compact,
             "window_stats": self.sets_count_window_distribution,
-            "tried_position_swaps": self.tried_position_swaps,
+            "tried_position_swaps": self.get_already_tried_positions_from_swap_positions_to_try(self.swap_positions_to_try),
             "pattern_weight": self.total_pattern_weight
         }
-
     def get_all_basic_pattern_positions(self):
         return [(row, col) for row in range(PATTERN_ROWS) for col in range(PATTERN_COLS)]
 
@@ -676,6 +696,7 @@ class SET():
 
     def start_search_all_windows_single_set(self, compact_pattern=None):
         success = False
+        tried_position_swaps = []
         if compact_pattern is not None:
             self.load_from_compact_pattern(compact_pattern)
             success = True
@@ -684,26 +705,35 @@ class SET():
             pattern_dict = self.db_set.get_pattern_with_best_weight_not_exhausted()
             
             if pattern_dict is not None:
-                
-                self.tried_position_swaps = []
-                
                 self.restore_archived_pattern(pattern_dict)
                 self.print_pattern()
                 self.print_pattern_stats()
-                self.tried_position_swaps = pattern_dict["tried_position_swaps"]
-                print(len(self.tried_position_swaps))
+                tried_position_swaps = pattern_dict["tried_position_swaps"]
+                
                 success = True
         
         if not success:   
             self.create_full_pattern()
             self.print_pattern()
 
+        self.swap_positions_to_try = self.get_swap_positions_to_try_from_already_tried_positions(tried_position_swaps)
+        # print(len(self.swap_positions_to_try))
         self.cyclic_swapping_single_set_improvement()
 
+    def get_already_tried_positions_from_swap_positions_to_try(self, positions_to_try):
+        positions = self.get_all_basic_pattern_positions()
+        all_possible_swap_combinations = set(itertools.combinations(positions, 2)) 
+        return list(all_possible_swap_combinations - set(positions_to_try))
+        
+    def get_swap_positions_to_try_from_already_tried_positions(self, already_tried_swap_positions):
+        positions = self.get_all_basic_pattern_positions()
+        all_possible_swap_combinations = set(itertools.combinations(positions, 2)) #3240 for swapping two cards in a full pattern
+        return list(all_possible_swap_combinations - set(already_tried_swap_positions))
+        
     def cyclic_swapping_single_set_improvement(self):
         swap_count = 0
         
-        pattern_dict_previous_swap = copy.deepcopy(self.get_pattern_as_dict())
+        pattern_dict_before_swap_attempt = copy.deepcopy(self.get_pattern_as_dict())
         
         now_ms_epoch = int(time.time() * 1000)
         previous_time_stamp = now_ms_epoch
@@ -713,24 +743,36 @@ class SET():
         recorded_set_counts_pattern = None
         pattern_compact = self.get_pattern_compact(
                 extended=False, compacted=True, as_list=True, as_JSON_string=True)
-
         
         while True:
             # 3240: = number of possible swaps for 81 cards (81cards in pattern.  80 + 79 + ... + 1)
-            if len(self.tried_position_swaps) < 3240:
+            if len(self.swap_positions_to_try) > 0:
                 swap_count += 1
-                pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped, recorded_set_counts_pattern, swapped_positions = self.swap_improve_single_set_window(
-                    recorded_set_counts_pattern, self.tried_position_swaps )
                 
-                
-                pattern_dict_post_swap = self.get_pattern_as_dict()
-            
-                self.tried_position_swaps.append(swapped_positions)
+                swap_positions = random.choice(self.swap_positions_to_try)  # Pick a random element
+                self.swap_positions_to_try.remove(swap_positions)
+                # print(len(self.swap_positions_to_try))
 
-            else:
-                # save pattern update (with the tried swap positions)
+                pattern_weigth_pre_swap, pattern_weigth_post_swap, is_swapped, recorded_set_counts_pattern = self.swap_improve_single_set_window(
+                    swap_positions, recorded_set_counts_pattern)
+                # self data after testing is ALWAYS as it was after the test! The pattern is already swapped back, but calcs are not redone. 
                 
+                # print("{} (swaps to go). ".format(len(self.swap_positions_to_try)))
+                
+                # pattern_dict_post_swap = self.get_pattern_as_dict()
+                
+            else:
                 # exhausted attempts, no improvement possibilities for swapping. 
+                
+                # write to db to tag it. 
+                d = pattern_dict_before_swap_attempt
+                l = len(d["tried_position_swaps"] )
+                d["tried_position_swaps"] = self.get_already_tried_positions_from_swap_positions_to_try(self.swap_positions_to_try)
+                tried = d["window_stats"]
+                # pattern_dict_before_swap_attempt["tried_position_swaps"]
+                pattern_dict_before_swap_attempt["tried_position_swaps"] = self.get_already_tried_positions_from_swap_positions_to_try(self.swap_positions_to_try)
+                self.db_set.add_pattern(pattern_dict_before_swap_attempt)  
+                print("dijeijjfijj added partterne . length pos tried: {}, windwo: {}".format(l, tried))
                 # change pattern
                 success = False
                 while not success:
@@ -738,24 +780,20 @@ class SET():
                         pattern_dict = self.db_set.get_pattern_with_best_weight_not_exhausted()
                         if pattern_dict is None:
                             raise "end of the road. Probably after the universe died"
-                        
-                        else:
-                            pattern_compact = pattern_dict["pattern"]
-                            swapped_positions = pattern_dict ["tried_position_swaps"] 
-                            self.tried_position_swaps = swapped_positions  # the already swapped positiosn are loaded, so they don't need to be rechecked again.
-                            self.load_from_compact_pattern(pattern_compact)  # resets pattern 
-                        self.calculate_all_pattern_stats()
+
+                       
+                        self.restore_archived_pattern(pattern_dict)  # resets pattern 
+                        self.swap_positions_to_try = self.get_swap_positions_to_try_from_already_tried_positions(pattern_dict ["tried_position_swaps"] )
+                        pattern_dict_before_swap_attempt = self.get_pattern_as_dict()
                         
                         success = True
                         
                         
                     except Exception as e:
                         print("error when loading new pattern.  {}".format(e))
-                        print("length of patterns and swapped positions memory : {}".format(len(self.tried_position_swaps.keys())))
                         print(pattern_compact)
                
                         
-                self.calculate_all_pattern_stats()
                 recorded_set_counts_pattern = None
                 
 
@@ -772,28 +810,40 @@ class SET():
                     )
                       )
               
-            if (is_swapped and pattern_dict_previous_swap["pattern_weight"] != pattern_dict_post_swap["pattern_weight"]):
-            # if pattern_weigth_pre_swap < 100 and is_swapped and pattern_weigth_pre_swap != pattern_weigth_post_swap:
-            
-                if (pattern_dict_post_swap["pattern_weight"] < 100):
-                    print("--------SET PATTERN STATS after {} cycles:-----------".format(swap_count))
-                    self.print_pattern()
-                    print("swapped. New weight is: {}, old weight was {}".format(
-                        pattern_weigth_post_swap, pattern_weigth_pre_swap))
+            if (is_swapped and pattern_dict_before_swap_attempt["pattern_weight"] != self.total_pattern_weight):
+                
+                # first update current pattern to db.
+                pattern_dict_before_swap_attempt["tried_position_swaps"] = self.get_already_tried_positions_from_swap_positions_to_try(self.swap_positions_to_try)
+                self.db_set.add_pattern(pattern_dict_before_swap_attempt)
+                
+                # do check if exists already:pattern_compact = self.get_pattern_compact(False, True, True, True)
+                new_pattern_from_db_dict = self.db_set.get_pattern_data(self.get_pattern_compact(False, True, True, True))
+                
+                if new_pattern_from_db_dict is not None and len(new_pattern_from_db_dict["tried_position_swaps"]) >= 3240:
+                    # this is an exhaused pattern (everything tried and failed to imporove weight). And it should be omitted.
+                    # print("NOT SWAPPED. pattern exists in db and is already tested without results. {}" .format(new_pattern_from_db_dict["window_stats"]))
 
-                    # print ("total one set per window score (0= all windows one set): {}".format(pattern_weigth))
-                    # self.calculate_all_pattern_stats()
-                    self.print_pattern_stats()
-                
-               
-            self.db_set.add_pattern(pattern_dict_post_swap)  # todo: limit db writes. by bundling...
-                
+                    self.restore_archived_pattern(pattern_dict_before_swap_attempt)
+                    # self.swap_positions_to_try = self.get_swap_positions_to_try_from_already_tried_positions(pattern_dict_before_swap_attempt ["tried_position_swaps"] )
+                    
+                    # print("rstoredsd: . {}" .format(pattern_dict_before_swap_attempt["window_stats"]))
+                    
+                else:
+                    if (self.total_pattern_weight < 100):
+                        print("--------SET PATTERN STATS after {} cycles:-----------".format(swap_count))
+                        self.print_pattern()
+                        print("swapped. New weight is: {}, old weight was {}".format(
+                            pattern_weigth_post_swap, pattern_weigth_pre_swap))
+
+                        # print ("total one set per window score (0= all windows one set): {}".format(pattern_weigth))
+                        # self.calculate_all_pattern_stats()
+                        self.print_pattern_stats()
+                    self.db_set.add_pattern(self.get_pattern_as_dict())  # todo: limit db writes. by bundling...
+                    pattern_dict_before_swap_attempt = copy.deepcopy(self.get_pattern_as_dict())
             # deep copy of the pattern data
-            pattern_dict_previous_swap = copy.deepcopy(pattern_dict_post_swap)
+            # pattern_dict_previous_swap = copy.deepcopy(pattern_dict_post_swap)
                 
-        print(self.patterns_and_swapped_positions_memory[pattern_compact])
-
-    def swap_improve_single_set_window(self, buffered_set_counts_pattern=None, previously_failed_swapped_positions_for_this_pattern=None):
+    def swap_improve_single_set_window(self, swap_positions, buffered_set_counts_pattern=None ):
         # improve the amount of single set windows by swapping cards and analysing.
 
         # 1. analyse
@@ -812,118 +862,120 @@ class SET():
         pre_swap_set_counts_pattern = self.set_counts_pattern.copy()
         pre_swap_pattern_weight = self.total_pattern_weight
 
-        # assigning card position weights
-        for position in self.basic_pattern_positions:
-            set_count_in_window = self.set_counts_pattern[position]
-            window_positions = self.get_pattern_positions_from_window_position(
-                position)
-            for wp in window_positions:
-                self.set_tag_card_at_pattern_position(wp, self.get_weight_from_window_set_count(set_count_in_window))
+        # # assigning card position weights
+        # for position in self.basic_pattern_positions:
+        #     set_count_in_window = self.set_counts_pattern[position]
+        #     window_positions = self.get_pattern_positions_from_window_position(
+        #         position)
+        #     for wp in window_positions:
+        #         self.set_tag_card_at_pattern_position(wp, self.get_weight_from_window_set_count(set_count_in_window))
         
-        USE_WEIGHTED_SWAPPABLE_POSITIONS = True
-        if USE_WEIGHTED_SWAPPABLE_POSITIONS:
-            # get highest score positions
-            # AMOUNT_OF_SWAPPABLE_POSITIONS = 15 # best pattern_weight of about 23
-            # AMOUNT_OF_SWAPPABLE_POSITIONS = 20 # best pattern weight of about 15
-            # AMOUNT_OF_SWAPPABLE_POSITIONS = 81 # best pattern_weight of about 23
+        # USE_WEIGHTED_SWAPPABLE_POSITIONS = False
+        # if USE_WEIGHTED_SWAPPABLE_POSITIONS:
+        #     # get highest score positions
+        #     # AMOUNT_OF_SWAPPABLE_POSITIONS = 15 # best pattern_weight of about 23
+        #     # AMOUNT_OF_SWAPPABLE_POSITIONS = 20 # best pattern weight of about 15
+        #     # AMOUNT_OF_SWAPPABLE_POSITIONS = 81 # best pattern_weight of about 23
 
-            # if (self.buffer_pre_swap_pattern_weight > 15):
-            #     AMOUNT_OF_SWAPPABLE_POSITIONS = self.buffer_pre_swap_pattern_weight +  10
-            # else:
+        #     # if (self.buffer_pre_swap_pattern_weight > 15):
+        #     #     AMOUNT_OF_SWAPPABLE_POSITIONS = self.buffer_pre_swap_pattern_weight +  10
+        #     # else:
 
-            # AMOUNT_OF_SWAPPABLE_POSITIONS = 20 #  weight 26 after 2500 cycles (multplier power = 1)  multiplier=2 : weight23 (at 2500 cycles)
-            # weight 26 after 2500 cycles (multplier power = 1), multiplier=2 : weight21 (at 2500 cycles), multiplier=3 : weight25 (at 2500 cycles) weight 13 after 5000 cycles,
+        #     # AMOUNT_OF_SWAPPABLE_POSITIONS = 20 #  weight 26 after 2500 cycles (multplier power = 1)  multiplier=2 : weight23 (at 2500 cycles)
+        #     # weight 26 after 2500 cycles (multplier power = 1), multiplier=2 : weight21 (at 2500 cycles), multiplier=3 : weight25 (at 2500 cycles) weight 13 after 5000 cycles,
 
-            AMOUNT_OF_SWAPPABLE_POSITIONS = 81
-            # AMOUNT_OF_SWAPPABLE_POSITIONS = 10 # weight 35 after 2500 cycles (multplier power = 1), not improving with hight power multiplier
+        #     AMOUNT_OF_SWAPPABLE_POSITIONS = 81
+        #     # AMOUNT_OF_SWAPPABLE_POSITIONS = 10 # weight 35 after 2500 cycles (multplier power = 1), not improving with hight power multiplier
 
-            tagged_position_basic_pattern = self.get_pattern_tagged_positions_basic()
-            # print(tagged_position_basic_pattern)
-            swappable_positions = [k for k, v in sorted(tagged_position_basic_pattern.items(
-            ), key=lambda item: (item[1], random.random()), reverse=True)[:AMOUNT_OF_SWAPPABLE_POSITIONS]]
-            # print(swappable_positions)
+        #     tagged_position_basic_pattern = self.get_pattern_tagged_positions_basic()
+        #     # print(tagged_position_basic_pattern)
+        #     swappable_positions = [k for k, v in sorted(tagged_position_basic_pattern.items(
+        #     ), key=lambda item: (item[1], random.random()), reverse=True)[:AMOUNT_OF_SWAPPABLE_POSITIONS]]
+        #     # print(swappable_positions)
 
-            # print(values_of_swappable_positions)
-            # select swap positions: unweighted.
-            # swap_pos_1 = swappable_positions.pop(random.randint(0, len(swappable_positions) - 1))
-            # swap_pos_2 = swappable_positions.pop(random.randint(0, len(swappable_positions) - 1))
+        #     # print(values_of_swappable_positions)
+        #     # select swap positions: unweighted.
+        #     # swap_pos_1 = swappable_positions.pop(random.randint(0, len(swappable_positions) - 1))
+        #     # swap_pos_2 = swappable_positions.pop(random.randint(0, len(swappable_positions) - 1))
 
-            # select swap positions: weighted.
-            # then higher the weight, the more probability to be picked. The multiplier enforces these probabilities
+        #     # select swap positions: weighted.
+        #     # then higher the weight, the more probability to be picked. The multiplier enforces these probabilities
 
-            # PROBABILITY_MULTIPLIER = 50
-            # PROBABILITY_POWER = self.buffer_pre_swap_pattern_weight + 1
+        #     # PROBABILITY_MULTIPLIER = 50
+        #     # PROBABILITY_POWER = self.buffer_pre_swap_pattern_weight + 1
 
-            # higher: faster weight optimizing at start, but then stops quickly.
-            if pre_swap_pattern_weight > 15:
-                PROBABILITY_POWER = 4
-            else:
-                PROBABILITY_POWER = 4
-
-            # weight 27 -->2500
-            values_of_swappable_positions = [
-                tagged_position_basic_pattern[p] ^ PROBABILITY_POWER for p in swappable_positions]
-
-            swap_positions_chosen = False
-            attempts = 100
-            while not swap_positions_chosen:
-                swap_pos_1_index = random.choices(
-                    range(len(swappable_positions)), weights=values_of_swappable_positions, k=1)[0]
-                swap_pos_2_index = swap_pos_1_index
-                while swap_pos_2_index == swap_pos_1_index:
-                    swap_pos_2_index = random.choices(
-                        range(len(swappable_positions)), weights=values_of_swappable_positions, k=1)[0]
-
-                swap_pos_1 = swappable_positions[swap_pos_1_index]
-                swap_pos_2 = swappable_positions[swap_pos_2_index]
-
-                # sorted to unify.
-                swapped_positions = sorted((swap_pos_1, swap_pos_2))
-
-        
-        
-                if previously_failed_swapped_positions_for_this_pattern is None:
-                    # no buffer to check if swapped position has been tested before.
-                    swap_positions_chosen = True
-                
-                else:
-                    if swapped_positions not in previously_failed_swapped_positions_for_this_pattern:
-                        swap_positions_chosen = True
-                        attempts -= 1
-                        if attempts <= 0:
-                            print("all swap positions have been tried before without success. {} ".format(
-                                previously_failed_swapped_positions_for_this_pattern))
-                            raise
-                    else:
-                        # position tested before. Try another one. 
-                        
-                        # if len(previously_failed_swapped_positions_for_this_pattern) > 3238:
-                        #     print("Nearing the end of the 3240 possible card swaps per pattern... ")
-                        #     print("repeat swap position, will not redo. amount of previous swap positions: {} ".format(len(previously_failed_swapped_positions_for_this_pattern)))
-                        pass
-        # else:
-        #     # take swap positions from available positions list :
-            
-        #     if previously_failed_swapped_positions_for_this_pattern is None:
-        #         # no buffer to check if swapped position has been tested before.
-        #         swap_positions_chosen = True
-            
+        #     # higher: faster weight optimizing at start, but then stops quickly.
+        #     if pre_swap_pattern_weight > 15:
+        #         PROBABILITY_POWER = 4
         #     else:
-        #         if swapped_positions not in previously_failed_swapped_positions_for_this_pattern:
+        #         PROBABILITY_POWER = 4
+
+        #     # weight 27 -->2500
+        #     values_of_swappable_positions = [
+        #         tagged_position_basic_pattern[p] ^ PROBABILITY_POWER for p in swappable_positions]
+
+        #     swap_positions_chosen = False
+        #     attempts = 100
+        #     while not swap_positions_chosen:
+        #         swap_pos_1_index = random.choices(
+        #             range(len(swappable_positions)), weights=values_of_swappable_positions, k=1)[0]
+        #         swap_pos_2_index = swap_pos_1_index
+        #         while swap_pos_2_index == swap_pos_1_index:
+        #             swap_pos_2_index = random.choices(
+        #                 range(len(swappable_positions)), weights=values_of_swappable_positions, k=1)[0]
+
+        #         swap_pos_1 = swappable_positions[swap_pos_1_index]
+        #         swap_pos_2 = swappable_positions[swap_pos_2_index]
+
+        #         # sorted to unify.
+        #         swapped_positions = sorted((swap_pos_1, swap_pos_2))
+
+        
+        
+        #         if previously_failed_swapped_positions_for_this_pattern is None:
+        #             # no buffer to check if swapped position has been tested before.
         #             swap_positions_chosen = True
-        #             attempts -= 1
-        #             if attempts <= 0:
-        #                 print("all swap positions have been tried before without success. {} ".format(
-        #                     previously_failed_swapped_positions_for_this_pattern))
-        #                 raise
+                
         #         else:
-        #             # position tested before. Try another one. 
+        #             if swapped_positions not in previously_failed_swapped_positions_for_this_pattern:
+        #                 swap_positions_chosen = True
+        #                 attempts -= 1
+        #                 if attempts <= 0:
+        #                     print("all swap positions have been tried before without success. {} ".format(
+        #                         previously_failed_swapped_positions_for_this_pattern))
+        #                     raise
+        #             else:
+        #                 # position tested before. Try another one. 
+                        
+        #                 # if len(previously_failed_swapped_positions_for_this_pattern) > 3238:
+        #                 #     print("Nearing the end of the 3240 possible card swaps per pattern... ")
+        #                 #     print("repeat swap position, will not redo. amount of previous swap positions: {} ".format(len(previously_failed_swapped_positions_for_this_pattern)))
+        #                 pass
+        # # else:
+        # #     # take swap positions from available positions list :
+            
+        # #     if previously_failed_swapped_positions_for_this_pattern is None:
+        # #         # no buffer to check if swapped position has been tested before.
+        # #         swap_positions_chosen = True
+            
+        # #     else:
+        # #         if swapped_positions not in previously_failed_swapped_positions_for_this_pattern:
+        # #             swap_positions_chosen = True
+        # #             attempts -= 1
+        # #             if attempts <= 0:
+        # #                 print("all swap positions have been tried before without success. {} ".format(
+        # #                     previously_failed_swapped_positions_for_this_pattern))
+        # #                 raise
+        # #         else:
+        # #             # position tested before. Try another one. 
                     
-        #             # if len(previously_failed_swapped_positions_for_this_pattern) > 3238:
-        #             #     print("Nearing the end of the 3240 possible card swaps per pattern... ")
-        #             #     print("repeat swap position, will not redo. amount of previous swap positions: {} ".format(len(previously_failed_swapped_positions_for_this_pattern)))
-        #             pass
-                    
+        # #             # if len(previously_failed_swapped_positions_for_this_pattern) > 3238:
+        # #             #     print("Nearing the end of the 3240 possible card swaps per pattern... ")
+        # #             #     print("repeat swap position, will not redo. amount of previous swap positions: {} ".format(len(previously_failed_swapped_positions_for_this_pattern)))
+        # #             pass
+        
+        
+        swap_pos_1, swap_pos_2 = swap_positions
 
         # do the swap
         orig_card_pos_1 = self.get_card_from_pattern(swap_pos_1)
@@ -946,11 +998,12 @@ class SET():
             self.remove_card_from_pattern(swap_pos_2)
             self.add_card_to_pattern(orig_card_pos_1, swap_pos_1)
             self.add_card_to_pattern(orig_card_pos_2, swap_pos_2)
-            return pre_swap_pattern_weight, post_swap_pattern_weight, False, pre_swap_set_counts_pattern, swapped_positions
+            
+            return pre_swap_pattern_weight, post_swap_pattern_weight, False, pre_swap_set_counts_pattern
 
         else:
             # if weight is equal, be ok with the changes. Prevents from being stuck in a situation for too long?! OK or not ?!
-            return pre_swap_pattern_weight, post_swap_pattern_weight, True, post_swap_set_counts_pattern, swapped_positions
+            return pre_swap_pattern_weight, post_swap_pattern_weight, True, post_swap_set_counts_pattern
 
     def start_recursive_single_set_window_pattern_search(self):
         # DEPRECATED
@@ -1163,9 +1216,16 @@ def get_best_weighted_set_from_db(db_path):
         setgame.print_pattern()
         setgame.calculate_all_pattern_stats()
         setgame.print_pattern_stats()
-
-if __name__ == "__main__":
+        
+def test():
+    setgame = SET()
+    positions = setgame.get_all_basic_pattern_positions()
+    pairs = list(itertools.combinations(positions, 2))
+    print(pairs)
+    if ((0,0),(0,8)) in pairs:
+        print("feije")
     
+if __name__ == "__main__":
     
     single_set_pattern_weight_5 = ["2GoP", "3BoS", "2BhS", "1RhS", "1GoP", "1BhD", "1BoS", "1BsD", "1GoD", "2BoD", "1BhP", "3GhD", "1BsP", "3BhS", "3RsS", "2BoS", "2GoD", "3RsD", "3GoS", "3RoP", "1BoD", "3GhS", "2BsS", "3RoS", "3BoD", "2GhD", "2RhD", "3GsP", "2BsD", "3GoP", "1GhD", "1GsD", "3BhP", "3GhP", "2RhS", "1RhD", "2GhS", "1RsP", "1GsS", "1GhP", "2RoP", "2BhD", "2BsP", "1RhP", "1RoD", "1RoS", "3BsD", "3RhP", "1RoP", "2GsD", "1RsS", "3BhD", "2RoS", "1GhS", "3GsD", "2RsS", "3RsP", "3BoP", "3RoD", "1GoS", "2GhP", "1BoP", "2GoS", "1BhS", "2GsS", "2BhP", "3GoD", "3GsS", "1RsD", "2RoD", "1BsS", "2GsP", "3BsP", "3RhD", "2BoP", "1GsP", "3BsS", "2RsP", "3RhS", "2RsD", "2RhP"]
     single_set_pattern_weight_2 = ["3RoP", "2BsP", "3GsS", "3RoS", "3GhS", "1GhP", "3BsP", "2BsS", "2GhS", "1RsS", "1RoS", "2BhD", "3RhS", "2GsD", "1RsD", "2BoS", "2BoP", "3BsD", "2RhS", "1GoD", "3GhP", "2GoP", "2RhD", "3GoP", "1RsP", "1RhP", "3BhD", "2BoD", "3GsD", "1GsS", "1GsD", "3RhD", "3GhD", "3GoS", "2GhD", "2RoS", "1GhS", "2RoP", "1BoD", "2RoD", "1BhP", "3RoD", "2BhP", "1RoD", "1GoP", "1BsD", "2BhS", "1BsP", "3RhP", "1GhD", "1BoP", "1BhS", "3GoD", "1BhD", "2GoS", "2BsD", "2RsD", "3BhS", "3RsD", "2RsP", "2RhP", "3BsS", "2GsS", "3BoS", "1RoP", "1RhS", "3BhP", "2GoD", "1GoS", "3BoD", "1GsP", "3RsS", "1BoS", "3GsP", "3BoP", "3RsP", "2GsP", "1RhD", "1BsS", "2GhP", "2RsS"]
@@ -1174,7 +1234,8 @@ if __name__ == "__main__":
     
     # db_path = "E:\set_patterns_{}.db".format(random.randint(1,10000))
     db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns_{}.db".format(random.randint(1,10000))
-    # db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns_5814.db"
+    
+    # db_path = "C:\Data\generated_program_data\SET_pattern_searcher\set_patterns_367.db"
     
     # get_best_weighted_set_from_db(db_path)
     # exit()
@@ -1191,7 +1252,7 @@ if __name__ == "__main__":
     # [(2, 5), (5, 8)]
     setgame = SET()
     setgame.setup_db(db_path)
-    setgame.start_search_all_windows_single_set(single_set_pattern_weight_7)
+    setgame.start_search_all_windows_single_set()
     
     
         # self.load_from_compact_pattern(pattern_compact)  # resets pattern
