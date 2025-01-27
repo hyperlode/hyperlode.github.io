@@ -651,6 +651,57 @@ class SET():
 
         self.sets_count_window_distribution = sets_count_window_distribution
 
+    # def get_weight_from_window_set_count(self, set_count):
+    #     # amount of sets in a window defines it weight
+    #     # for ZERO set PER WINDOW!!!
+        
+    #      # zero set windows get a punish point.
+    #     # one set windows: no punish points
+    #     # two  set windows: two punish points
+    #     # ...
+        
+    #     if set_count == 0:
+    #         return 0
+    #     else:
+    #         return set_count 
+    # def get_weight_from_window_set_count(self, set_count):
+    #     # amount of sets in a window defines it weight
+    #     # for TRIPLE set PER WINDOW!!!
+        
+    #      # zero set windows get a punish point.
+    #     # one set windows: no punish points
+    #     # two  set windows: two punish points
+    #     # ...
+        
+    #     if set_count == 0:
+    #         return 3
+    #     if set_count == 1:
+    #         return 2 
+    #     if set_count == 2:
+    #         return 1 
+    #     elif set_count == 3:
+    #         # add zero
+    #         return 0
+    #     else:
+    #         return set_count - 3
+    # def get_weight_from_window_set_count(self, set_count):
+    #     # amount of sets in a window defines it weight
+    #     # FOR double set PER WINDOW!!!
+        
+    #      # zero set windows get a punish point.
+    #     # one set windows: no punish points
+    #     # two  set windows: two punish points
+    #     # ...
+        
+    #     if set_count == 0:
+    #         return 2
+    #     if set_count == 1:
+    #         return 1 
+    #     elif set_count == 2:
+    #         # add zero
+    #         return 0
+    #     else:
+    #         return set_count - 2
     def get_weight_from_window_set_count(self, set_count):
         # amount of sets in a window defines it weight
         
@@ -850,15 +901,15 @@ class SET():
                     # print("rstoredsd: . {}" .format(pattern_dict_before_swap_attempt["window_stats"]))
                     
                 else:
-                    # if (self.total_pattern_weight < 100):
-                    #     print("--------SET PATTERN STATS after {} cycles:-----------".format(swap_count))
-                    #     self.print_pattern()
-                    #     print("swapped. New weight is: {}, old weight was {}".format(
-                    #         pattern_weigth_post_swap, pattern_weigth_pre_swap))
+                    if (self.total_pattern_weight < 100):
+                        print("--------SET PATTERN STATS after {} cycles:-----------".format(swap_count))
+                        self.print_pattern()
+                        print("swapped. New weight is: {}, old weight was {}".format(
+                            pattern_weigth_post_swap, pattern_weigth_pre_swap))
 
-                    #     # print ("total one set per window score (0= all windows one set): {}".format(pattern_weigth))
-                    #     # self.calculate_all_pattern_stats()
-                    #     self.print_pattern_stats()
+                        # print ("total one set per window score (0= all windows one set): {}".format(pattern_weigth))
+                        # self.calculate_all_pattern_stats()
+                        self.print_pattern_stats()
                     
                     print("Set pattern improved: weight: {}".format(pattern_weigth_post_swap))
                     self.db_set.add_pattern(self.get_pattern_as_dict())  # todo: limit db writes. by bundling...
@@ -902,16 +953,30 @@ class SET():
             (pos1,pos2):self.get_all_window_weight_at_pattern_position(pos1) + self.get_all_window_weight_at_pattern_position(pos2)
             for pos1,pos2 in available_swap_combinations
             } 
+        # print(weighted_swap_positions_to_try_dict)
         
         swap, value = max(weighted_swap_positions_to_try_dict.items(), key=lambda item: item[1])
         
         swap_pos_1, swap_pos_2 = swap
+        
         available_swap_combinations.remove(swap)
         
         # print(swap_pos_1)
         # print(swap_pos_2)
         # print("00000000000000 {}".format(value))
         # self.print_pattern_stats()
+        
+        # # Get the keys of the 10 items with the lowest values
+        # keys_to_keep = sorted(available_swap_combinations, key=available_swap_combinations.get)[100:]
+        # Get the keys of the 10 items with the highest values
+        # keys_to_keep = sorted(weighted_swap_positions_to_try_dict, key=weighted_swap_positions_to_try_dict.get, reverse=True)[10:]
+        # # available_swap_combinations = {key: available_swap_combinations[key] for key in keys_to_keep}
+        
+        
+        # for swap_position in available_swap_combinations:
+        #     if swap_position not in keys_to_keep:
+        #         available_swap_combinations.remove(swap_position)
+        # # exit()
         # exit()
         
             # swap_positions = random.choice(swap_positions_to_try)  # Pick a random element
