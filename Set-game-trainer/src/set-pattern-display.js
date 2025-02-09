@@ -42,22 +42,44 @@ function display_pattern(numberOfCardsToGuess) {
 	// this.deck.show();
 	// this.deck.shuffle();
 
+	
+	PATTERN_CARDS_COUNT = 81; // 9rowsx9cols
+	PATTERN_CARDS_PER_ROW = 9; 
+	
+	PATTERNS = 9; // 3x3
+	TOTAL_CARDS = PATTERN_CARDS_COUNT * PATTERNS;
+	TOTAL_CARDS_PER_ROW = PATTERN_CARDS_PER_ROW *3;
+
 	let dummyCard = new Card("lode", NUMBER_OF_PROPERTIES, NUMBER_OF_VALUES_PER_PROPERTY, true, [0, 0, 0, 0]);
-	setupSetPatternField(81, 9);
+	setupSetPatternField(TOTAL_CARDS, TOTAL_CARDS_PER_ROW);
 	set_pattern = get_pattern_as_id_array();
-	for (var i = 0; i < 81; i++) {
-		console.log("fiejieijfejifji");
-		// this.deck.show();
-		// card = this.deck.takeOffTopCard();
-		card_id = set_pattern[i];
-		// console.log(card_id);
-		// console.log(card_id);
-		card = this.deck.returnCardById(card_id);
-		// console.log(card);
 		
-		addCardToField(card, i, true);
-		// card = this.deck.takeOffSpecificCard(card_id);
-	}
+		for (var index_in_pattern = 0; index_in_pattern < PATTERN_CARDS_COUNT; index_in_pattern++) {
+			card_id = set_pattern[index_in_pattern];
+			card = this.deck.returnCardById(card_id);
+
+			// for (var pattern_index=0;pattern_index < PATTERNS; pattern_index++){
+			// 	// every card is repeat over all patterns.
+			console.log(index_in_pattern);
+			// first row of patterns.
+			
+			row_index = (Math.floor(index_in_pattern/9)) *27;
+			col_index = index_in_pattern % 9;
+			addCardToField(card, row_index + col_index , true);
+			addCardToField(card, row_index + col_index + 9, true);
+			addCardToField(card, row_index + col_index + 18, true);
+			// second row of patterns
+			addCardToField(card, row_index + col_index + 243, true);
+			addCardToField(card, row_index + col_index + 243 + 9, true);
+			addCardToField(card, row_index + col_index + 243 + 18, true);
+			// third row of patterns
+			addCardToField(card, row_index + col_index + 243*2, true);
+			addCardToField(card, row_index + col_index + 243*2 + 9, true);
+			addCardToField(card, row_index + col_index + 243*2 + 18, true);
+				
+
+			// }
+		}
 	// this.deck.show();
 	// get_pattern_as_id_array();
 }
