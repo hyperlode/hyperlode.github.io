@@ -46,9 +46,13 @@ function display_pattern(numberOfCardsToGuess) {
         // }
 
 		setupSetPatternField(81,9);
-		this.deck.show();
-		
-		addCardToField(this.deck.takeOffTopCard(), 10, true);
+		for (var i =0;i<81;i++){
+
+			// this.deck.show();
+			card = this.deck.takeOffTopCard();
+			console.log(card);
+			addCardToField(card, i, true);
+		}
 		
 
 }
