@@ -47,6 +47,15 @@ function Deck(properties, valuesForEachProperty,cardsPerDeck,isCardRepeatable){
 	}
 }
 	
+Deck.prototype.returnCardById = function(id){
+	//will search all cards in deck for the given id, and remove card if id is found.
+	for( var i = 0; i < this.deck.length-1; i++){ 
+		if ( this.deck[i].getId() === id) {
+			return this.deck[i];
+		}
+	}
+}
+
 Deck.prototype.takeOffSpecificCard = function(id){
 	//will search all cards in deck for the given id, and remove card if id is found.
 	for( var i = 0; i < this.deck.length-1; i++){ 
