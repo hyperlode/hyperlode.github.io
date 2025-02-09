@@ -46,18 +46,19 @@ function display_pattern(numberOfCardsToGuess) {
 	setupSetPatternField(81, 9);
 	set_pattern = get_pattern_as_id_array();
 	for (var i = 0; i < 81; i++) {
-
+		console.log("fiejieijfejifji");
 		// this.deck.show();
 		// card = this.deck.takeOffTopCard();
 		card_id = set_pattern[i];
 		// console.log(card_id);
+		// console.log(card_id);
 		card = this.deck.returnCardById(card_id);
-		
 		// console.log(card);
+		
 		addCardToField(card, i, true);
 		// card = this.deck.takeOffSpecificCard(card_id);
 	}
-	this.deck.show();
+	// this.deck.show();
 	// get_pattern_as_id_array();
 }
 
@@ -89,7 +90,7 @@ function setupSetPatternField(cardsToChooseFrom, cardsPerRow) {
 	//add space for the other cards.
 	var div;
 	for (var i = 0; i < cardsToChooseFrom; i++) {
-		console.log("added: " + i);
+		// console.log("added: " + i);
 		if (i % cardsPerRow == 0) {
 			div = addDiv(bottomField, "bottomRow_" + i / cardsPerRow, "bottomRow");
 		}

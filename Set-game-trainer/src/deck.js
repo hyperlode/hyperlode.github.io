@@ -30,7 +30,7 @@ function Deck(properties, valuesForEachProperty,cardsPerDeck,isCardRepeatable){
 	if (cardsPerDeck == this.allCards.getNumberOfCards()){
 		// console.log("complete pack");
 		this.deck = this.allCards.getAllCards();
-		this.shuffle();
+		// this.shuffle();
 	}else if (isCardRepeatable){
 		this.deck = []
 		for (i=0;i<cardsPerDeck;i++){
@@ -49,7 +49,7 @@ function Deck(properties, valuesForEachProperty,cardsPerDeck,isCardRepeatable){
 	
 Deck.prototype.returnCardById = function(id){
 	//will search all cards in deck for the given id, and remove card if id is found.
-	for( var i = 0; i < this.deck.length-1; i++){ 
+	for( var i = 0; i < this.deck.length; i++){ 
 		if ( this.deck[i].getId() === id) {
 			return this.deck[i];
 		}
