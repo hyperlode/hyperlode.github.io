@@ -421,6 +421,8 @@ function addPossibleCardSolutionLocationToDom(elementToAttachTo, position){
 	//addButtonToExecuteGeneralFunction(optionContainer,"Chose", "optionButton", "optionButton"+ position, optionCardClicked, position);
 }
 
+
+
 function addSetCardLocationsToDom(cardsPerSet, cardsToChooseFrom){
 	// build up the fields with option cards and set cards locations	
 

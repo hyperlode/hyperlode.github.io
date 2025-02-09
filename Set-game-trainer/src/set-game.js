@@ -6,18 +6,17 @@ class RealGame{
 
     start(){
 
-        var MAX_CARDS_ON_FIELD = 16;
-        addSetCardLocationsToDom(NUMBER_OF_CARDS_PER_SET,MAX_CARDS_ON_FIELD);  // 15 because there will always be a set if 14 cards layed out.
-    
+        var MAX_CARDS_ON_FIELD = 16; // 16 is a bug right there!!!! there can be more than 16 cards needed for a set to occur
+        addSetCardLocationsToDom(NUMBER_OF_CARDS_PER_SET,MAX_CARDS_ON_FIELD);
+        
         //complete set
-        // this.set = getFullSet(NUMBER_OF_PROPERTIES, NUMBER_OF_CARDS_PER_SET);
         this.deck = new Deck (NUMBER_OF_PROPERTIES, NUMBER_OF_VALUES_PER_PROPERTY);
     
         // console.log(this.set);
         // console.log("lode");
         
         this.fieldCards = [];
-        for(var i=0;i<16;i++){
+        for(var i=0;i<MAX_CARDS_ON_FIELD;i++){  // 16 is a bug right there!!!! 
             this.fieldCards[i] = false;
         }
     
