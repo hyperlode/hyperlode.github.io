@@ -14,7 +14,8 @@ var NUMBER_OF_PROPERTIES = 4;
 var NUMBER_OF_VALUES_PER_PROPERTY = 3;  // is also number of cards per set
 var NUMBER_OF_CARDS_PER_SET = NUMBER_OF_VALUES_PER_PROPERTY;
 var CARD_WIDTH = 100;
-var CARD_MAX_ROTATION_ANGLE = 2;
+var CARD_MAX_ROTATION_ANGLE = 0;
+// var CARD_MAX_ROTATION_ANGLE = 2;
 
 
 var score = 0;
@@ -49,7 +50,9 @@ var CARD_ANIMATION_DELAY_CORRECT = 500;
 var CARD_ANIMATION_DELAY_WRONG = 2000;
 var MAX_CARDS_PER_ROW = 4; //4
 // var GAME_CARDS_TYPE = "addCardSvg_special_Brainfuck";
-var GAME_CARDS_TYPE = "cards_classic_SET";
+// var GAME_CARDS_TYPE = "cards_classic_SET";
+var GAME_CARDS_TYPE = "cards_babyBlanket";
+
 var SET_CARDS_TO_GUESS = 2	;
 var CARDS_TO_CHOOSE_FROM = 12; //12
 
@@ -187,7 +190,7 @@ function initGlobalFunctionalityDOM(){
 	
 }
 
-function getCardOutline(width, height, id){
+function getCardOutline(width, height, id,cssClass){
 	//add card outline
 	var outlineStrokeWidth = 4;
 	
@@ -198,8 +201,9 @@ function getCardOutline(width, height, id){
 	cardOutline.setAttribute('ry', width/14); 
 	cardOutline.setAttribute('x', outlineStrokeWidth/2); 
 	cardOutline.setAttribute('y', outlineStrokeWidth/2); 
-	cardOutline.setAttribute('style',  'fill:white;stroke:black;stroke-width:2;opacity:1'); 
-        cardOutline.setAttribute('id', id);
+	// cardOutline.setAttribute('style',  'fill:white;stroke:black;stroke-width:2;opacity:1'); 
+	cardOutline.setAttribute('id', id);
+	cardOutline.setAttribute('class', cssClass); // Apply CSS class
 	return cardOutline;
 
 }
@@ -212,13 +216,14 @@ function addCardSvg_classicSetGame(elementToAttachTo,width,id,quantityValue,shap
 	
 	addSvg(elementToAttachTo,id,width,height,"white","white");
 	var card = document.getElementById(id);
-	card.appendChild(getCardOutline(width, height));
+	card.appendChild(getCardOutline(width, height, id+"_cardOutline", "cardOutline"));
 		
 	//set properties to value.
 	//shape
 	peanutPoints = "0.14 0.54,0.20 0.51,0.25 0.44,0.31 0.44,0.41 0.45,0.55 0.53,0.72 0.53,0.84 0.44,0.92 0.32,0.94 0.22,0.93 0.14,0.90 0.09,0.78 0.19,0.70 0.20,0.64 0.19,0.53 0.16,0.41 0.10,0.30 0.06,0.19 0.09,0.12 0.20,0.07 0.30,0.09 0.46,0.11 0.54,0.17 0.54";
 	diamondPoints = "0 0.25 , 0.5 0.5 , 1 0.25, 0.5 0" ; //"200 200,300 350,400 200,300 50" 
 	pillPoints = " 0.25 0.5, 0.75 0.5 , 0.815 0.491, 0.875 0.467, 0.927 0.427, 0.967 0.375, 0.991 0.315, 1 0.25, 0.991 0.185, 0.967 0.125, 0.927 0.073, 0.875 0.033, 0.815 0.009, 0.75 0, 0.25 0 ,0.185 0.009, 0.125 0.033, 0.073 0.073, 0.033 0.125, 0.009 0.185, 0.0 0.250, 0.009 0.315, 0.033 0.375, 0.073 0.427, 0.125 0.467, 0.185 0.491	";
+	
 	var shapesByValue= [diamondPoints, pillPoints, peanutPoints];
 	var symbolWidth = width/2;
 	var symbolHeightIncludingWhiteSpace = symbolWidth/2.7;
@@ -246,6 +251,52 @@ function addCardSvg_classicSetGame(elementToAttachTo,width,id,quantityValue,shap
 		add_polygon(card,shapesByValue[shapeValue], colorByValue[colorValue],fillByValue[infillValue],symbolWidth/2, dy, symbolWidth);
 	}
 }
+function addCardSvg_babyBlanket(elementToAttachTo,width,id,quantityValue,shapeValue,colorValue, infillValue){
+	//ratio:  width * 1.45 = height
+	var height = width * 1.45;
+	// var height = width * 2;
+	
+	//add card
+	addSvg(elementToAttachTo,id,width,height,"blue","green");
+	var card = document.getElementById(id);
+	card.appendChild(getCardOutline(width, height, id+"_cardOutline", "cardOutline"));
+		
+	//set properties to value.
+	//shape
+	trianglePoints = "0.25 0.5 , 0.5 0 , 0.75 0.5";
+	squarePoints = "0.25 0, 0.25 0.5, 0.75 0.5, 0.75 0";
+	circlePoints = "0.8 0.25, 0.798 0.281, 0.792 0.312, 0.783 0.342, 0.771 0.371, 0.755 0.399, 0.737 0.425, 0.716 0.449, 0.692 0.471, 0.666 0.49, 0.638 0.506, 0.609 0.519, 0.579 0.529, 0.548 0.536, 0.517 0.54, 0.485 0.54, 0.454 0.536, 0.423 0.529, 0.393 0.519, 0.364 0.506, 0.336 0.49, 0.31 0.471, 0.286 0.449, 0.265 0.425, 0.247 0.399, 0.231 0.371, 0.219 0.342, 0.21 0.312, 0.204 0.281, 0.202 0.25, 0.204 0.219, 0.21 0.188, 0.219 0.158, 0.231 0.129, 0.247 0.101, 0.265 0.075, 0.286 0.051, 0.31 0.029, 0.336 0.01, 0.364 -0.006, 0.393 -0.019, 0.423 -0.029, 0.454 -0.036, 0.485 -0.04, 0.517 -0.04, 0.548 -0.036, 0.579 -0.029, 0.609 -0.019, 0.638 -0.006, 0.666 0.01, 0.692 0.029, 0.716 0.051, 0.737 0.075, 0.755 0.101, 0.771 0.129, 0.783 0.158, 0.792 0.188, 0.798 0.219"
+
+	var shapesByValue= [circlePoints, squarePoints, trianglePoints];
+	var symbolWidth = width/2;
+	var symbolHeightIncludingWhiteSpace = symbolWidth/2.7;
+		
+	//color
+	//var colorByValue = ["red","green","blue"];
+	// var colorByValue = ["#F4A7B9","#A7D8F4","#F4E1A7"];
+	// var colorByValue = ["#a8da65","#ef587e","#3bc0b3"]; //#e8e100 (yellow) "#a8da65"green,"#ef587e"pink,"#3bc0b3"blue
+	var colorByValue = ["#f6aa2f","#ff0eb1","#3bc0b3"]; //#e8e100 (yellow) "#a8da65"green,"#ef587e"pink,"#3bc0b3"blue
+	
+	//pattern
+	var vertical_hatch_id =  "vertical_hatch_"+id;
+	add_pattern_vertical_lines(card, "vertical_hatch_"+id, colorByValue[colorValue], width/5000, width/1000);
+	fill_blank = "white";
+	fill_solid = colorByValue[colorValue];
+	fill_hatch = "url(#"+vertical_hatch_id+")"; //defined in svgOperations...
+	var fillByValue = [fill_blank, fill_solid, fill_hatch];
+	
+	//quantity
+	var cardsQuantity = quantityValue + 1; 
+		
+	//add properties
+	for (var i=0; i<cardsQuantity;i++){
+		var multiplier = -cardsQuantity + 1 + i * 2;
+		var dy = height/2 -symbolHeightIncludingWhiteSpace/1.5 +  multiplier  * symbolHeightIncludingWhiteSpace; // symbols always in middle.   -symbolHeightIncludingWhiteSpace/1.5 is by trial and error :(
+		
+		//add shape
+		add_polygon(card,shapesByValue[shapeValue], colorByValue[colorValue],fillByValue[infillValue],symbolWidth*0.5, dy, symbolWidth);
+	}
+}
 
 function addCardSvg_special_Brainfuck(elementToAttachTo,width,id, brightnessTextValue,textValue,colorValue, brightnessValue){
 	//ratio:  width * 1.45 = height
@@ -254,7 +305,7 @@ function addCardSvg_special_Brainfuck(elementToAttachTo,width,id, brightnessText
 	//add card
 	addSvg(elementToAttachTo,id,width,height,"white","white");
 	var card = document.getElementById(id);
-	card.appendChild(getCardOutline(width, height));
+	card.appendChild(getCardOutline(width, height, id+"_cardOutline", "cardOutline"));
 	
 	// //add card outline
 	// var cardOutline = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -351,16 +402,14 @@ function showCardDom(card, elementToAttachToId, isVisible){
 	var cardDiv = document.getElementById(elementToAttachToId);
 	
 	//cardId as title
-	//cardDiv.innerHTML = "<p>"+ card.getId() +"</p>";
 	cardDiv.innerHTML = "";
 	//card as svg
-	
-	//addCardSvg(cardDiv,CARD_WIDTH, elementToAttachToId +"_"+card.getId() , card.getPropertyValue(0),card.getPropertyValue(1),card.getPropertyValue(2), card.getPropertyValue(3));
-	
 	if (GAME_CARDS_TYPE == "addCardSvg_special_Brainfuck"){
 		addCardSvg_special_Brainfuck(cardDiv,CARD_WIDTH, elementToAttachToId +"_"+card.getId() , card.getPropertyValue(0),card.getPropertyValue(1),card.getPropertyValue(2), card.getPropertyValue(3));
 	}else if( GAME_CARDS_TYPE == "cards_classic_SET"){
-		addCardSvg_classicSetGame  (cardDiv,CARD_WIDTH, elementToAttachToId +"_"+card.getId() , card.getPropertyValue(0),card.getPropertyValue(1),card.getPropertyValue(2), card.getPropertyValue(3));	
+		addCardSvg_classicSetGame  (cardDiv,CARD_WIDTH, elementToAttachToId +"_"+card.getId() , card.getPropertyValue(0),card.getPropertyValue(1),card.getPropertyValue(2), card.getPropertyValue(3));
+	}else if( GAME_CARDS_TYPE == "cards_babyBlanket"){
+		addCardSvg_babyBlanket  (cardDiv,CARD_WIDTH, elementToAttachToId +"_"+card.getId() , card.getPropertyValue(0),card.getPropertyValue(1),card.getPropertyValue(2), card.getPropertyValue(3));	
 	}else{
 		console.log("error, select card visuals TYPE");
 	}

@@ -81,7 +81,7 @@ class RealGame{
 	    let cardNumber = i-1;
             // style.transform = `rotate(${a}deg)`;
 
-            let outline = getCardOutline(width, height, `draw_card_${cardNumber}`);
+            let outline = getCardOutline(width, height, `draw_card_${cardNumber}`, "cardOutline");
     		
             // outline.style.transform = `rotate(${10*i + 10}deg)`;
             let max_angle = 2;

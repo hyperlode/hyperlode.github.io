@@ -5,13 +5,15 @@ function addSvg(elementToAppendTo, name,width, height,color_background,border_co
 		border_color = typeof border_color !== 'undefined' ? border_color : "black";
 	}
 	var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	svg.setAttribute('style', 'border: 1px solid '+ border_color+ ';background:' + color_background);
+	svg.setAttribute('style', 'border: 10px solid '+ border_color+ ';background:' + color_background);
+	svg.setAttribute('border', "5px solid");
 	svg.setAttribute('width', width);
 	//svg.setAttribute('background', SVG_BACKGROUND);
 	svg.setAttribute('id', name);
 	svg.setAttribute('height', height);
 	svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
 	elementToAppendTo.appendChild(svg);
+	// console.log(name);
 };
 
 
@@ -97,7 +99,7 @@ function add_pattern_diagonal_lines(svgElement){
 	path.setAttribute("d", "M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2"); //http://stackoverflow.com/questions/13069446/simple-fill-pattern-in-svg-diagonal-hatching
 	path.setAttribute("color", "black");
 	path.setAttribute('stroke-width', 2);
-	path.setAttribute('stroke', "yellow"); //http://codepen.io/endlist/pen/qEjdKg
+	path.setAttribute('stroke', "red"); //http://codepen.io/endlist/pen/qEjdKg
 	pattern.appendChild(path);
 	
 	svgElement.appendChild(pattern);

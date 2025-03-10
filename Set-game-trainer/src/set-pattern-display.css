@@ -2,6 +2,29 @@ body {
 	text-align:center;
 }
 
+.cardOutline{
+    /* stroke: rgb(33, 34, 81); */
+    /* stroke: black; */
+    /* stroke: #3bc0b3; */
+    stroke: #3336ae;
+    stroke-width: 1;
+    /* fill:rgb(33, 34, 81); */
+    fill:white;
+}
+
+
+.colourA{
+
+}
+.colourB{
+
+}
+
+.colourC{
+
+}
+
+
 .row {
   width: 100%;
   text-align: center; /* center the content of the container */
@@ -14,7 +37,8 @@ body {
 }
 
 .cardsField{
-  background: white;
+  /* background: black; */
+  background: #3336ae;
   white-space: nowrap;
 	text-align: center;
 	width: auto;
@@ -25,6 +49,7 @@ body {
 
   /* width: 100px; */
   display: inline-block; /* display inline with abality to provide width/height */
+  margin-right: 3px;
 }
 
 /* #lines path

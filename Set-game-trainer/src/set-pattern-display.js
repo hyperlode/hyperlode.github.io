@@ -39,15 +39,14 @@ function get_pattern_as_id_array() {
 function display_pattern(numberOfCardsToGuess) {
 
 	this.deck = new Deck(NUMBER_OF_PROPERTIES, NUMBER_OF_VALUES_PER_PROPERTY);
-	// this.deck.show();
-	// this.deck.shuffle();
 
-
+	// cards per pattern
 	PATTERN_CARDS_COUNT = 81; // 9rowsx9cols
 	PATTERN_CARDS_PER_ROW = 9; // aka number of cols
 
-	PATTERN_ROWS = 3; // repeating of pattern
-	PATTERN_COLS = 3;
+	// amount of patterns displayed
+	PATTERN_ROWS = 3; //3 // repeating of pattern
+	PATTERN_COLS = 3; //3
 	PATTERNS = PATTERN_ROWS * PATTERN_COLS;
 
 
@@ -64,14 +63,12 @@ function display_pattern(numberOfCardsToGuess) {
 		card_id = set_pattern[index_in_pattern];
 		card = this.deck.returnCardById(card_id);
 
-		// for (var pattern_index=0;pattern_index < PATTERNS; pattern_index++){
-		// 	// every card is repeat over all patterns.
 		console.log(index_in_pattern);
 		// first row of patterns.
-
 		row_index = (Math.floor(index_in_pattern / PATTERN_CARDS_PER_ROW)) * PATTERN_CARDS_PER_ROW * PATTERN_COLS;
 		col_index = index_in_pattern % PATTERN_CARDS_PER_ROW;
 
+		// add all cards to field (all cards all patterns)
 		for (var pattern_row_index = 0; pattern_row_index < PATTERN_ROWS; pattern_row_index++) {
 			for (var pattern_col_index = 0; pattern_col_index < PATTERN_COLS; pattern_col_index++) {
 				addCardToField(card, row_index + col_index + TOTAL_CARDS_PER_PATTERN_ROW * pattern_row_index + pattern_col_index * PATTERN_CARDS_PER_ROW, true);
@@ -90,12 +87,7 @@ function display_pattern(numberOfCardsToGuess) {
 		// addCardToField(card, row_index + col_index + 243*2, true);
 		// addCardToField(card, row_index + col_index + 243*2 + 9, true);
 		// addCardToField(card, row_index + col_index + 243*2 + 18, true);
-
-
-		// }
 	}
-	// this.deck.show();
-	// get_pattern_as_id_array();
 }
 
 function addCardToField(card, index, visible) {
