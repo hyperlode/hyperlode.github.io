@@ -883,7 +883,7 @@ class SET():
                     )
                       )
               
-            if (is_swapped and pattern_dict_before_swap_attempt["pattern_weight"] != self.total_pattern_weight):
+            if (is_swapped and self.total_pattern_weight <= pattern_dict_before_swap_attempt["pattern_weight"]):
                 
                 # first update current pattern to db.
                 pattern_dict_before_swap_attempt["tried_position_swaps"] = self.get_already_tried_positions_from_swap_positions_to_try(self.swap_positions_to_try)

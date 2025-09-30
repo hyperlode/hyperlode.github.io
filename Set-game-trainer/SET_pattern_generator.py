@@ -773,12 +773,17 @@ class SET():
             window_positions = self.get_pattern_positions_from_window_position(
                 position)
             for wp in window_positions:
-                if set_count_in_window == 0:
-                    # 0 is equally bad as two
-                    score = 2
-                else:
-                    score = set_count_in_window
-                self.set_tag_card_at_pattern_position(wp, score)
+                goal = "zero_sets_per_window_goal"
+                if goal == "zero_sets_per_window_goal":
+                    score = set_count_in_window + 1
+                    self.set_tag_card_at_pattern_position(wp, score)
+                elif goal == "one_set_per_window_goal":
+                    if set_count_in_window == 0:
+                        # 0 is equally bad as two
+                        score = 2
+                    else:
+                        score = set_count_in_window
+                    self.set_tag_card_at_pattern_position(wp, score)
 
         # get highest score positions
         # AMOUNT_OF_SWAPPABLE_POSITIONS = 15 # best pattern_weight of about 23
