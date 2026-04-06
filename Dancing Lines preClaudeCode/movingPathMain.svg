@@ -1,0 +1,45 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"	"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg id ="testsvg" width="1000" height="1000" viewBox="0 0 2001 2000" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" onload="init_path(evt)">
+
+<script type="text/javascript" xlink:href="svg.js" xlink:actuate="onLoad" xlink:show="other" xlink:type="simple" />
+	<desc>
+		Example script01 - invoke an ECMAScript function from an onclick event
+	</desc>
+	
+	<!-- ECMAScript to change the radius with each click -->
+	
+		
+	<!-- Outline the drawing area with a blue line -->
+	<rect x="1" y="1" width="1000" height="1000" fill="none" stroke="blue"/>
+
+
+
+	<!-- <g transform='translate(50 300)'>  -->
+		<!-- Act on each click event -->
+		<!-- <circle onclick="circle_click(evt)" cx="0" cy="0" r="50" fill="red"/> -->
+		<!-- Act on each click event -->
+		<!-- <text x="60" y="0" font-family="Verdana" font-size="35" text-anchor="left"> -->
+			<!-- Click on red circle to change its size. -->
+		<!-- </text>  -->
+	<!-- </g> -->
+
+	<!-- <g transform='translate(50 100)'>  -->
+		<!-- <circle onclick="make_shape(evt)" cx="0" cy="0" r="50" fill="yellow"/>		 -->
+		<!-- <text x="60" y="0" font-family="Verdana" font-size="35" text-anchor="left"> -->
+			<!-- Click on yellow circle to add a circle -->
+		<!-- </text> -->
+	<!-- </g> -->
+	
+	
+	<!-- <path fill = "none" stroke="red" d="M150 0 L75 200 L225 200 Z" /> -->
+	
+	<!-- <g transform='translate(50 500)'>  -->
+	<!-- <path fill = "white" stroke="red" d="M0 0 L300 0 L300 400 L200 400 L200 100 L100 100 L100 150 L400 150 L400 200 L0 200 Z" transform='translate(500 20)'/> -->
+	<!-- </g> -->
+ 
+	
+
+	
+</svg>
