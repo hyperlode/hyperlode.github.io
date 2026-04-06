@@ -50,8 +50,8 @@ var CARD_ANIMATION_DELAY_CORRECT = 500;
 var CARD_ANIMATION_DELAY_WRONG = 2000;
 var MAX_CARDS_PER_ROW = 4; //4
 // var GAME_CARDS_TYPE = "addCardSvg_special_Brainfuck";
-// var GAME_CARDS_TYPE = "cards_classic_SET";
-var GAME_CARDS_TYPE = "cards_babyBlanket";
+var GAME_CARDS_TYPE = "cards_classic_SET";
+// var GAME_CARDS_TYPE = "cards_babyBlanket";
 
 var SET_CARDS_TO_GUESS = 2	;
 var CARDS_TO_CHOOSE_FROM = 12; //12

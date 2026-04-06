@@ -5,7 +5,7 @@ function addSvg(elementToAppendTo, name,width, height,color_background,border_co
 		border_color = typeof border_color !== 'undefined' ? border_color : "black";
 	}
 	var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	svg.setAttribute('style', 'border: 10px solid '+ border_color+ ';background:' + color_background);
+	svg.setAttribute('style', 'border: 1px solid '+ border_color+ ';background:' + color_background);
 	svg.setAttribute('border', "5px solid");
 	svg.setAttribute('width', width);
 	//svg.setAttribute('background', SVG_BACKGROUND);
