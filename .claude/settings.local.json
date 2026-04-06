@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Bash(wc -l \"/c/Data/GIT/hyperlode.github.io\"/Set-game-trainer/src/*.js)",
+      "Bash(grep -v \"^$\")"
+    ]
+  }
+}
