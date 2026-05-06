@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Code — Your AI Coding Sidekick</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      overflow-x: hidden;
+    }
+
+    /* Animated starfield background */
+    canvas#stars {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 60px 0 40px;
+    }
+
+    .hero .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #a78bfa, #60a5fa, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+    }
+
+    .hero .subtitle {
+      font-size: 1.2rem;
+      color: #8b949e;
+      max-width: 560px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+
+    /* Terminal demo */
+    .terminal {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 0 auto 60px;
+      max-width: 680px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      text-align: left;
+    }
+
+    .terminal-bar {
+      background: #21262d;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot.red   { background: #ff5f57; }
+    .dot.yellow{ background: #febc2e; }
+    .dot.green { background: #28c840; }
+
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #8b949e;
+      font-family: monospace;
+    }
+
+    .terminal-body {
+      padding: 20px 24px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      line-height: 1.8;
+      min-height: 180px;
+    }
+
+    .line-prompt { color: #34d399; }
+    .line-cmd    { color: #e6edf3; }
+    .line-out    { color: #8b949e; }
+    .line-ok     { color: #60a5fa; }
+    .cursor {
+      display: inline-block;
+      width: 9px; height: 1.1em;
+      background: #34d399;
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* Feature cards */
+    .section-title {
+      text-align: center;
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #e6edf3;
+    }
+
+    .section-sub {
+      text-align: center;
+      color: #8b949e;
+      margin-bottom: 36px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 60px;
+    }
+
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 28px 24px;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      cursor: default;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: #7c3aed;
+      box-shadow: 0 8px 30px rgba(124,58,237,0.2);
+    }
+
+    .card .icon {
+      font-size: 2.2rem;
+      margin-bottom: 14px;
+    }
+
+    .card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #e6edf3;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: #8b949e;
+      line-height: 1.6;
+    }
+
+    /* "What happened here" section */
+    .timeline {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 36px 32px;
+      margin-bottom: 60px;
+    }
+
+    .timeline h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 28px;
+      color: #a78bfa;
+    }
+
+    .tl-item {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 22px;
+      align-items: flex-start;
+    }
+
+    .tl-num {
+      flex-shrink: 0;
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .tl-text strong { color: #e6edf3; display: block; margin-bottom: 2px; }
+    .tl-text span   { color: #8b949e; font-size: 0.9rem; }
+
+    /* Quote */
+    .quote-box {
+      text-align: center;
+      background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(37,99,235,0.15));
+      border: 1px solid rgba(124,58,237,0.3);
+      border-radius: 12px;
+      padding: 40px 32px;
+      margin-bottom: 60px;
+    }
+
+    .quote-box blockquote {
+      font-size: 1.35rem;
+      font-style: italic;
+      font-weight: 600;
+      color: #e6edf3;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .quote-box cite {
+      color: #8b949e;
+      font-size: 0.9rem;
+    }
+
+    /* CTA */
+    .cta {
+      text-align: center;
+    }
+
+    .cta h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .cta p {
+      color: #8b949e;
+      margin-bottom: 28px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: opacity 0.2s, transform 0.2s;
+      margin: 6px;
+    }
+
+    .btn:hover { opacity: 0.85; transform: translateY(-2px); }
+
+    .btn.secondary {
+      background: transparent;
+      border: 1px solid #30363d;
+      color: #8b949e;
+    }
+
+    .btn.secondary:hover { border-color: #7c3aed; color: #e6edf3; }
+
+    /* back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #8b949e;
+      text-decoration: none;
+      font-size: 0.9rem;
+      margin-bottom: 40px;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: #a78bfa; }
+  </style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="content">
+
+  <a class="back-link" href="../index.html">&#8592; Back to Lode's site</a>
+
+  <div class="hero">
+    <div class="badge">Built with Claude Code</div>
+    <h1>Your AI Coding<br>Sidekick Is Here</h1>
+    <p class="subtitle">
+      Claude Code sits in your terminal and writes, refactors, debugs, and ships code
+      while you sip coffee and take all the credit.
+    </p>
+  </div>
+
+  <!-- Animated terminal -->
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="dot red"></div>
+      <div class="dot yellow"></div>
+      <div class="dot green"></div>
+      <div class="terminal-title">terminal — claude</div>
+    </div>
+    <div class="terminal-body" id="term-body">
+      <span class="line-prompt">$ </span><span class="line-cmd" id="term-text"></span><span class="cursor" id="term-cursor"></span>
+    </div>
+  </div>
+
+  <!-- Feature cards -->
+  <h2 class="section-title">What it actually does</h2>
+  <p class="section-sub">Spoiler: a lot.</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="icon">&#x1F9E0;</div>
+      <h3>Understands your whole codebase</h3>
+      <p>Not just the file you opened. Claude Code reads the repo, follows imports, and grasps the big picture before touching anything.</p>
+    </div>
+    <div class="card">
+      <div class="icon">&#x1F527;</div>
+      <h3>Fixes bugs you've been ignoring</h3>
+      <p>Point at the symptom. Claude traces it to the root cause, proposes a fix, and even writes the regression test so it stays fixed.</p>
+    </div>
+    <div class="card">
+      <div class="icon">&#x1F680;</div>
+      <h3>Writes features from scratch</h3>
+      <p>"Add a dark mode toggle" goes from sentence to working code — including the CSS, the JS, and the edge case you forgot about.</p>
+    </div>
+    <div class="card">
+      <div class="icon">&#x1F4DD;</div>
+      <h3>Commits & PRs</h3>
+      <p>Stages the right files, writes a meaningful commit message, and can open a pull request — all without leaving the terminal.</p>
+    </div>
+    <div class="card">
+      <div class="icon">&#x1F5A5;&#xFE0F;</div>
+      <h3>Runs commands safely</h3>
+      <p>Needs to run tests? Check a build? It asks before doing anything risky and shows you exactly what it's about to execute.</p>
+    </div>
+    <div class="card">
+      <div class="icon">&#x1F4AC;</div>
+      <h3>Explains anything</h3>
+      <p>"What does this regex even do?" — Claude explains it in plain English, with examples, at whatever level of detail you need.</p>
+    </div>
+  </div>
+
+  <!-- What happened on this site -->
+  <div class="timeline">
+    <h2>&#x26A1; What Claude Code built on this very site</h2>
+
+    <div class="tl-item">
+      <div class="tl-num">1</div>
+      <div class="tl-text">
+        <strong>Dancing Lines — complete rewrite</strong>
+        <span>Took the old orthogonal path animator, understood the algorithm, rewrote it cleanly with new controls and smoother rendering.</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-num">2</div>
+      <div class="tl-num" style="display:none"></div>
+      <div class="tl-num">2</div>
+      <div class="tl-text">
+        <strong>SET game trainer — bug hunt</strong>
+        <span>Tracked down a tricky card-rendering bug across five interdependent JS files, patched it, and kept the existing code style intact.</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-num">3</div>
+      <div class="tl-text">
+        <strong>This page — written in one prompt</strong>
+        <span>"Add a fun Claude Code promo page to the site" → folder created, HTML/CSS/JS written, link added to the main index. Done.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quote -->
+  <div class="quote-box">
+    <blockquote>
+      "It's like pair programming with someone who has read every Stack Overflow answer,
+      never gets tired, and doesn't judge you for the variable name you chose at 2 am."
+    </blockquote>
+    <cite>— A very satisfied developer (Lode)</cite>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <h2>Try it yourself</h2>
+    <p>Claude Code runs in your terminal. No plugin, no IDE lock-in.</p>
+    <a class="btn" href="https://claude.ai/code" target="_blank" rel="noopener">Get Claude Code</a>
+    <a class="btn secondary" href="../index.html">Back to the site</a>
+  </div>
+
+</div>
+
+<script>
+  // Starfield
+  (function() {
+    var canvas = document.getElementById('stars');
+    var ctx = canvas.getContext('2d');
+    var stars = [];
+    var W, H;
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    for (var i = 0; i < 160; i++) {
+      stars.push({
+        x: Math.random() * 1920,
+        y: Math.random() * 1080,
+        r: Math.random() * 1.4 + 0.3,
+        speed: Math.random() * 0.15 + 0.05,
+        alpha: Math.random() * 0.6 + 0.2
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      stars.forEach(function(s) {
+        ctx.beginPath();
+        ctx.arc(s.x % W, s.y % H, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,' + s.alpha + ')';
+        ctx.fill();
+        s.y += s.speed;
+        if (s.y > H) { s.y = 0; s.x = Math.random() * W; }
+      });
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  // Terminal typewriter
+  (function() {
+    var sequences = [
+      { cmd: 'claude "add a dark mode toggle"',       delay: 60 },
+      { cmd: 'claude "fix the login bug on line 42"', delay: 60 },
+      { cmd: 'claude "write tests for this module"',  delay: 60 },
+      { cmd: 'claude "refactor this into smaller functions"', delay: 55 },
+      { cmd: 'claude "explain what this regex does"', delay: 65 },
+    ];
+
+    var outputs = [
+      ['Reading codebase...', 'Found toggle button hook.', 'Writing CSS variables...', '\u2713 Dark mode added! (3 files changed)'],
+      ['Tracing error...', 'Found null ref in auth.js:42.', 'Applying fix...', '\u2713 Bug squashed. Test added.'],
+      ['Analysing module...', 'Writing unit tests...', '\u2713 12 tests written. All passing.'],
+      ['Identifying functions...', 'Splitting into 4 helpers...', '\u2713 Refactor complete. Cleaner!'],
+      ['"Match one or more digits, non-greedy."', '\u2713 Explained! (with examples)'],
+    ];
+
+    var termText   = document.getElementById('term-text');
+    var termCursor = document.getElementById('term-cursor');
+    var termBody   = document.getElementById('term-body');
+
+    var seqIndex = 0;
+
+    function typeLine(text, speed, done) {
+      var i = 0;
+      termText.textContent = '';
+      termCursor.style.display = 'inline-block';
+      var iv = setInterval(function() {
+        termText.textContent += text[i++];
+        if (i >= text.length) {
+          clearInterval(iv);
+          termCursor.style.display = 'none';
+          setTimeout(done, 400);
+        }
+      }, speed);
+    }
+
+    function showOutputLines(lines, idx, done) {
+      if (idx >= lines.length) { setTimeout(done, 1200); return; }
+      var div = document.createElement('div');
+      div.style.color = lines[idx].startsWith('\u2713') ? '#34d399' : '#8b949e';
+      div.style.fontFamily = 'monospace';
+      div.style.fontSize = '0.9rem';
+      div.textContent = lines[idx];
+      termBody.appendChild(div);
+      setTimeout(function() { showOutputLines(lines, idx + 1, done); }, 350);
+    }
+
+    function runSequence() {
+      var seq = sequences[seqIndex % sequences.length];
+      var out = outputs[seqIndex % outputs.length];
+
+      // Reset
+      termBody.innerHTML = '<span class="line-prompt">$ </span><span class="line-cmd" id="term-text"></span><span class="cursor" id="term-cursor"></span>';
+      termText   = document.getElementById('term-text');
+      termCursor = document.getElementById('term-cursor');
+
+      typeLine(seq.cmd, seq.delay, function() {
+        // show running indicator
+        var running = document.createElement('div');
+        running.style.color = '#a78bfa';
+        running.style.fontFamily = 'monospace';
+        running.style.fontSize = '0.9rem';
+        running.textContent = '> Running...';
+        termBody.appendChild(running);
+
+        setTimeout(function() {
+          showOutputLines(out, 0, function() {
+            seqIndex++;
+            setTimeout(runSequence, 1800);
+          });
+        }, 400);
+      });
+    }
+
+    runSequence();
+  })();
+
+  // Fix duplicate tl-num in timeline item 2 (copy-paste artifact guard)
+  document.querySelectorAll('.tl-item').forEach(function(item) {
+    var nums = item.querySelectorAll('.tl-num');
+    if (nums.length > 1) {
+      for (var i = 1; i < nums.length; i++) nums[i].remove();
+    }
+  });
+</script>
+
+</body>
+</html>
