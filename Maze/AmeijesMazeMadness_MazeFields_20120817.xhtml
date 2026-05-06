@@ -81,7 +81,18 @@
     }
     .maze-cell:hover .remove-btn { display: block; }
 
-    .field-actions { margin-top: 14px; display: flex; gap: 8px; }
+    .field-actions { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .sym-toggle {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #888;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .sym-toggle input { margin-right: 4px; cursor: pointer; }
+    .sym-toggle label { cursor: pointer; white-space: nowrap; }
 
     /* ======= CHOOSER =======
        Each cell is one tile (24px), cycling: grey / black / white  */
@@ -181,8 +192,34 @@
       <div class="section-label">Canvas (5&#215;5)</div>
       <div id="mazeFieldGrid"></div>
       <div class="field-actions">
+        <button onclick="fillCanvas()">Fill randomly</button>
+        <button onclick="fillSymmetric()">Fill symmetric</button>
         <button onclick="clearSelectedCell()">Clear cell</button>
         <button onclick="clearAllCells()">Clear all</button>
+      </div>
+      <div class="sym-toggle">
+        <label>
+          <input type="checkbox" id="symOnly" onchange="updateResults()" />
+          self-symmetric mazes only
+        </label>
+      </div>
+      <div class="sym-toggle">
+        <label>
+          <input type="checkbox" id="canvasSym" />
+          canvas symmetric (H + V mirror)
+        </label>
+      </div>
+      <div class="sym-toggle">
+        <label>
+          <input type="checkbox" id="canvasDiagSym" />
+          canvas D4-symmetric (+ diagonal axes)
+        </label>
+      </div>
+      <div class="sym-toggle">
+        <label>
+          <input type="checkbox" id="useFilter" />
+          fill from filtered patterns only
+        </label>
       </div>
     </div>
 
@@ -195,6 +232,11 @@
         <div><span class="dot" style="background:#bbb"></span>grey – any</div>
         <div><span class="dot" style="background:#000"></span>black – cell IN</div>
         <div><span class="dot" style="background:#fff;outline:1px solid #ccc"></span>white – cell OUT</div>
+      </div>
+      <div class="sym-toggle">
+        <label><input type="checkbox" id="filterH"  onchange="updateResults()" /> H-symmetric</label>
+        <label><input type="checkbox" id="filterV"  onchange="updateResults()" /> V-symmetric</label>
+        <label><input type="checkbox" id="filterD2" onchange="updateResults()" /> D2-symmetric</label>
       </div>
       <div class="chooser-actions">
         <button onclick="clearChooser()">Reset filter</button>
@@ -239,7 +281,250 @@
       return svg;
     }
 
-    // ---- Canvas field ----
+    // ---- Maze transforms ----
+    function rotateMaze90CW(ms) {
+      var result = '';
+      for (var r = 0; r < 5; r++)
+        for (var c = 0; c < 5; c++)
+          result += ms[(4-c)*5 + r];
+      return result;
+    }
+
+    function mirrorMazeH(ms) {  // flip left-right
+      var result = '';
+      for (var r = 0; r < 5; r++)
+        for (var c = 0; c < 5; c++)
+          result += ms[r*5 + (4-c)];
+      return result;
+    }
+
+    function mirrorMazeV(ms) {  // flip top-bottom
+      var result = '';
+      for (var r = 0; r < 5; r++)
+        for (var c = 0; c < 5; c++)
+          result += ms[(4-r)*5 + c];
+      return result;
+    }
+
+    function mirrorMazeDiag(ms) {  // reflect along main diagonal: (r,c) <- (c,r)
+      var result = '';
+      for (var r = 0; r < 5; r++)
+        for (var c = 0; c < 5; c++)
+          result += ms[c*5 + r];
+      return result;
+    }
+
+    function mirrorMazeAntiDiag(ms) {  // reflect along anti-diagonal: (r,c) <- (4-c,4-r)
+      var result = '';
+      for (var r = 0; r < 5; r++)
+        for (var c = 0; c < 5; c++)
+          result += ms[(4-c)*5 + (4-r)];
+      return result;
+    }
+
+    function isSelfSymmetric(ms) {
+      var r90  = rotateMaze90CW(ms);
+      var r180 = rotateMaze90CW(r90);
+      return ms === r90 || ms === r180 || ms === mirrorMazeH(ms) || ms === mirrorMazeV(ms);
+    }
+
+    // Pre-computed pools (lazy)
+    var _symPool = null, _hPool = null, _vPool = null, _d2Pool = null, _diagPool = null, _d4Pool = null;
+
+    function getSymmetricPool() {
+      if (_symPool) return _symPool;
+      _symPool = getAllMazeNames().filter(isSelfSymmetric);
+      return _symPool;
+    }
+    // H-symmetric: invariant under left-right flip
+    function getHSymPool() {
+      if (_hPool) return _hPool;
+      _hPool = getAllMazeNames().filter(function(ms) { return ms === mirrorMazeH(ms); });
+      return _hPool;
+    }
+    // V-symmetric: invariant under top-bottom flip
+    function getVSymPool() {
+      if (_vPool) return _vPool;
+      _vPool = getAllMazeNames().filter(function(ms) { return ms === mirrorMazeV(ms); });
+      return _vPool;
+    }
+    // D2-symmetric: invariant under both H and V (and therefore also 180° rotation)
+    function getD2SymPool() {
+      if (_d2Pool) return _d2Pool;
+      _d2Pool = getAllMazeNames().filter(function(ms) {
+        return ms === mirrorMazeH(ms) && ms === mirrorMazeV(ms);
+      });
+      return _d2Pool;
+    }
+    // Diag-symmetric: invariant under main-diagonal reflection
+    function getDiagSymPool() {
+      if (_diagPool) return _diagPool;
+      _diagPool = getAllMazeNames().filter(function(ms) { return ms === mirrorMazeDiag(ms); });
+      return _diagPool;
+    }
+    // D4-symmetric: invariant under the full dihedral group (H + diag suffice as generators)
+    function getD4SymPool() {
+      if (_d4Pool) return _d4Pool;
+      _d4Pool = getAllMazeNames().filter(function(ms) {
+        return ms === mirrorMazeH(ms) && ms === mirrorMazeDiag(ms);
+      });
+      return _d4Pool;
+    }
+
+    function checked(id) {
+      var el = document.getElementById(id);
+      return !!(el && el.checked);
+    }
+
+    function getMask() {
+      var mask = '';
+      for (var r = 0; r < N; r++)
+        for (var c = 0; c < N; c++) {
+          var s = document.getElementById('ch_' + r + '_' + c).getAttribute('data-state');
+          mask += s === 'in' ? '1' : s === 'out' ? '0' : 'x';
+        }
+      return mask;
+    }
+
+    function applyMask(pool, mask) {
+      return pool.filter(function(maze) {
+        for (var j = 0; j < 25; j++)
+          if (mask[j] !== 'x' && mask[j] !== maze[j]) return false;
+        return true;
+      });
+    }
+
+    // Pool from symmetry checkboxes only (no pattern mask).
+    function getBasePool() {
+      if (checked('filterD2') || (checked('filterH') && checked('filterV'))) return getD2SymPool();
+      if (checked('filterH'))  return getHSymPool();
+      if (checked('filterV'))  return getVSymPool();
+      if (checked('symOnly'))  return getSymmetricPool();
+      return getAllMazeNames();
+    }
+
+    // Pool used by fill operations — optionally also restricted to the filter pattern.
+    function getPool() {
+      var pool = getBasePool();
+      if (checked('useFilter')) pool = applyMask(pool, getMask());
+      return pool;
+    }
+
+
+    // ---- Fill helpers ----
+
+    function applyTransform(ms, xf) {
+      if (xf === 'H')   return mirrorMazeH(ms);
+      if (xf === 'V')   return mirrorMazeV(ms);
+      if (xf === 'HV')  return mirrorMazeH(mirrorMazeV(ms));
+      if (xf === 'r90') return rotateMaze90CW(ms);
+      if (xf === 'r180') { var t = rotateMaze90CW(ms); return rotateMaze90CW(t); }
+      if (xf === 'r270') { var t = rotateMaze90CW(ms); t = rotateMaze90CW(t); return rotateMaze90CW(t); }
+      if (xf === 'diag')  return mirrorMazeDiag(ms);
+      if (xf === 'adiag') return mirrorMazeAntiDiag(ms);
+      return ms; // 'id'
+    }
+
+    // 4-fold rotational canvas orbits (CW order -> id/r90/r180/r270)
+    var ORBITS_ROT = [
+      { cells: [[2,2]],                         xfs: ['id']                      },
+      { cells: [[0,0],[0,4],[4,4],[4,0]],        xfs: ['id','r90','r180','r270']  },
+      { cells: [[0,2],[2,4],[4,2],[2,0]],        xfs: ['id','r90','r180','r270']  },
+      { cells: [[0,1],[1,4],[4,3],[3,0]],        xfs: ['id','r90','r180','r270']  },
+      { cells: [[0,3],[3,4],[4,1],[1,0]],        xfs: ['id','r90','r180','r270']  },
+      { cells: [[1,1],[1,3],[3,3],[3,1]],        xfs: ['id','r90','r180','r270']  },
+      { cells: [[1,2],[2,3],[3,2],[2,1]],        xfs: ['id','r90','r180','r270']  }
+    ];
+
+    // H+V mirror canvas orbits.
+    // pool: constraint the BASE maze must satisfy when canvas-sym is active:
+    //   'any' = unconstrained          (off-axis quads)
+    //   'H'   = mirrorMazeH(ms)===ms   (cell sits on vertical mirror axis, col 2)
+    //   'V'   = mirrorMazeV(ms)===ms   (cell sits on horizontal mirror axis, row 2)
+    //   'D2'  = both H and V           (center (2,2) sits on both axes)
+    var ORBITS_HV = [
+      { cells: [[2,2]],                   xfs: ['id'],              pool: 'D2'  },
+      { cells: [[2,0],[2,4]],             xfs: ['id','H'],          pool: 'V'   },
+      { cells: [[0,2],[4,2]],             xfs: ['id','V'],          pool: 'H'   },
+      { cells: [[1,2],[3,2]],             xfs: ['id','V'],          pool: 'H'   },
+      { cells: [[2,1],[2,3]],             xfs: ['id','H'],          pool: 'V'   },
+      { cells: [[0,0],[0,4],[4,0],[4,4]], xfs: ['id','H','V','HV'], pool: 'any' },
+      { cells: [[0,1],[0,3],[4,1],[4,3]], xfs: ['id','H','V','HV'], pool: 'any' },
+      { cells: [[1,0],[1,4],[3,0],[3,4]], xfs: ['id','H','V','HV'], pool: 'any' },
+      { cells: [[1,1],[1,3],[3,1],[3,3]], xfs: ['id','H','V','HV'], pool: 'any' }
+    ];
+
+    // D4 canvas orbits (full dihedral: rotations + H/V/diagonal reflections).
+    // pool constraint on the base maze per orbit:
+    //   'D4'   = invariant under all 8 D4 operations  (center)
+    //   'H'    = H-symmetric (mid-edge orbits on rotation axes)
+    //   'diag' = diag-symmetric (corner orbits on diagonal axes)
+    //   'any'  = unconstrained (generic 8-cell orbit)
+    var ORBITS_D4 = [
+      { cells: [[2,2]],                                                                    xfs: ['id'],                                                    pool: 'D4'   },
+      { cells: [[0,2],[2,4],[4,2],[2,0]],                                                  xfs: ['id','r90','r180','r270'],                                 pool: 'H'    },
+      { cells: [[0,0],[0,4],[4,4],[4,0]],                                                  xfs: ['id','H','r180','V'],                                      pool: 'diag' },
+      { cells: [[1,2],[2,3],[3,2],[2,1]],                                                  xfs: ['id','r90','r180','r270'],                                 pool: 'H'    },
+      { cells: [[1,1],[1,3],[3,3],[3,1]],                                                  xfs: ['id','H','r180','V'],                                      pool: 'diag' },
+      { cells: [[0,1],[1,4],[4,3],[3,0],[0,3],[4,1],[1,0],[3,4]], xfs: ['id','r90','r180','r270','H','V','diag','adiag'], pool: 'any'  }
+    ];
+
+    function poolForOrbit(p) {
+      if (p === 'H')    return getHSymPool();
+      if (p === 'V')    return getVSymPool();
+      if (p === 'D2')   return getD2SymPool();
+      if (p === 'diag') return getDiagSymPool();
+      if (p === 'D4')   return getD4SymPool();
+      return getPool(); // 'any' — respects symOnly checkbox
+    }
+
+    function fillWithOrbits(orbits) {
+      for (var o = 0; o < orbits.length; o++) {
+        var orbit = orbits[o];
+        var pool  = orbit.pool ? poolForOrbit(orbit.pool) : getPool();
+        if (!pool.length) pool = getPool();
+        if (!pool.length) pool = getAllMazeNames();
+        var base  = pool[Math.floor(Math.random() * pool.length)];
+        for (var i = 0; i < orbit.cells.length; i++) {
+          var r = orbit.cells[i][0], c = orbit.cells[i][1];
+          fieldMazes[r + '_' + c] = applyTransform(base, orbit.xfs[i]);
+          renderCell(r, c);
+        }
+      }
+    }
+
+    function canvasSymChecked() {
+      var el = document.getElementById('canvasSym');
+      return el && el.checked;
+    }
+
+    function canvasDiagSymChecked() {
+      var el = document.getElementById('canvasDiagSym');
+      return el && el.checked;
+    }
+
+    function fillSymmetric() {
+      if (canvasDiagSymChecked()) fillWithOrbits(ORBITS_D4);
+      else if (canvasSymChecked()) fillWithOrbits(ORBITS_HV);
+      else fillWithOrbits(ORBITS_ROT);
+    }
+
+    function fillCanvas() {
+      if (canvasDiagSymChecked()) {
+        fillWithOrbits(ORBITS_D4);
+      } else if (canvasSymChecked()) {
+        fillWithOrbits(ORBITS_HV);
+      } else {
+        var all = getPool();
+        for (var r = 0; r < N; r++)
+          for (var c = 0; c < N; c++) {
+            fieldMazes[r + '_' + c] = all[Math.floor(Math.random() * all.length)];
+            renderCell(r, c);
+          }
+      }
+    }
+
+
     function initField() {
       var grid = document.getElementById('mazeFieldGrid');
       for (var r = 0; r < N; r++) {
@@ -331,7 +616,7 @@
           cell.className = 'chooser-cell';
           cell.id = 'ch_' + r + '_' + c;
           cell.setAttribute('data-state', 'any');
-          cell.addEventListener('click', function() {
+          cell.addEventListener('mouseenter', function() {
             var s = this.getAttribute('data-state');
             this.setAttribute('data-state', STATES[(STATES.indexOf(s) + 1) % 3]);
             updateResults();
@@ -349,23 +634,7 @@
     }
 
     function getMatchingMazes() {
-      var mask = '';
-      for (var r = 0; r < N; r++)
-        for (var c = 0; c < N; c++) {
-          var s = document.getElementById('ch_' + r + '_' + c).getAttribute('data-state');
-          mask += s === 'in' ? '1' : s === 'out' ? '0' : 'x';
-        }
-
-      var all  = getAllMazeNames();
-      var hits = [];
-      for (var i = 0; i < all.length; i++) {
-        var maze = all[i], ok = true;
-        for (var j = 0; j < 25; j++) {
-          if (mask[j] !== 'x' && mask[j] !== maze[j]) { ok = false; break; }
-        }
-        if (ok) hits.push(maze);
-      }
-      return hits;
+      return applyMask(getBasePool(), getMask());
     }
 
     // ---- Results ----
