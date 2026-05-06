@@ -1,894 +1,420 @@
-<!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/xhtml"><head> 
-  <title>Create SVG Elements HTML</title>
-  <style type="text/css" media="screen">
-    body { background:#eee; margin:0 }
-    svg {
-      display:block; border:1px solid #ccc; position:absolute;
-      top:5%; left:5%; width:90%; height:90%; background:#fff;
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maze Pattern Builder</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #111118;
+      color: #ccc;
+      min-height: 100vh;
+      padding: 28px;
     }
-    .face { stroke:#000; stroke-width:20px; stroke-linecap:round }
+
+    header { margin-bottom: 28px; }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #7ec8e3;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .app {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #444;
+      margin-bottom: 14px;
+    }
+
+    /* ======= MAZE FIELD ======= */
+    #mazeFieldGrid {
+      display: grid;
+      grid-template-columns: repeat(5, 68px);
+      gap: 4px;
+    }
+
+    .maze-cell {
+      width: 68px;
+      height: 68px;
+      border: 2px solid #252535;
+      border-radius: 5px;
+      cursor: pointer;
+      background: #1a1a28;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: border-color 0.12s;
+    }
+
+    .maze-cell:hover { border-color: #3a3a55; }
+    .maze-cell.selected { border-color: #e94560; box-shadow: 0 0 0 2px #e9456030; }
+    .maze-cell svg { pointer-events: none; display: block; }
+
+    .remove-btn {
+      display: none;
+      position: absolute;
+      top: 3px; right: 5px;
+      font-size: 10px;
+      color: #e94560;
+      cursor: pointer;
+      z-index: 1;
+      line-height: 1;
+    }
+    .maze-cell:hover .remove-btn { display: block; }
+
+    .field-actions { margin-top: 12px; display: flex; gap: 8px; }
+
+    /* ======= CHOOSER ======= */
+    #chooserGrid {
+      display: grid;
+      grid-template-columns: repeat(5, 40px);
+      gap: 4px;
+    }
+
+    .chooser-cell {
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: opacity 0.1s;
+    }
+    .chooser-cell:hover { opacity: 0.75; }
+    .chooser-cell[data-state="any"] { background: #252535; border: 2px solid #333345; }
+    .chooser-cell[data-state="in"]  { background: #7ec8e3; border: 2px solid #7ec8e3; }
+    .chooser-cell[data-state="out"] { background: #111118; border: 2px solid #3a3a55; }
+
+    .match-count {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #555;
+    }
+    .match-count strong { color: #7ec8e3; }
+
+    .legend {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #444;
+      line-height: 2.2;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+
+    .chooser-actions { margin-top: 12px; }
+
+    /* ======= BUTTONS ======= */
+    button {
+      background: #1e1e2e;
+      border: 1px solid #333;
+      color: #888;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s, border-color 0.12s;
+    }
+    button:hover { background: #252535; color: #ccc; border-color: #555; }
+
+    /* ======= RESULTS ======= */
+    .results-section { flex: 1; min-width: 220px; }
+
+    #resultsGrid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      max-height: 560px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .result-maze {
+      width: 52px;
+      height: 52px;
+      border: 2px solid #252535;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #1a1a28;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: border-color 0.12s, background 0.12s;
+    }
+    .result-maze:hover { border-color: #7ec8e3; background: #1e1e35; }
+    .result-maze.placed { border-color: #e94560; }
+    .result-maze svg { pointer-events: none; display: block; }
+
+    #resultsGrid::-webkit-scrollbar { width: 4px; }
+    #resultsGrid::-webkit-scrollbar-track { background: transparent; }
+    #resultsGrid::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+    .no-matches { color: #444; font-size: 13px; padding: 16px 0; }
   </style>
 </head>
-  
-  
-  <body>
-	<A HREF="javascript:myStartUpFunction()">click to start</A> 
-	<button onclick="myStartUpFunction()">Try it</button>
-		<!--<H1> Ameije's Amazing Mazes Amaiamaiamai</H1> -->
-			<!--<p> YIPIE! It's interactive, HURRAY! It's a game...</p>-->
-		
-  
-  
-  <script src="mazes_5x5.js">
-  </script>
-  <svg height="100" version="1.1" width="140"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" onload="startup(evt)" >
-  
-<!-- <text x="10" y="250" 									  -->	
-<!--       font-family="Verdana" font-size="40" fill="black" >-->
-<!--		Ameije's Amazing Mazes Amaiamaiamai               -->
-<!-- </text>                                                  -->
-<!--  <text x="10" y="300"                                    -->
-<!--       font-family="Verdana" font-size="40" fill="black" >-->
-<!--		YIPIE! It's interactive, HURRAY! It's a game...   -->
-<!--  </text>												  -->
-<!--   <text x="10" y="320" 																															-->
-<!--        font-family="Verdana" font-size="18" fill="black" >                                                                                         -->
-<!--		The "no newline character found" one line rules: - left up = active maze  - right mazes = links to other mazes from the active maze         -->
-<!--  </text>                                                                                                                                           -->
-<!--     <text x="10" y="340"                                                                                                                           -->
-<!--        font-family="Verdana" font-size="18" fill="black" >                                                                                         -->
-<!--		ok ok this is another line: - red maze bottom left = maze you should try to reach  - bottom right mazes = clicked mazes for so far.         -->
-<!--		                                                                                                                                            -->
-<!--  </text>                                                                                                                                           -->
-<!--  <text x="10" y="360"                                                                                                                              -->
-<!--        font-family="Verdana" font-size="18" fill="black" >                                                                                         -->
-<!--		yet another line: - click each time one of the top right mazes to find a path to the red maze. Succes!!! Press browser refresh to restart.  -->
-<!--		                                                                                                                                            -->
-<!--  </text>             -->
-<!--<text x="60" y="20" font-family="Calibri" font-size="20" fill="black" > Create raster patterns, choose rasters from the right (after clicking in the 5x5 array in the middle<tspan dy=3D"1.2em"/>(black = must include this postit, white= must not include this postit, grey= undefined </tspan></text> -->
-<text x="60" y="20" font-family="Calibri" font-size="12" fill="black" > Create raster patterns, choose rasters from the right (after clicking in the 5x5 array in the middle(black = must include this postit, white= must not include this postit, grey= undefined </text>                                                                                                                              
-<text x="60" y="35" font-family="Calibri" font-size="12" fill="black" > steps: 1: select field in the left matrix, 2: create maze in the middle field by clicking the rectangles, 3: choose maze from the right </text>                                                                                                                              
-  <script ><![CDATA[
-	
-	//http://pilat.free.fr/english/routines/js_dom.htm
-	function getElementAttributeStandardDOM(ID,att){
-	  var element = document.getElementById(ID);
-	  return element.getAttribute(att);
-	}
-	
-	function getPathDataSVGDOM(ID){
-	  var path = document.getElementById(ID);
-	  // http://www.w3.org/TR/SVG/paths.html#__svg__SVGAnimatedPathData__normalizedPathSegList
-	  // See also path.pathSegList and path.animatedPathSegList and path.animatedNormalizedPathSegList
-	  var segments = path.pathSegList;
-	  for (var i=0,len=segments.numberOfItems;i<len;++i){
-		var pathSeg = segments.getItem(i);
-		// http://www.w3.org/TR/SVG/paths.html#InterfaceSVGPathSeg
-		switch(pathSeg.pathSegType){
-		  case SVGPathSeg.PATHSEG_MOVETO_ABS:
-			// http://www.w3.org/TR/SVG/paths.html#InterfaceSVGPathSegMovetoAbs
-			console.log("Move to",pathSeg.x,pathSeg.y);
-		  break;
-		  case SVGPathSeg.PATHSEG_LINETO_ABS:
-			// http://www.w3.org/TR/SVG/paths.html#InterfaceSVGPathSegLinetoAbs
-			console.log("Line to",pathSeg.x,pathSeg.y);
-		  break;
-		  case SVGPathSeg.PATHSEG_CLOSEPATH:
-			// http://www.w3.org/TR/SVG/paths.html#InterfaceSVGPathSegClosePath
-			console.log("Close Path");
-		  break;
-		}
-	  }
-	}
-	
-	function createSvgElement( root, name, attrs ){
-	  //createSvgElement( svg, 'path', {fill:"none", "class":"face",  transform:"translate(50 ,0)", d:"M200.41,100.411 c-15.07,36.137-50.735, 61.537-92.333,61.537     c-41.421,0-76.961-25.185-92.142-61.076"});
-      //createSvgElement( svg, 'circle', { cx:60, cy:50, 	 r:20, fill:'#060' });
-	  
-	  /*these vars are already defined globally...
-	  //var svg  = document.getElementsByTagName('svg')[0];
-	  var svgNS = svg.getAttribute('xmlns');
-	  */
-	  var el = document.createElementNS(svgNS,name);
-      for (var attr in attrs){
-        if (attrs.hasOwnProperty(attr)) el.setAttribute(attr,attrs[attr]);
-      }
-      return root.appendChild(el);
+<body>
+  <script src="mazes_5x5.js"></script>
+
+  <header>
+    <h1>Maze Pattern Builder</h1>
+    <p class="subtitle">
+      1. Select a cell in the canvas &#160;→&#160;
+      2. Draw a filter pattern &#160;→&#160;
+      3. Click a matching maze to place it
+    </p>
+  </header>
+
+  <div class="app">
+    <!-- CANVAS / MAZE FIELD -->
+    <div>
+      <div class="section-label">Canvas (5×5)</div>
+      <div id="mazeFieldGrid"></div>
+      <div class="field-actions">
+        <button onclick="clearSelectedCell()">Clear cell</button>
+        <button onclick="clearAllCells()">Clear all</button>
+      </div>
+    </div>
+
+    <!-- FILTER CHOOSER -->
+    <div>
+      <div class="section-label">Filter pattern</div>
+      <div id="chooserGrid"></div>
+      <div class="match-count">Matching: <strong id="matchCount">0</strong></div>
+      <div class="legend">
+        <div><span class="dot" style="background:#252535;border:1px solid #3a3a55"></span>grey – any</div>
+        <div><span class="dot" style="background:#7ec8e3"></span>blue – cell IN</div>
+        <div><span class="dot" style="background:#111118;border:1px solid #3a3a55"></span>dark – cell OUT</div>
+      </div>
+      <div class="chooser-actions">
+        <button onclick="clearChooser()">Reset filter</button>
+      </div>
+    </div>
+
+    <!-- MATCHING MAZES -->
+    <div class="results-section">
+      <div class="section-label">Matching mazes — click to place in selected cell</div>
+      <div id="resultsGrid"></div>
+    </div>
+  </div>
+
+  <script>//<![CDATA[
+    var MAZE_SCALE = 12;  // coordinate scale for viewBox (path coords go 0..6*scale)
+    var FIELD_SIZE = 60;  // display px for canvas cell SVG
+    var RESULT_SIZE = 44; // display px for result SVG
+    var N = 5;
+
+    var selectedRow = 0, selectedCol = 0;
+    var fieldMazes = {};  // "r_c" -> mazeString
+
+    // ---- SVG factory ----
+    function makeSvg(mazeString, displaySize, strokeColor) {
+      var ns = 'http://www.w3.org/2000/svg';
+      var vb = MAZE_SCALE * 6;
+      var svg = document.createElementNS(ns, 'svg');
+      svg.setAttribute('width', displaySize);
+      svg.setAttribute('height', displaySize);
+      svg.setAttribute('viewBox', '0 0 ' + vb + ' ' + vb);
+
+      var path = document.createElementNS(ns, 'path');
+      path.setAttribute('d', getSVGPathFromMazeName(mazeString, MAZE_SCALE, MAZE_SCALE));
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', strokeColor || '#7ec8e3');
+      path.setAttribute('stroke-width', MAZE_SCALE * 0.45);
+      path.setAttribute('stroke-linejoin', 'round');
+      path.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(path);
+      return svg;
     }
-	
-	function createSvgElementSvgDom(root,name,attrs,text){
-      var doc = root.ownerDocument, svg = root;
-      while (svg.tagName!='svg') svg = svg.parentNode;
-      var el = doc.createElementNS(svg.namespaceURI,name);
-	  
-      for (var a in attrs){
-        if (!attrs.hasOwnProperty(a)) continue;
-        var p = a.split(':');
-		//console.log(p);
-		//console.log(attrs);
-		
-        if (p[1]) el.setAttributeNS(svg.getAttribute('xmlns:'+p[0]),p[1],attrs[a]);
-        else el.setAttribute(a,attrs[a]);
+
+    // ---- Canvas field ----
+    function initField() {
+      var grid = document.getElementById('mazeFieldGrid');
+      for (var r = 0; r < N; r++) {
+        for (var c = 0; c < N; c++) {
+          var cell = document.createElement('div');
+          cell.className = 'maze-cell';
+          cell.id = 'field_' + r + '_' + c;
+
+          var rm = document.createElement('div');
+          rm.className = 'remove-btn';
+          rm.textContent = '✕';
+          rm.setAttribute('data-r', r);
+          rm.setAttribute('data-c', c);
+          rm.addEventListener('click', function(e) {
+            e.stopPropagation();
+            clearCell(+this.getAttribute('data-r'), +this.getAttribute('data-c'));
+          });
+          cell.appendChild(rm);
+
+          cell.setAttribute('data-r', r);
+          cell.setAttribute('data-c', c);
+          cell.addEventListener('click', function() {
+            selectCell(+this.getAttribute('data-r'), +this.getAttribute('data-c'));
+          });
+          grid.appendChild(cell);
+        }
       }
-      if (text) el.appendChild(doc.createTextNode(text));
-      return root.appendChild(el);
+      selectCell(0, 0);
     }
-	
-	//function changeAttribute(element, att, attVal){
-	//	element.setAttribute(att, attVal);
-	//}
-	
 
-	
-	
-	function defaultValue(arg, defaultVal){
-		//checks if a variable is set (when given as an argument to a function), if not: set default value
-		if (typeof(arg) == 'undefined') arg = defaultVal;
-		return arg;
-	}
-	
-	function mazeStringToSvgPath(svg, name, mazeString, xScale, yScale, xOffset, yOffset,  colour, lineWidth, fill, onclick){
-		var yOffset = defaultValue(yOffset,0);
-		var xOffset = defaultValue(xOffset,0);
-		var colour = defaultValue(colour,"black");
-		var lineWidth = defaultValue(lineWidth,xScale/2);
-		var fill = defaultValue(fill,"none");
-		var offset = "translate("+ xOffset + ","  + yOffset + ")";
-		var d = getSVGPathFromMazeName(mazeString, xScale, yScale);
-		//console.log(d);
-		var onclick = defaultValue(onclick,"NONE");
-		
-		//console.log(d);
-		
-		//console.log(colour);
-		//console.log(lineWidth);
-		//console.log(fill);
-		//console.log("-----");
-		
-		var atts = new Array();
-		atts['id'] = name;
-		atts['fill'] = fill;
-		atts['transform'] = offset;
-		atts['stroke'] = colour;
-		atts['stroke-width'] = lineWidth;
-		atts['d'] = d;
-		if (onclick != "NONE"){
-			atts['onclick'] = onclick;
-		}
-		//console.log(atts['onclick']);
-		atts['maze'] = mazeString;
-		
-		//{'id': name, 'fill':fill,   'transform':offset, 'stroke':colour, 'stroke-width':lineWidth,	'd':d}
-		createSvgElementSvgDom( svg, 'path', atts); //
-	}
-	
-	function animateCircle(){
-		x += incr*dir;
-		if ((x<xlow+incr)||(x>xhigh+incr))dir=-dir;
-		console.log(x);
-		var el = document.getElementById("C1");
-		var data = el.getAttribute('id');
-		el.setAttribute('cx', x);
-		window.setTimeout("animateCircle()",500); //when creating a loop, it is important that the setTimeout is included in the called function in setTimeout
-	}
-	
-		
-	function printPathData(path){
-		var segments = path.pathSegList;
-		for (var i=0,len=segments.numberOfItems;i<len;++i){
-			var pathSeg = segments.getItem(i);
-			console.log(pathSeg.x                  ) ; // i.e. 30
-			console.log(pathSeg.y                  ) ; // i.e. 40
-			console.log(pathSeg.pathSegType        ) ; // i.e. 3
-			console.log(pathSeg.pathSegTypeAsLetter) ; // i.e. L
-		}	
-	}
-	
-	function changePathMazeById(pathId, mazeString){
-		path = getElementById(pathId);
-		changePathMaze(path, mazeString);
-		
-	}
-	function changePathMaze(path, mazeString){
-		var coords = getPathcoordsScaledFromMazeString(mazeString, xScale, yScale);
-		changePathCoords(path, coords);
-		
-	}
-	function changePathCoords(path, coords){
-		//changes path d element in place. connects last coord to start.
-		
-		//http://www.geocities.ws/kcleung88/dom/interfaces/svg.html
-		//SVGPathSegList --> all possible methods for segList.... clear, appendItem,.....
-		
-		//get segments from path
-		var segments = path.pathSegList;
-		
-		//delete all segments
-		segments.clear();
-		
-		//build up path
-		for (var i = 0; i< coords.length;i++){
-			if (i == 0){
-				var seg = path.createSVGPathSegMovetoAbs(Math.round(coords[i][0]), Math.round(coords[i][1]));
-			}
-			//else if (i == coords.length-1){
-			//	var seg = path.createSVGPathSegClosePath();
-			//}
-			else{
-				var seg = path.createSVGPathSegLinetoAbs(Math.round(coords[i][0]), Math.round(coords[i][1]));
-			}
-			segments.appendItem(seg);
-		}
-		//close path
-		segments.appendItem(path.createSVGPathSegClosePath());
-		
-		
-		/*
-		var segments = path.pathSegList;
-		for (var i=0;i<segments.numberOfItems -1 ;++i){
-			item = segments.getItem(i);
-			item.x  = coords[i][0];
-			item.y  = coords[i][1];
-		}
-		/**/
-	}
-	
-	function animatePathChange(){
-		//set running on click (see startup)
-		//(without moving animation) change path
-		if (!running) return;
-		
-		for (var row = 0; row< mazesRows; row++){
-			for (var col = 0; col< mazesCols; col++){
-				var path = document.getElementById("M"+row+col);
-				coords = getRandomMazeCoordsScaled(xScale, yScale);
-				changePathCoords(path, coords);
-			}
-		}
-		window.setTimeout("animatePathChange()",1000);//when creating a loop, it is important that the setTimeout is included in the called function in setTimeout
-	}
-	
-	function startup(evt) {
-		//O=evt.target;
-		//O.setAttribute("onclick","running=!running;animatePathChange()");
-	}
-	
-	function onClickEvent(evt){
-		//test function
-		var element = evt.target;
-		var name = element.getAttribute("maze");
-		console.log(name);
-		var property = element.getAttribute("stroke");
-		if (property == "blue"){ 
-			newProp = "black";
-		}
-		else{
-			newProp = "blue";
-		}
-		element.setAttribute("stroke", newProp);
-		
-		console.log("clicked");
-	}	
-	
-	function removeElementById(name){
-		el = document.getElementById(name);
-		//console.log(el); //(prints the svg element as string)
-		removeElement(el);
-	}
-	
-	function getElementById(ID){
-	//http://www.carto.net/svg/manipulating_svg_with_dom_ecmascript/
-		return document.getElementById(ID);
-	}
-	
-	function removeElement(element) {
-		//http://www.carto.net/svg/manipulating_svg_with_dom_ecmascript/
-		//var element = evt.target;
-		element.parentNode.removeChild(element);
-	}
-	
-	function animatePathMove(path,coords, animateSteps, changeCoordsSteps, step, totalTimeStep){
-		for (var coord in coords){
-			coords[coord][0] +=  changeCoordsSteps[coord][0];
-			coords[coord][1] +=  changeCoordsSteps[coord][1];
-		}
-		step++;
-		changePathCoords(path, coords);
-		
-		//console.log(totalTimeStep/animateSteps *1.0);
-		//console.log(totalTimeStep);
-		
-		if (step< animateSteps ){
-			//window.setTimeout(animatePathMove,1000,[path, coords, animateSteps, changeCoordsSteps, step]);//when creating a loop, it is important that the setTimeout is included in the called function in setTimeout
-			//window.setTimeout("animatePathMove("+path+"," +coords+", "+animateSteps+"," +changeCoordsSteps+"," +step+	")",2000);//when creating a loop, it is important that the setTimeout is included in the called function in setTimeout
-			window.setTimeout(function(){animatePathMove(path, coords, animateSteps, changeCoordsSteps, step,totalTimeStep)}, totalTimeStep/animateSteps *1.0);
-		}
-	}
-	
-	function infinitePathLoop(path, mazeStringCurrent, xScale, yScale, steps, milliSecondsPerMaze){
-		
-		var nextMazeString = getRandomLinkFromMazeName(mazeStringCurrent);
-		
-		//console.log("****");	
-		//console.log(path.getAttribute("id"));
-		//console.log(mazeStringCurrent);		
-		//
-		//console.log(nextMazeString);		
-		//console.log("startMaze = \"" + mazeStringCurrent +"\" ");
-		//console.log("endMaze =   \"" + nextMazeString +"\"");
-		
-		
-		var animatePath  = getTransformationsFromMazeNames(mazeStringCurrent,nextMazeString,xScale, yScale, steps);
-		//console.log(animatePath);
-		
-		animatePathMove(path,animatePath[0],steps,animatePath[1],0, milliSecondsPerMaze );
-		
-		
-		window.setTimeout(function(){infinitePathLoop(path, nextMazeString, xScale, yScale, steps,milliSecondsPerMaze)}, milliSecondsPerMaze);
-	}
-	
-	function changePathIdOneStep(pathId, endMaze, xScale, yScale, milliSecondsTransformTime){
-		//change a path defined by its ID one step (if no animation of the stepmove is wanted, set milliSecondsTransformTime to zero
-		var path = getElementById(pathId);
-		changePathOneStep(path, endMaze, xScale, yScale, milliSecondsTransformTime);
-	}
-	
-	function changePathOneStep(path, endMaze, xScale, yScale, milliSecondsTransformTime){
-		//your start to change a path one step (if no animation of the stepmove is wanted, set milliSecondsTransformTime to zero
-		
-		var startMaze = path.getAttribute("maze");
-		
-		var stepsPerSecond = 40;
-		var steps = Math.floor(stepsPerSecond * milliSecondsTransformTime / 1000);
-		
-		if (endMaze != startMaze){
-			if (steps == 0) {
-				//change right away!
-				changePathMaze(path, endMaze);
-				//var coords = getPathcoordsScaledFromMazeString(endMaze, xScale, yScale);
-				//changePathCoords(path, coords);
-				
-			}else{
-						
-				var animationData = getTransformationsFromMazeNames(startMaze, endMaze, xScale, yScale, steps);
-				animatePathMove(path, animationData[0], steps, animationData[1], 0, milliSecondsTransformTime);
-				
-				
-			}
-		}
-		path.setAttribute("maze", endMaze);
-	}
-	
-	function changePathMultipleStepsRandom(path, xScale, yScale, milliSecondsTransformTime, numberOfSimultaneousSteps){
-		
-		var name = path.getAttribute("maze");
-		var stepsPerSecond = 40;
-		var steps = Math.floor(stepsPerSecond * milliSecondsTransformTime / 1000);
-		
-		previousMazeName = name; 
-		
-		var moves = new Array();
-		moves.push(name);
-		
-		for (var i = 0; i < numberOfSimultaneousSteps; i ++){
-			previousMazeName = moves[i];
-			moves.push(getRandomLinkFromMazeName(previousMazeName));
-		}
-		
-		console.log(moves[moves.length -2]);
-		changePathOneStep(path, moves[moves.length -1], xScale,yScale,500);
-		
-		//mazeStringToSvgPath(svg, "root" ,root , xScale, yScale, 0, 0, "black", width, "white");
-		
-		
-		//for (var i = 0; i< moves.length -1; i++){
-		//	var animationData = getTransformationsFromMazeNames(moves[i], moves[i+1], xScale, yScale, steps);
-		//	console.log(animationData);
-		//}
-	}
-	
-	
-	//---------------------game functions---------------------
-	function mazeClicked(evt){
-		var pathElement = evt.target;
-		var clickedName = pathElement.getAttribute("maze");
-		
-		
-		var rootPath = getElementById("root");
-		var rootPathName = rootPath.getAttribute("maze");
-	
-		//animate root to link
-		//animationData = getTransformationsFromMazeNames(rootPathName, clickedName, xScale, yScale, 10);
-		//animatePathMove(rootPath, animationData[0], 10, animationData[1], 0, 1000);
-		
-		
-		//remove other mazes
-		var newRoot;
-		for (var i = 0; i< links.length; i++){
-			if (links[i] != clickedName){
-				removeElementById("link"+i);
-			}else{
-				newRoot = links[i];
-				
-				newRootPreviousLinkId = "link" + i;
-				//removeElementById("link"+i);
-			}
-		}
-		
-		changePathOneStep(rootPath, clickedName, xScale,yScale,500);
-		window.setTimeout(function(){mazeClickedDelayed(newRoot, newRootPreviousLinkId)},500);
-	
-	}	
-	
-	function mazeClickedDelayed(newRoot, newRootPreviousLinkId){	
-		
-		//remove last link path
-		removeElementById(newRootPreviousLinkId);
-		
-		//replace root by link
-		removeElementById("root");
-		
-		//add new maze to list 
-		steps.push(newRoot);
-	
-		displayActiveMazeWithLinks(newRoot);	
-		
-		updateSteps();
-		
-	}
+    function selectCell(r, c) {
+      var prev = document.getElementById('field_' + selectedRow + '_' + selectedCol);
+      if (prev) prev.classList.remove('selected');
+      selectedRow = r;
+      selectedCol = c;
+      var cell = document.getElementById('field_' + r + '_' + c);
+      if (cell) cell.classList.add('selected');
+    }
 
-	function displayActiveMazeWithLinks(root){
-		//root = mazename ("1010101010....")
-		
-		links = getMazeLinkNamesFromMazeName(root); //links is a global variable that we are changing here!!!
-		mazeStringToSvgPath(svg, "root" ,root , xScale, yScale, 0, 0, "black", width, "white");
-		
-		
-		for (var row=0; row < links.length; row++){
-			//mazeStringToSvgPath(svg, "link" + row ,links[row] , xScale, yScale, 7 * (row+2) * xScale, 0 , "black", width, "white","mazeClicked(evt)"); //
-			mazeStringToSvgPath(svg, "link" + row ,root , xScale, yScale, 7 * (row+2) * xScale, 0 , "black", width, "white","mazeClicked(evt)"); //
-			changePathIdOneStep("link" + row, links[row], xScale,yScale,1000);
-			
-		}
-		return links;
-	}
-	
-	function updateSteps(){
-	//bar with steps taken.
-		//console.log(steps);
-		for (var i=0; i < steps.length; i++){
-			el = getElementById("step" + i);
-			if (el == null){ //if not yet existing add 
-				mazeStringToSvgPath(svg, "step" + i ,steps[i] , xScale, yScale, 7 * (i+2) * xScale, 7 * 1 * yScale , "black", width, "white"); //
-			}
-			if (steps[i] == goalMaze){
-				console.log("You win!!!")
-				el = getElementById("step" + i);
-				el.setAttribute("stroke","red");
-			}
-			//console.log(el);
-		}
-	}
-	
-	
-	
-	
-	//---------------------end of game functions----
-	
-	
-	//--------------------------mazefield en maze chooser functions----------------
-	
-	function mazeFieldToggleRaster(evt){
-		console.log("testj");
-		for (fieldId in mazeFieldIdsAss){
-			var field  = getElementById(fieldId);
-			var stroke = field.getAttribute("stroke");
-			if ( stroke == "lightgrey" || stroke == fieldSelectedColour){
-				field.setAttribute("stroke", "white");	
-			}else{
-				field.setAttribute("stroke", "lightgrey");	
-			}
-			
-		}
-		
-	}
-	
-	function deleteSelectedMazeFieldMaze(){
-		//will delete the maze that belongs to a certain selected mazefield. (if non selected, none will be deleted...
-		for (fieldId in mazeFieldIdsAss){
-			var field  = getElementById(fieldId);
-			if (field.getAttribute("stroke") == fieldSelectedColour){
-				rowCol = mazeFieldIdsAss[fieldId];
-				mazeFieldMazeId = "mazeFieldMaze" + rowCol[0] + rowCol[1];
-				
-				
-				el = removeElementById(mazeFieldMazeId);
-			}
-		}
-		
-	}
-	
-	function mazeFieldRectClicked(evt){
-		var rect = evt.target;
-		var clickedMazeFieldID = rect.getAttribute("id");
-		
-		/*
-		for (id in mazeFieldIds){
-			var field  = getElementById(mazeFieldIds[id]);
-			field.setAttribute("stroke", "lightgrey");
-			
-		}
-		*/
-		for (fieldId in mazeFieldIdsAss){
-			var field  = getElementById(fieldId);
-			field.setAttribute("stroke", "lightgrey");
-		}
-		
-		rect.setAttribute("stroke", fieldSelectedColour);
-		
-		
-		//if maze is located in field, get ID
-		//var fieldMaze = getElementById(mazeFieldID + "maze");
-		//console.log(fieldMaze);
-		//if (fieldMaze != null){
-		//	var mazeString = fieldMaze.getAttribute("maze");
-		//	
-		//	for (var i = 0; i < mazeString.length; i++){
-		//		var row= i % 5;
-		//		var col= Math.floor(i/5);
-		//		var rect = getElementById("chooser"+row+col);
-		//		
-		//		if (mazeString[i] == 1) rect.setAttribute("fill","black");
-		//		if (mazeString[i] == 0) rect.setAttribute("fill","white");
-		//	}
-		//}
-		
-	}
-	
-	function chooserMazeClicked(evt){
-		var m = evt.target;
-		//console.log(m.getAttribute("maze"));
-		
-		for (fieldId in mazeFieldIdsAss){
-			var field  = getElementById(fieldId);
-			if (field.getAttribute("stroke") == fieldSelectedColour){
-				rowCol = mazeFieldIdsAss[fieldId];
-				mazeFieldMazeId = "mazeFieldMaze" + rowCol[0] + rowCol[1];
-				
-				el = getElementById(mazeFieldMazeId);
-				if (el != null)removeElementById(mazeFieldMazeId);
-				console.log(xScale);
-				mazeStringToSvgPath(svg, mazeFieldMazeId, m.getAttribute("maze"), xScale, yScale,  mazeFieldXOffset + ( 6 * rowCol[1] * xScale ) - (xScale / 2), mazeFieldYOffset + ( 6 * rowCol[0] * yScale ) - (yScale / 2), "black", width, "white"); //,'mazeFieldMazeClicked(evt)'
-			}
-		}
-	}
-	
-	
-	function chooserRectClicked(evt){	
-		var rect = evt.target;
-		var chooserID = rect.getAttribute("id");
-		
-		var fillColour = rect.getAttribute("fill");
-		if (fillColour == 'lightgrey') rect.setAttribute("fill", "black");
-		if (fillColour == 'black') rect.setAttribute("fill", "white");
-		if (fillColour == 'white') rect.setAttribute("fill", "lightgrey");
-		updateChooserMazes();
-	}
-	
-	function updateChooserMazes(){
-		var mazeMask= "";
-		//get mazemask;   (i.e. "10xxxxxxx0xx1...xxx"  first defen
-		for (var row = 0; row< chooserRows; row++){
-			for (var col = 0; col< chooserCols; col++){
-				rect = getElementById("chooser"+row+col);
-				fillColour = rect.getAttribute("fill");
-				if (fillColour == "black") mazeMask += "1";
-				if (fillColour == "white") mazeMask += "0";
-				if (fillColour == "lightgrey") mazeMask += "x";
-			}
-		
-		}
-		
-		//get all mazes 
-		var mazes = getAllMazeNames();
-		var maskFittingMazes = new Array();
-		
-		//get all mask fitting mazes
-		for (var i = 0; i< mazes.length; i++){
-			var maze = mazes[i];
-			var mazeFits = true;
-			for (var j = 0; j<mazeMask.length; j++){
-				if (mazeMask[j]!= "x"){
-					if (mazeMask[j]!= maze[j]){
-						mazeFits =false;
-						break;
-					}
-				}
-			}
-			if (mazeFits) maskFittingMazes.push(maze);
-		}
-		//console.log(maskFittingMazes.length);
-		//delete all maskfitters from the other time
-		var i = 0;
-		while (getElementById("maskFitter" + i) != null) {
-			removeElementById("maskFitter" + i);
-			i++ ;
-		}
-		
-		//display maskfitters
-		for (var i=0; i < maskFittingMazes.length; i++){
-			el = getElementById("maskFitter" + i);
-			if (el == null){ //if not yet existing add 
-				mazeStringToSvgPath(svg, "maskFitter" + i ,maskFittingMazes[i] , xScale, yScale, maskFittersRowXOffset + (7 * (i % maskFittersPerRow) * xScale), maskFittersRowYOffset + (7 * (Math.floor(i / maskFittersPerRow))* yScale) , "black", width, "white",'chooserMazeClicked(evt)'); //
-			}
-		}
-	}
-	
-	//-------------------------- END mazefield en maze chooser functions----------------
-	
-	
-	function animateLoopMazes(pathId, mazes, index, transformationTimeMilliSecs,backAndForth){
-		//sequence of mazes in array, loop through them infinitely
-		index += 1;
-		
-		if (index >= mazes.length) { 
-			index = 0;
-			//changePathMazeById(pathId, mazes[0]);
-			//console.log("zero" + index + mazes[index]);
-			changePathIdOneStep(pathId, mazes[0], xScale, yScale, 0);
-			
-			//changePathIdOneStep(pathId, mazes[0], xScale,yScale,transformationTimeMilliSecs);
-			window.setTimeout(function(){animateLoopMazes(pathId, mazes, index, transformationTimeMilliSecs)},transformationTimeMilliSecs * 2);
-		
-		}
-		else{
-			//changePathIdOneStep(pathId, mazes[index], xScale,yScale,0);
-			//console.log(mazes[index]);	
-			changePathIdOneStep(pathId, mazes[index], xScale,yScale,transformationTimeMilliSecs);
-			window.setTimeout(function(){animateLoopMazes(pathId, mazes, index, transformationTimeMilliSecs)},transformationTimeMilliSecs);
-		
-		}
-		
-	
-	}
-	
-	//-----------------------------end functions----------------------------------------------------------
-	var svg  = document.getElementsByTagName('svg')[0];
-	var svgNS = svg.getAttribute('xmlns');
-    //console.log(svgNS);
-	
-	var running = true;
-	var mazesRows = 3;
-	var mazesCols = 5;
-	
-	var xScale = 8;
-	var yScale = 8	;
-	
-	var colours= [ "blue", "yellow","black"];
-	var colour = colours[2];
-	var width = xScale *1.0/2	;
-	//var width = 2	;
-	//createSvgElement( svg, 'circle', { id:"hoi", cx:60, cy:50, r:20, fill:'#060' });
-	//createSvgElement( svg, 'text', { id:"hoi", cx:60, cy:50, r:20, fill:'#060' });
+    function renderCell(r, c) {
+      var cell = document.getElementById('field_' + r + '_' + c);
+      var old = cell.querySelector('svg');
+      if (old) cell.removeChild(old);
+      var key = r + '_' + c;
+      if (fieldMazes[key]) {
+        cell.insertBefore(makeSvg(fieldMazes[key], FIELD_SIZE, '#7ec8e3'), cell.firstChild);
+      }
+    }
 
-	
-	/* path chooser */
-	
-	var chooserCols = 5;
-	var chooserRows = 5;
-	var chooserXOffset = 480;
-	var chooserYOffset = 100;
-	var chooserElWidth = 20;
-	var chooserElHeight = 20;
-	
-	var maskFittersPerRow = 7;
-	var maskFittersRowXOffset = 600;
-	var maskFittersRowYOffset = 100;
-	
-	for (var row = 0; row< chooserRows; row++){
-		for (var col = 0; col< chooserCols; col++){
-			createSvgElement( svg, 'rect', {  id: "chooser"+ row + col,width: chooserElWidth, height: chooserElHeight, x:chooserXOffset + chooserElWidth * col, y:chooserYOffset + chooserElHeight * row,  fill:'lightgrey' , stroke: 'black', "stroke-width":0, "onclick" : 'chooserRectClicked(evt)'});
-		}
-	}
-	/**/
-	
-	
-	/*mazefield*/
-	var mazeFieldRows = 5;
-	var mazeFieldCols = 5;
-	var mazeFieldXOffset = 20;
-	var mazeFieldYOffset = 100;
-	
-	var mazeFieldIdsAss = new Array();
-	var fieldSelectedColour = "red";
-	
-	for (var row = 0; row< mazeFieldRows; row++){
-		for (var col = 0; col< mazeFieldCols; col++){
-			
-			//createSvgElement( svg, 'rect', {  id: "mazeField"+ row + col,width: mazeFieldElWidth, height: mazeFieldElHeight, x:mazeFieldXOffset + mazeFieldElWidth * col, y:mazeFieldYOffset + mazeFieldElHeight * row,  fill:'white	' , stroke: 'lightgrey', "stroke-width":3, "onclick" : 'mazeFieldRectClicked(evt)'});
-			createSvgElement( svg, 'rect', {  id: "mazeField"+ row + col,width: yScale * 6, height: xScale * 6, x:mazeFieldXOffset + (yScale * col * 6), y:mazeFieldYOffset + (xScale * row * 6),  fill:'white	' , stroke: 'lightgrey', "stroke-width":3, "onclick" : 'mazeFieldRectClicked(evt)'});
-			//mazeFieldIds.push("mazeField"+ row + col);
-			mazeFieldIdsAss["mazeField"+ row + col] = [row,col];
-		}
-	}
-	
-	var textelement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-	textelement.setAttribute("id", "text1");
-	textelement.setAttribute("x", mazeFieldXOffset + 200);
-	textelement.setAttribute("y", mazeFieldYOffset + 200);
-	textelement.setAttribute("fill","black");
-	textelement.textContent = "hurray!";
-	
-	//textelement.addEventListener("click", svgclick, false);
-	//textelement.addEventListener("keypress", onkeypress, false);
-	
-	
-	
-	//toggle button
-	createSvgElement( svg, 'text', {id: "mazeFieldRasterVisibilityToggle", x: mazeFieldXOffset , y:mazeFieldYOffset -20, fill:"black", "font-size":"12", "font-family":"Calibri","onclick" : 'mazeFieldToggleRaster(evt)'});	
-	el = getElementById("mazeFieldRasterVisibilityToggle");
-	el.textContent = "Click to toggle raster visibility (and then take a screenshot).";
-	
-	//button erase field.
-	createSvgElement( svg, 'text', {id: "deleteSelectedMazeFieldMaze", x: mazeFieldXOffset , y:mazeFieldYOffset -40, fill:"black", "font-size":"12", "font-family":"Calibri","onclick" : 'deleteSelectedMazeFieldMaze()'});	
-	el = getElementById("deleteSelectedMazeFieldMaze");
-	el.textContent = "Click to remove maze from selected field.";
-	
-	
-	
-	
-	//<text x="60" y="20" font-family="Calibri" font-size="20" fill="white" >My Code , Your Achivement....... </text>
-	
-	
-	/*
-	//lots of paths... changing over time
-	for (var row = 0; row< mazesRows; row++){
-		for (var col = 0; col< mazesCols; col++){
-			for (var k = 0; k < 1; k++){
-				var mazeName = getRandomMazeName();
-				//console.log(mazeName);
-				mazeStringToSvgPath(svg, "M" + row + col ,mazeName , xScale, yScale, 6*xScale*col, 6*yScale*row, "black", width, "white");
-				
-			}
-		}
-	}
-	//working animation of paths
-	animatePathChange();
-	/**/
-	
-	
-	/* multimove
-	mazeStringToSvgPath(svg, "multiChanger" ,"1111110000111110010011111" , xScale, yScale, 7 * (12) * xScale, 6 * 0 * yScale , "blue", width, "white"); 
-	
-	
-	var multiChanger = getElementById("multiChanger");
-	//changePathOneStep(multiChanger, 1111100001111110010011111, xScale,yScale,500);
-	changePathOneStep(multiChanger, "1111100010111110010011111", xScale,yScale,500);
-	//changePathMultipleStepsRandom(multiChanger, xScale, yScale, 1000,3);
-	/**/
-	
-	/*superloop
-	
-	startMaze = "1111100100111110010011111";
-	mazeStringToSvgPath(svg, "changer" ,startMaze , xScale, yScale, 7 * (12) * xScale, 6 * 0 * yScale , "blue", width, "white"); 
-	var path = getElementById("changer");
-	infinitePathLoop(path, startMaze, xScale, yScale, 10, 1000);
-	
-	//tweedemaze ="1010111111010001111110101";
-	//mazeStringToSvgPath(svg, "changer2" ,tweedemaze , xScale, yScale, 6 * (1) * xScale, 6 * 0 * yScale , "black", width,"black"); 
-	//var path2 = getElementById("changer2");
-	//infinitePathLoop(path2, startMaze, xScale, yScale, 10, 1000);
-	//
-	//startMaze = "1111100100111110010011111";
-	//mazeStringToSvgPath(svg, "changer3" ,startMaze , xScale, yScale, 6 * (2) * xScale, 6 * 0 * yScale , "black", width,"white"); 
-	//var path = getElementById("changer3");
-	//infinitePathLoop(path, startMaze, xScale, yScale, 10, 1000);
-	//
-	//tweedemaze ="1010111111010001111110101";
-	//mazeStringToSvgPath(svg, "changer4" ,tweedemaze , xScale, yScale, 6 * (3) * xScale, 6 * 0 * yScale , "black", width,"white"); 
-	//var path2 = getElementById("changer4");
-	//infinitePathLoop(path2, startMaze, xScale, yScale, 10, 1000);
-	/**/
-	
-	
-	/* maze corner transformation
-	var animateSteps = 20;
-	
+    function placeInSelected(mazeString) {
+      fieldMazes[selectedRow + '_' + selectedCol] = mazeString;
+      renderCell(selectedRow, selectedCol);
+      advanceSelection();
+    }
 
-	////unsolved ones:
-	
-	//endMaze = "1110100101101111110010111" 
-	//startMaze=   "1010110101101111110010111"
-	
-	endMaze = "1101110001101111001011111" ;
-	startMaze =   "1011110001101111001011111";
-    
-	endMaze = 		"1101110001111111010110101" ;
-	startMaze =   	"1110110001111111010110101";
-   
-	mazeStringToSvgPath(svg, "beta" ,startMaze , xScale, yScale, 7 * (0) * xScale, 7 * 0 * yScale , "red", width, "white"); 
-	mazeStringToSvgPath(svg, "start" ,startMaze , xScale, yScale, 7 * (0) * xScale, 7 * 1 * yScale , "red", width, "white"); 
-	mazeStringToSvgPath(svg, "end" ,endMaze , xScale, yScale, 7 * (1) * xScale, 7 * 1 * yScale , "red", width, "white"); 
-	path = getElementById("start");
-	
-	var animatePath  = getTransformationsFromMazeNames(startMaze,endMaze,xScale, yScale, animateSteps);
-	//console.log(animatePath);
-	//for (var j = 0; j< animatePath[0].length; j++){
-	//
-	//	console.log(animatePath[0][j]);
-	//	console.log("step" + animatePath[1][j]);
-	//}
-	animatePathMove(path,animatePath[0],animateSteps,animatePath[1],0, 500);
-	
-	
-	/* transformation test
-	startMaze = "1111101000111111000011111";
-	endMaze   = "1111100100111111000011111";
-	startMaze="1111110010101111000111101";
-	endMaze="1111110010101111000111011";
-	mazeStringToSvgPath(svg, "start" ,startMaze , xScale, yScale, 7 * (1) * xScale, 7 * 1 * yScale , "red", width, "white"); 
-	mazeStringToSvgPath(svg, "end" ,endMaze , xScale, yScale, 7 * (2) * xScale, 7 * 1 * yScale , "red", width, "white"); 
-	
-	var animateSteps = 10;
-	var path = getElementById("start");
-	console.log(path.getAttribute("d"));
-	var animatePath  = getTransformationsFromMazeNames(startMaze,endMaze,xScale, yScale, animateSteps);
-	
-	animatePathMove(path,animatePath[0],animateSteps,animatePath[1],0,1000);
-	console.log(path.getAttribute("d"));
-	
-	mazeStringToSvgPath(svg, "startPos" ,startMaze , xScale, yScale, 7 * (0) * xScale, 7 * 1 * yScale , "red", width, "white"); 
-	
-	
-	/**/
-	
-	/*
-	// The game, set up:
-	//var root = getRandomMazeName();
-	var root = "1110100101111111010010111"
-	var links = displayActiveMazeWithLinks(root);
-	var steps = new Array();
-	var goalMaze = getRandomMazeName();
-	
-	mazeStringToSvgPath(svg, "goalMaze" ,goalMaze , xScale, yScale, 7 * (0) * xScale, 7 * 1 * yScale , "red", width, "white"); 
-	
-	steps.push(root);
-	
-	
-	mazeStringToSvgPath(svg, "stepsLoop" ,root , xScale, yScale, 7 * (0) * xScale, 7 * 2 * yScale , "red", width, "white"); 
-	animateLoopMazes("stepsLoop", steps, 0, 1000);
-	
-	//mazeStringToSvgPath(svg, "stepsLoop2" ,root , xScale, yScale, 7 * (0) * xScale, 7 * 3 * yScale , "red", width, "white"); 
-	//animateLoopMazes("stepsLoop2", steps, 0, 0);
-	
-	updateSteps();
-	
-	/**/
-	
-	/*
-	//path timed
-	i = 2;
-	setTimeout(	function() {
-		mazeStringToSvgPath( svg,  name =  "lode", pathB , xScale, yScale, 6*xScale*i,0 *yScale*i 	);//"class":"face",
-	
-		//( svg, 'path', {id: "lode", fill:"none",   transform:"translate(100 ,0)", stroke:"blue", 'stroke-width':yScale/2,d:pathString});//"class":"face",
-	}, 1000);
-	*/
-	
-	/* animation test, moving circle
-	createSvgElementSvgDom( svg, 'circle', { id:"C1", cx:60, cy:50, r:20, fill:'#066' });
-	var incr = 3;
-	var xlow = 20;
-	var xhigh = 200;
-	var dir = 1;
-	var x;
-	x = Math.floor((xlow + xhigh)/2);
-	console.log(x);
-	animateCircle();
-	/**/
-	
-  ]]></script>
-  </svg>
+    // After placing, move to the next empty cell (left-to-right, top-to-bottom)
+    function advanceSelection() {
+      for (var r = 0; r < N; r++) {
+        for (var c = 0; c < N; c++) {
+          if (!fieldMazes[r + '_' + c] && !(r === selectedRow && c === selectedCol)) {
+            selectCell(r, c);
+            return;
+          }
+        }
+      }
+    }
 
-</body></html>
+    function clearCell(r, c) {
+      delete fieldMazes[r + '_' + c];
+      renderCell(r, c);
+    }
+
+    function clearSelectedCell() { clearCell(selectedRow, selectedCol); }
+
+    function clearAllCells() {
+      fieldMazes = {};
+      for (var r = 0; r < N; r++)
+        for (var c = 0; c < N; c++)
+          renderCell(r, c);
+    }
+
+    // ---- Filter chooser ----
+    var STATES = ['any', 'in', 'out'];
+
+    function initChooser() {
+      var grid = document.getElementById('chooserGrid');
+      for (var r = 0; r < N; r++) {
+        for (var c = 0; c < N; c++) {
+          var cell = document.createElement('div');
+          cell.className = 'chooser-cell';
+          cell.id = 'ch_' + r + '_' + c;
+          cell.setAttribute('data-state', 'any');
+          cell.addEventListener('click', function() {
+            var s = this.getAttribute('data-state');
+            this.setAttribute('data-state', STATES[(STATES.indexOf(s) + 1) % 3]);
+            updateResults();
+          });
+          grid.appendChild(cell);
+        }
+      }
+    }
+
+    function clearChooser() {
+      for (var r = 0; r < N; r++)
+        for (var c = 0; c < N; c++)
+          document.getElementById('ch_' + r + '_' + c).setAttribute('data-state', 'any');
+      updateResults();
+    }
+
+    function getMatchingMazes() {
+      var mask = '';
+      for (var r = 0; r < N; r++)
+        for (var c = 0; c < N; c++) {
+          var s = document.getElementById('ch_' + r + '_' + c).getAttribute('data-state');
+          mask += s === 'in' ? '1' : s === 'out' ? '0' : 'x';
+        }
+
+      var all = getAllMazeNames();
+      var hits = [];
+      for (var i = 0; i < all.length; i++) {
+        var maze = all[i], ok = true;
+        for (var j = 0; j < 25; j++) {
+          if (mask[j] !== 'x' && mask[j] !== maze[j]) { ok = false; break; }
+        }
+        if (ok) hits.push(maze);
+      }
+      return hits;
+    }
+
+    // ---- Results ----
+    function updateResults() {
+      var matches = getMatchingMazes();
+      document.getElementById('matchCount').textContent = matches.length;
+      var grid = document.getElementById('resultsGrid');
+      grid.innerHTML = '';
+
+      if (!matches.length) {
+        var msg = document.createElement('div');
+        msg.className = 'no-matches';
+        msg.textContent = 'No mazes match this pattern.';
+        grid.appendChild(msg);
+        return;
+      }
+
+      for (var i = 0; i < matches.length; i++) {
+        (function(ms) {
+          var item = document.createElement('div');
+          item.className = 'result-maze';
+          item.appendChild(makeSvg(ms, RESULT_SIZE, '#888'));
+          item.addEventListener('click', function() {
+            placeInSelected(ms);
+            item.classList.add('placed');
+            setTimeout(function() { item.classList.remove('placed'); }, 400);
+          });
+          grid.appendChild(item);
+        })(matches[i]);
+      }
+    }
+
+    initField();
+    initChooser();
+    updateResults();
+  //]]></script>
+</body>
+</html>
