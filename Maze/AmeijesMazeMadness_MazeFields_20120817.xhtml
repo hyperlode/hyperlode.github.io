@@ -8,32 +8,30 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #111118;
-      color: #ccc;
-      min-height: 100vh;
+      font-family: monospace;
+      background: #fff;
+      color: #111;
       padding: 28px;
     }
 
     header { margin-bottom: 28px; }
 
     h1 {
-      font-size: 22px;
-      font-weight: 300;
+      font-size: 16px;
+      font-weight: bold;
       letter-spacing: 3px;
       text-transform: uppercase;
-      color: #7ec8e3;
     }
 
     .subtitle {
       margin-top: 6px;
-      font-size: 13px;
-      color: #555;
+      font-size: 11px;
+      color: #888;
     }
 
     .app {
       display: flex;
-      gap: 40px;
+      gap: 48px;
       align-items: flex-start;
       flex-wrap: wrap;
     }
@@ -42,86 +40,83 @@
       font-size: 10px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: #444;
-      margin-bottom: 14px;
+      color: #aaa;
+      margin-bottom: 12px;
     }
 
-    /* ======= MAZE FIELD ======= */
+    /* ======= CANVAS FIELD =======
+       FIELD_TILE = 14px  -> each maze slot = 70x70px
+       gap = 14px         -> one tile between slots          */
     #mazeFieldGrid {
       display: grid;
-      grid-template-columns: repeat(5, 68px);
-      gap: 4px;
+      grid-template-columns: repeat(5, 70px);
+      gap: 14px;
     }
 
     .maze-cell {
-      width: 68px;
-      height: 68px;
-      border: 2px solid #252535;
-      border-radius: 5px;
+      width: 70px;
+      height: 70px;
       cursor: pointer;
-      background: #1a1a28;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       position: relative;
-      transition: border-color 0.12s;
+      background: #f0f0f0;
+      outline: 2px solid transparent;
+      outline-offset: 2px;
     }
 
-    .maze-cell:hover { border-color: #3a3a55; }
-    .maze-cell.selected { border-color: #e94560; box-shadow: 0 0 0 2px #e9456030; }
-    .maze-cell svg { pointer-events: none; display: block; }
+    .maze-cell.selected { outline: 2px solid #000; }
+    .maze-cell svg { display: block; pointer-events: none; }
 
     .remove-btn {
       display: none;
       position: absolute;
-      top: 3px; right: 5px;
+      top: 2px; right: 3px;
       font-size: 10px;
-      color: #e94560;
+      font-family: monospace;
+      color: #fff;
+      background: #000;
+      line-height: 1;
+      padding: 1px 2px;
       cursor: pointer;
       z-index: 1;
-      line-height: 1;
     }
     .maze-cell:hover .remove-btn { display: block; }
 
-    .field-actions { margin-top: 12px; display: flex; gap: 8px; }
+    .field-actions { margin-top: 14px; display: flex; gap: 8px; }
 
-    /* ======= CHOOSER ======= */
+    /* ======= CHOOSER =======
+       Each cell is one tile (24px), cycling: grey / black / white  */
     #chooserGrid {
       display: grid;
-      grid-template-columns: repeat(5, 40px);
-      gap: 4px;
+      grid-template-columns: repeat(5, 24px);
+      gap: 3px;
     }
 
     .chooser-cell {
-      width: 40px;
-      height: 40px;
-      border-radius: 4px;
+      width: 24px;
+      height: 24px;
       cursor: pointer;
-      transition: opacity 0.1s;
     }
-    .chooser-cell:hover { opacity: 0.75; }
-    .chooser-cell[data-state="any"] { background: #252535; border: 2px solid #333345; }
-    .chooser-cell[data-state="in"]  { background: #7ec8e3; border: 2px solid #7ec8e3; }
-    .chooser-cell[data-state="out"] { background: #111118; border: 2px solid #3a3a55; }
+    .chooser-cell[data-state="any"] { background: #bbb; }
+    .chooser-cell[data-state="in"]  { background: #000; }
+    .chooser-cell[data-state="out"] { background: #fff; outline: 1px solid #ccc; }
 
     .match-count {
       margin-top: 12px;
-      font-size: 13px;
-      color: #555;
+      font-size: 11px;
+      color: #888;
     }
-    .match-count strong { color: #7ec8e3; }
+    .match-count strong { color: #000; }
 
     .legend {
       margin-top: 10px;
-      font-size: 11px;
-      color: #444;
+      font-size: 10px;
+      color: #aaa;
       line-height: 2.2;
     }
 
     .dot {
       display: inline-block;
       width: 10px; height: 10px;
-      border-radius: 2px;
       vertical-align: middle;
       margin-right: 5px;
     }
@@ -130,52 +125,42 @@
 
     /* ======= BUTTONS ======= */
     button {
-      background: #1e1e2e;
-      border: 1px solid #333;
-      color: #888;
-      padding: 6px 14px;
-      border-radius: 4px;
+      background: #fff;
+      border: 1px solid #ccc;
+      color: #555;
+      padding: 5px 12px;
+      font-family: monospace;
       font-size: 11px;
       letter-spacing: 0.5px;
       cursor: pointer;
-      transition: background 0.12s, color 0.12s, border-color 0.12s;
     }
-    button:hover { background: #252535; color: #ccc; border-color: #555; }
+    button:hover { background: #f5f5f5; border-color: #888; color: #000; }
 
-    /* ======= RESULTS ======= */
-    .results-section { flex: 1; min-width: 220px; }
+    /* ======= RESULTS =======
+       RESULT_TILE = 8px -> each maze = 40x40px               */
+    .results-section { flex: 1; min-width: 200px; }
 
     #resultsGrid {
       display: flex;
       flex-wrap: wrap;
-      gap: 5px;
+      gap: 4px;
       max-height: 560px;
       overflow-y: auto;
-      padding-right: 4px;
     }
 
     .result-maze {
-      width: 52px;
-      height: 52px;
-      border: 2px solid #252535;
-      border-radius: 4px;
+      width: 40px;
+      height: 40px;
       cursor: pointer;
-      background: #1a1a28;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       flex-shrink: 0;
-      transition: border-color 0.12s, background 0.12s;
+      outline: 2px solid transparent;
+      outline-offset: 1px;
     }
-    .result-maze:hover { border-color: #7ec8e3; background: #1e1e35; }
-    .result-maze.placed { border-color: #e94560; }
-    .result-maze svg { pointer-events: none; display: block; }
+    .result-maze:hover { outline: 2px solid #000; }
+    .result-maze.placed { outline: 2px solid #000; }
+    .result-maze svg { display: block; pointer-events: none; }
 
-    #resultsGrid::-webkit-scrollbar { width: 4px; }
-    #resultsGrid::-webkit-scrollbar-track { background: transparent; }
-    #resultsGrid::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
-
-    .no-matches { color: #444; font-size: 13px; padding: 16px 0; }
+    .no-matches { color: #bbb; font-size: 11px; padding: 12px 0; }
   </style>
 </head>
 <body>
@@ -184,16 +169,16 @@
   <header>
     <h1>Maze Pattern Builder</h1>
     <p class="subtitle">
-      1. Select a cell in the canvas &#160;→&#160;
-      2. Draw a filter pattern &#160;→&#160;
+      1. Select a cell in the canvas &#160;&#8594;&#160;
+      2. Set a filter pattern &#160;&#8594;&#160;
       3. Click a matching maze to place it
     </p>
   </header>
 
   <div class="app">
-    <!-- CANVAS / MAZE FIELD -->
+    <!-- CANVAS -->
     <div>
-      <div class="section-label">Canvas (5×5)</div>
+      <div class="section-label">Canvas (5&#215;5)</div>
       <div id="mazeFieldGrid"></div>
       <div class="field-actions">
         <button onclick="clearSelectedCell()">Clear cell</button>
@@ -201,54 +186,56 @@
       </div>
     </div>
 
-    <!-- FILTER CHOOSER -->
+    <!-- FILTER -->
     <div>
       <div class="section-label">Filter pattern</div>
       <div id="chooserGrid"></div>
       <div class="match-count">Matching: <strong id="matchCount">0</strong></div>
       <div class="legend">
-        <div><span class="dot" style="background:#252535;border:1px solid #3a3a55"></span>grey – any</div>
-        <div><span class="dot" style="background:#7ec8e3"></span>blue – cell IN</div>
-        <div><span class="dot" style="background:#111118;border:1px solid #3a3a55"></span>dark – cell OUT</div>
+        <div><span class="dot" style="background:#bbb"></span>grey – any</div>
+        <div><span class="dot" style="background:#000"></span>black – cell IN</div>
+        <div><span class="dot" style="background:#fff;outline:1px solid #ccc"></span>white – cell OUT</div>
       </div>
       <div class="chooser-actions">
         <button onclick="clearChooser()">Reset filter</button>
       </div>
     </div>
 
-    <!-- MATCHING MAZES -->
+    <!-- RESULTS -->
     <div class="results-section">
-      <div class="section-label">Matching mazes — click to place in selected cell</div>
+      <div class="section-label">Matching mazes – click to place</div>
       <div id="resultsGrid"></div>
     </div>
   </div>
 
   <script>//<![CDATA[
-    var MAZE_SCALE = 12;  // coordinate scale for viewBox (path coords go 0..6*scale)
-    var FIELD_SIZE = 60;  // display px for canvas cell SVG
-    var RESULT_SIZE = 44; // display px for result SVG
+    var FIELD_TILE  = 14;  // px per tile in the canvas
+    var RESULT_TILE = 8;   // px per tile in the results panel
     var N = 5;
 
     var selectedRow = 0, selectedCol = 0;
-    var fieldMazes = {};  // "r_c" -> mazeString
+    var fieldMazes = {};   // "r_c" -> mazeString
 
-    // ---- SVG factory ----
-    function makeSvg(mazeString, displaySize, strokeColor) {
-      var ns = 'http://www.w3.org/2000/svg';
-      var vb = MAZE_SCALE * 6;
+    // ---- Tile SVG factory ----
+    function makeTileSvg(mazeString, tileSize) {
+      var ns  = 'http://www.w3.org/2000/svg';
+      var sz  = 5 * tileSize;
       var svg = document.createElementNS(ns, 'svg');
-      svg.setAttribute('width', displaySize);
-      svg.setAttribute('height', displaySize);
-      svg.setAttribute('viewBox', '0 0 ' + vb + ' ' + vb);
+      svg.setAttribute('width',   sz);
+      svg.setAttribute('height',  sz);
+      svg.setAttribute('viewBox', '0 0 ' + sz + ' ' + sz);
 
-      var path = document.createElementNS(ns, 'path');
-      path.setAttribute('d', getSVGPathFromMazeName(mazeString, MAZE_SCALE, MAZE_SCALE));
-      path.setAttribute('fill', 'none');
-      path.setAttribute('stroke', strokeColor || '#7ec8e3');
-      path.setAttribute('stroke-width', MAZE_SCALE * 0.45);
-      path.setAttribute('stroke-linejoin', 'round');
-      path.setAttribute('stroke-linecap', 'round');
-      svg.appendChild(path);
+      for (var i = 0; i < 25; i++) {
+        var row  = Math.floor(i / 5);
+        var col  = i % 5;
+        var rect = document.createElementNS(ns, 'rect');
+        rect.setAttribute('x',      col * tileSize);
+        rect.setAttribute('y',      row * tileSize);
+        rect.setAttribute('width',  tileSize);
+        rect.setAttribute('height', tileSize);
+        rect.setAttribute('fill',   mazeString[i] === '1' ? '#000' : '#fff');
+        svg.appendChild(rect);
+      }
       return svg;
     }
 
@@ -263,7 +250,7 @@
 
           var rm = document.createElement('div');
           rm.className = 'remove-btn';
-          rm.textContent = '✕';
+          rm.textContent = 'x';
           rm.setAttribute('data-r', r);
           rm.setAttribute('data-c', c);
           rm.addEventListener('click', function(e) {
@@ -294,11 +281,11 @@
 
     function renderCell(r, c) {
       var cell = document.getElementById('field_' + r + '_' + c);
-      var old = cell.querySelector('svg');
+      var old  = cell.querySelector('svg');
       if (old) cell.removeChild(old);
       var key = r + '_' + c;
       if (fieldMazes[key]) {
-        cell.insertBefore(makeSvg(fieldMazes[key], FIELD_SIZE, '#7ec8e3'), cell.firstChild);
+        cell.insertBefore(makeTileSvg(fieldMazes[key], FIELD_TILE), cell.firstChild);
       }
     }
 
@@ -308,7 +295,6 @@
       advanceSelection();
     }
 
-    // After placing, move to the next empty cell (left-to-right, top-to-bottom)
     function advanceSelection() {
       for (var r = 0; r < N; r++) {
         for (var c = 0; c < N; c++) {
@@ -370,7 +356,7 @@
           mask += s === 'in' ? '1' : s === 'out' ? '0' : 'x';
         }
 
-      var all = getAllMazeNames();
+      var all  = getAllMazeNames();
       var hits = [];
       for (var i = 0; i < all.length; i++) {
         var maze = all[i], ok = true;
@@ -401,7 +387,7 @@
         (function(ms) {
           var item = document.createElement('div');
           item.className = 'result-maze';
-          item.appendChild(makeSvg(ms, RESULT_SIZE, '#888'));
+          item.appendChild(makeTileSvg(ms, RESULT_TILE));
           item.addEventListener('click', function() {
             placeInSelected(ms);
             item.classList.add('placed');
