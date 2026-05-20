@@ -103,17 +103,17 @@ function setShapeType(){
 		shapeType = sevSeg;
 	}else if ($('input[name=shapeMode]:checked').val() === "fifteenSeg"){
 		shapeType = fifteenSeg;
-	}else if ($('#shapeModeBootstrap option:selected').val() == "circle"){
+	}else if ($('#shapeModeBootstrap').val() == "circle"){
 		shapeType = circle;
-	}else if ($('#shapeModeBootstrap option:selected').val() == "sevSeg"){
+	}else if ($('#shapeModeBootstrap').val() == "sevSeg"){
 		shapeType = sevSeg;
-	}else if ($('#shapeModeBootstrap option:selected').val() == "fifteenSeg"){
+	}else if ($('#shapeModeBootstrap').val() == "fifteenSeg"){
 		shapeType = fifteenSeg;
 	}else{
 		console.log("ASSERT ERROR: shape undefined");
 		
 	};
-	// console.log(	$('#shapeModeBootstrap option:selected').val() == "Circle");
+	// console.log(	$('#shapeModeBootstrap').val() == "Circle");
 // console.log( "lode");
 };
 
@@ -469,20 +469,20 @@ function changeDigitMode_radioDefined(id){
 	col=idArray[1];
 	
 	returnArray =[];
-	if ($('input[name=digitChangeMode]:checked').val() === "single" || $('#digitChangeModeBootstrap option:selected').val() == "single"){
+	if ($('input[name=digitChangeMode]:checked').val() === "single" || $('#digitChangeModeBootstrap').val() == "single"){
 		return [row + "_" + col];
-	}else if ($('input[name=digitChangeMode]:checked').val() === "row" || $('#digitChangeModeBootstrap option:selected').val() == "row"){
+	}else if ($('input[name=digitChangeMode]:checked').val() === "row" || $('#digitChangeModeBootstrap').val() == "row"){
 		for(var i=0; i<NUMBER_OF_CHARACTERS_ON_LINE;i++){
 			returnArray.push(row + "_" + i);
 		};
 		return returnArray;
 		
-	}else if ($('input[name=digitChangeMode]:checked').val() === "column" || $('#digitChangeModeBootstrap option:selected').val() == "column"){
+	}else if ($('input[name=digitChangeMode]:checked').val() === "column" || $('#digitChangeModeBootstrap').val() == "column"){
 		for(var i=0; i<NUMBER_OF_LINES;i++){
 			returnArray.push(i + "_" + col);
 		};
 		return returnArray;
-	}else if ($('input[name=digitChangeMode]:checked').val() === "cross"  || $('#digitChangeModeBootstrap option:selected').val() == "cross"){
+	}else if ($('input[name=digitChangeMode]:checked').val() === "cross"  || $('#digitChangeModeBootstrap').val() == "cross"){
 		for (var i = 0; i < NUMBER_OF_LINES; i++) {
 			for (var j = 0; j < NUMBER_OF_CHARACTERS_ON_LINE; j++) {
 				if(i== row || j == col){
@@ -493,7 +493,7 @@ function changeDigitMode_radioDefined(id){
 		return returnArray;	
 		
 		
-	}else if ($('input[name=digitChangeMode]:checked').val() === "all" || $('#digitChangeModeBootstrap option:selected').val() == "all"){
+	}else if ($('input[name=digitChangeMode]:checked').val() === "all" || $('#digitChangeModeBootstrap').val() == "all"){
 		return getAllDigitIds();
 		
 		
@@ -539,11 +539,11 @@ function changeSegmentColor_radioDefined(shape){
 		
 	// }else 
 	
-	if ($('#segmentChangeModeBootstrap option:selected').val() == "on"){	
+	if ($('#segmentChangeModeBootstrap').val() == "on"){	
 	changeSegmentColor(shape,true);
-	}else if ($('#segmentChangeModeBootstrap option:selected').val() == "off"){	
+	}else if ($('#segmentChangeModeBootstrap').val() == "off"){	
 	changeSegmentColor(shape,false);
-	}else if ($('#segmentChangeModeBootstrap option:selected').val() == "toggle"){	
+	}else if ($('#segmentChangeModeBootstrap').val() == "toggle"){	
 		changeSegmentColor(shape, shape.getAttribute("data-rel") == "false" )
 		
 		

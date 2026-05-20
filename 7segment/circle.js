@@ -34,9 +34,9 @@ var circle={
 		shape.setAttribute("class", "segment");
 		shape.setAttribute("data-rel", "true");
 		shape.addEventListener("click", 
-		function(){  if ($('input[name=segmentToggleTrigger]:checked').val() === "click"  || $('#segmentToggleTriggerBootstrap option:selected').val() == "click"){	defineDigitsAndChangeColorOfSelectedSegment(shape.getAttribute("id")); }}, false);
+		function(){  if ($('input[name=segmentToggleTrigger]:checked').val() === "click"  || $('#segmentToggleTriggerBootstrap').val() == "click"){	defineDigitsAndChangeColorOfSelectedSegment(shape.getAttribute("id")); }}, false);
 		shape.addEventListener("mouseover", 
-		function(){  if ($('input[name=segmentToggleTrigger]:checked').val() === "hover"  || $('#segmentToggleTriggerBootstrap option:selected').val() == "hover"){	defineDigitsAndChangeColorOfSelectedSegment(shape.getAttribute("id")); } }, false);
+		function(){  if ($('input[name=segmentToggleTrigger]:checked').val() === "hover"  || $('#segmentToggleTriggerBootstrap').val() == "hover"){	defineDigitsAndChangeColorOfSelectedSegment(shape.getAttribute("id")); } }, false);
 		digit.appendChild(shape);
 		
 		//applying skew is not that easy!
