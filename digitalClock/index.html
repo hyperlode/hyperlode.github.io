@@ -9,23 +9,36 @@
     body {
       background: #e8e8e8;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: flex-start;
-      padding: 16px 20px;
+      min-height: 100vh;
       font-family: sans-serif;
       font-size: 13px;
     }
     #controls {
       display: flex;
-      align-items: center;
-      gap: 24px;
-      padding-bottom: 12px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 10px;
+      padding: 20px 16px;
+      width: 200px;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #888;
+      margin-top: 6px;
     }
     .ctrl { display: flex; align-items: center; gap: 6px; }
-    .ctrl label { white-space: nowrap; }
-    .ctrl input[type=range] { width: 100px; }
-    .ctrl .val { width: 28px; text-align: right; color: #555; }
+    .ctrl label { white-space: nowrap; width: 62px; flex-shrink: 0; color: #444; }
+    .ctrl input[type=range] { flex: 1; min-width: 0; }
+    .ctrl .val { width: 26px; text-align: right; color: #666; flex-shrink: 0; }
+    #drawing { flex: 1; padding: 20px; overflow: auto; }
+    #settings-json { width: 100%; height: 80px; font-size: 10px; font-family: monospace; resize: vertical; box-sizing: border-box; }
+    .btn-row { display: flex; gap: 6px; }
+    .btn-row button { flex: 1; font-size: 11px; padding: 3px 0; cursor: pointer; }
   </style>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
   <script src="svgOperations.js"></script>
@@ -34,14 +47,90 @@
 </head>
 <body>
   <div id="controls">
+
+    <div class="section-title">Display</div>
     <div class="ctrl">
       <input type="checkbox" id="chk-red-bg">
-      <label for="chk-red-bg">Full red background</label>
+      <label for="chk-red-bg" style="width:auto">Full red background</label>
     </div>
     <div class="ctrl">
       <input type="checkbox" id="chk-light-up">
-      <label for="chk-light-up">Segments light up on touch</label>
+      <label for="chk-light-up" style="width:auto">Segments light up</label>
     </div>
+
+    <div class="section-title">Hour hand</div>
+    <div class="ctrl">
+      <label for="slider-hour-w">Thickness</label>
+      <input type="range" id="slider-hour-w" min="1" max="40" value="14">
+      <span class="val" id="val-hour-w">14</span>
+    </div>
+    <div class="ctrl">
+      <label for="slider-hour-len">Length %</label>
+      <input type="range" id="slider-hour-len" min="0" max="100" value="50">
+      <span class="val" id="val-hour-len">50</span>
+    </div>
+    <div class="ctrl">
+      <label for="slider-hour-off">Offset %</label>
+      <input type="range" id="slider-hour-off" min="-50" max="50" value="0">
+      <span class="val" id="val-hour-off">0</span>
+    </div>
+
+    <div class="section-title">Minute hand</div>
+    <div class="ctrl">
+      <label for="slider-min-w">Thickness</label>
+      <input type="range" id="slider-min-w" min="1" max="40" value="9">
+      <span class="val" id="val-min-w">9</span>
+    </div>
+    <div class="ctrl">
+      <label for="slider-min-len">Length %</label>
+      <input type="range" id="slider-min-len" min="0" max="100" value="75">
+      <span class="val" id="val-min-len">75</span>
+    </div>
+    <div class="ctrl">
+      <label for="slider-min-off">Offset %</label>
+      <input type="range" id="slider-min-off" min="-50" max="50" value="0">
+      <span class="val" id="val-min-off">0</span>
+    </div>
+
+    <div class="section-title">Second hand</div>
+    <div class="ctrl">
+      <input type="checkbox" id="chk-seconds" checked>
+      <label for="chk-seconds" style="width:auto">Enabled</label>
+    </div>
+    <div class="ctrl">
+      <label for="slider-sec-w">Thickness</label>
+      <input type="range" id="slider-sec-w" min="1" max="40" value="5">
+      <span class="val" id="val-sec-w">5</span>
+    </div>
+    <div class="ctrl">
+      <label for="slider-sec-len">Length %</label>
+      <input type="range" id="slider-sec-len" min="0" max="100" value="85">
+      <span class="val" id="val-sec-len">85</span>
+    </div>
+    <div class="ctrl">
+      <label for="slider-sec-off">Offset %</label>
+      <input type="range" id="slider-sec-off" min="-50" max="50" value="0">
+      <span class="val" id="val-sec-off">0</span>
+    </div>
+
+    <div class="section-title">Digits</div>
+    <div class="ctrl">
+      <label for="slider-skew">Slant</label>
+      <input type="range" id="slider-skew" min="-20" max="5" value="-7">
+      <span class="val" id="val-skew">-7</span>
+    </div>
+    <div class="ctrl">
+      <label for="slider-offset-x">Offset X</label>
+      <input type="range" id="slider-offset-x" min="-25" max="25" value="0">
+      <span class="val" id="val-offset-x">0</span>
+    </div>
+    <div class="ctrl">
+      <label for="slider-offset-y">Offset Y</label>
+      <input type="range" id="slider-offset-y" min="-25" max="25" value="0">
+      <span class="val" id="val-offset-y">0</span>
+    </div>
+
+    <div class="section-title">Grid</div>
     <div class="ctrl">
       <label for="slider-gapx">Gap X</label>
       <input type="range" id="slider-gapx" min="0" max="60" value="8">
@@ -53,44 +142,190 @@
       <span class="val" id="val-gapy">8</span>
     </div>
     <div class="ctrl">
-      <label for="slider-decpoint">Dec point X</label>
+      <label for="slider-decpoint">Dec pt X</label>
       <input type="range" id="slider-decpoint" min="-20" max="40" value="8">
       <span class="val" id="val-decpoint">8</span>
     </div>
+
+    <div class="section-title">Segments</div>
+    <div class="ctrl">
+      <input type="checkbox" id="chk-click-toggle">
+      <label for="chk-click-toggle" style="width:auto">Click to toggle</label>
+    </div>
+    <div class="ctrl">
+      <input type="checkbox" id="chk-hover-on">
+      <label for="chk-hover-on" style="width:auto">Hover for on</label>
+    </div>
+    <div class="ctrl">
+      <input type="checkbox" id="chk-hover-off">
+      <label for="chk-hover-off" style="width:auto">Hover for off</label>
+    </div>
+    <div class="btn-row">
+      <button onclick="clearPinnedSegments()">Clear toggles</button>
+    </div>
+
+    <div class="section-title">Settings</div>
+    <textarea id="settings-json" placeholder="JSON…"></textarea>
+    <div class="btn-row">
+      <button onclick="saveSettings()">Save</button>
+      <button onclick="loadSettings()">Load</button>
+    </div>
+
   </div>
   <div id="drawing"></div>
 
   <script>
+    function bindSlider(id, valId, onChange) {
+      var el = document.getElementById(id);
+      el.addEventListener("input", function () {
+        document.getElementById(valId).textContent = this.value;
+        onChange(parseFloat(this.value));
+      });
+    }
+
     document.getElementById("chk-red-bg").addEventListener("change", function () {
       var el = document.getElementById("red-bg");
       if (el) el.setAttribute("visibility", this.checked ? "visible" : "hidden");
     });
 
-    function onSliderChange() {
-      var gx = parseInt(document.getElementById("slider-gapx").value);
-      var gy = parseInt(document.getElementById("slider-gapy").value);
-      var dp = parseInt(document.getElementById("slider-decpoint").value);
-      document.getElementById("val-gapx").textContent = gx;
-      document.getElementById("val-gapy").textContent = gy;
-      document.getElementById("val-decpoint").textContent = dp;
-      GAP_X = gx;
-      GAP_Y = gy;
-      DECPOINT_SPACE = dp;
-      buildClock();
-    }
-
     document.getElementById("chk-light-up").addEventListener("change", function () {
       _litEnabled = this.checked;
-      if (!this.checked) {
-        for (var i = 0; i < _allSegments.length; i++) {
+      if (!this.checked)
+        for (var i = 0; i < _allSegments.length; i++)
           _allSegments[i].el.setAttribute("fill", "none");
-        }
-      }
     });
 
-    document.getElementById("slider-gapx").addEventListener("input", onSliderChange);
-    document.getElementById("slider-gapy").addEventListener("input", onSliderChange);
-    document.getElementById("slider-decpoint").addEventListener("input", onSliderChange);
+    document.getElementById("chk-seconds").addEventListener("change", function () {
+      _secondEnabled = this.checked;
+    });
+
+    // Thickness
+    bindSlider("slider-hour-w", "val-hour-w", function (v) { if (_handHour)   _handHour.setAttribute("stroke-width",   v); });
+    bindSlider("slider-min-w",  "val-min-w",  function (v) { if (_handMinute) _handMinute.setAttribute("stroke-width", v); });
+    bindSlider("slider-sec-w",  "val-sec-w",  function (v) { if (_handSecond) _handSecond.setAttribute("stroke-width", v); });
+
+    // Length %
+    bindSlider("slider-hour-len", "val-hour-len", function (v) { _hourLen   = v; });
+    bindSlider("slider-min-len",  "val-min-len",  function (v) { _minuteLen = v; });
+    bindSlider("slider-sec-len",  "val-sec-len",  function (v) { _secondLen = v; });
+
+    // Offset %
+    bindSlider("slider-hour-off", "val-hour-off", function (v) { _hourOff   = v; });
+    bindSlider("slider-min-off",  "val-min-off",  function (v) { _minuteOff = v; });
+    bindSlider("slider-sec-off",  "val-sec-off",  function (v) { _secondOff = v; });
+
+    // Digit offset — no rebuild needed
+    document.getElementById("slider-offset-x").addEventListener("input", function() {
+      _offsetX = parseInt(this.value);
+      document.getElementById("val-offset-x").textContent = _offsetX;
+      applyDigitOffset(_offsetX, _offsetY);
+    });
+    document.getElementById("slider-offset-y").addEventListener("input", function() {
+      _offsetY = parseInt(this.value);
+      document.getElementById("val-offset-y").textContent = _offsetY;
+      applyDigitOffset(_offsetX, _offsetY);
+    });
+
+    // Digits / Grid — require full rebuild
+    function onGridChange() {
+      DIGIT_SKEW = parseInt(document.getElementById("slider-skew").value);
+      document.getElementById("val-skew").textContent = DIGIT_SKEW;
+      GAP_X          = parseInt(document.getElementById("slider-gapx").value);
+      GAP_Y          = parseInt(document.getElementById("slider-gapy").value);
+      DECPOINT_SPACE = parseInt(document.getElementById("slider-decpoint").value);
+      document.getElementById("val-gapx").textContent     = GAP_X;
+      document.getElementById("val-gapy").textContent     = GAP_Y;
+      document.getElementById("val-decpoint").textContent = DECPOINT_SPACE;
+      buildClock();
+    }
+    document.getElementById("slider-skew").addEventListener("input", onGridChange);
+    document.getElementById("slider-gapx").addEventListener("input", onGridChange);
+    document.getElementById("slider-gapy").addEventListener("input", onGridChange);
+    document.getElementById("slider-decpoint").addEventListener("input", onGridChange);
+
+    document.getElementById("chk-click-toggle").addEventListener("change", function() {
+      _clickToggleEnabled = this.checked;
+      updateHoverCursorAndPlane();
+    });
+
+    function updateHoverCursorAndPlane() {
+      var active = _clickToggleEnabled || _hoverOnEnabled || _hoverOffEnabled;
+      var cursor = active ? "pointer" : "default";
+      for (var i = 0; i < _allSegments.length; i++) _allSegments[i].el.style.cursor = cursor;
+      var plane = document.getElementById("clock-plane");
+      if (plane) plane.setAttribute("fill", active ? "#c8c8c8" : "#e8e8e8");
+    }
+
+    document.getElementById("chk-hover-on").addEventListener("change", function() {
+      _hoverOnEnabled = this.checked;
+      updateHoverCursorAndPlane();
+    });
+
+    document.getElementById("chk-hover-off").addEventListener("change", function() {
+      _hoverOffEnabled = this.checked;
+      updateHoverCursorAndPlane();
+    });
+
+    function clearPinnedSegments() {
+      _pinnedSegments = {};
+    }
+
+    var _sliderIds   = ["slider-hour-w","slider-hour-len","slider-hour-off",
+                        "slider-min-w","slider-min-len","slider-min-off",
+                        "slider-sec-w","slider-sec-len","slider-sec-off",
+                        "slider-skew","slider-gapx","slider-gapy","slider-decpoint",
+                        "slider-offset-x","slider-offset-y"];
+    var _checkboxIds = ["chk-red-bg","chk-light-up","chk-seconds"];
+
+    function saveSettings() {
+      var s = {};
+      _sliderIds.forEach(function(id)   { s[id] = parseFloat(document.getElementById(id).value); });
+      _checkboxIds.forEach(function(id) { s[id] = document.getElementById(id).checked; });
+      s["chk-click-toggle"] = document.getElementById("chk-click-toggle").checked;
+      s["chk-hover-on"]  = document.getElementById("chk-hover-on").checked;
+      s["chk-hover-off"] = document.getElementById("chk-hover-off").checked;
+      s.pinnedSegments = Object.keys(_pinnedSegments);
+      document.getElementById("settings-json").value = JSON.stringify(s, null, 2);
+    }
+
+    function loadSettings() {
+      var s;
+      try { s = JSON.parse(document.getElementById("settings-json").value); }
+      catch(e) { alert("Invalid JSON"); return; }
+      _sliderIds.forEach(function(id) {
+        if (s[id] === undefined) return;
+        var el = document.getElementById(id);
+        el.value = s[id];
+        el.dispatchEvent(new Event("input"));
+      });
+      _checkboxIds.forEach(function(id) {
+        if (s[id] === undefined) return;
+        var el = document.getElementById(id);
+        el.checked = s[id];
+        el.dispatchEvent(new Event("change"));
+      });
+      // Restore click-toggle checkbox
+      if (s["chk-click-toggle"] !== undefined) {
+        var ctEl = document.getElementById("chk-click-toggle");
+        ctEl.checked = s["chk-click-toggle"];
+        ctEl.dispatchEvent(new Event("change"));
+      }
+      if (s["chk-hover-on"] !== undefined) {
+        var hoEl = document.getElementById("chk-hover-on");
+        hoEl.checked = s["chk-hover-on"];
+        hoEl.dispatchEvent(new Event("change"));
+      }
+      if (s["chk-hover-off"] !== undefined) {
+        var hfEl = document.getElementById("chk-hover-off");
+        hfEl.checked = s["chk-hover-off"];
+        hfEl.dispatchEvent(new Event("change"));
+      }
+      // Restore pinned segments
+      if (Array.isArray(s.pinnedSegments)) {
+        _pinnedSegments = {};
+        s.pinnedSegments.forEach(function(id) { _pinnedSegments[id] = true; });
+      }
+    }
   </script>
 </body>
 </html>

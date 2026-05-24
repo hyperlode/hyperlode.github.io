@@ -13,7 +13,7 @@ var DIGIT_MARGIN_HORIZONTAL_RIGHT = 5;
 var DIGIT_MARGIN_VERTICAL_TOP     = 10;
 var DIGIT_MARGIN_VERTICAL_BOTTOM  = 10;
 
-var DIGIT_SKEW = 0;
+var DIGIT_SKEW = -7;
 
 var DIGIT_WIDTH       = SEGMENT_HEIGHT + SEGMENT_WIDTH;
 var DIGIT_HEIGHT      = SEGMENT_HEIGHT * 2 + SEGMENT_WIDTH;
@@ -32,15 +32,27 @@ var GAP_X = 8;
 var GAP_Y = 8;
 
 // ── Runtime state ──────────────────────────────────────────────────────────
-var _handHour     = null;
-var _handMinute   = null;
-var _handSecond   = null;
-var _clockCx      = 0;
-var _clockCy      = 0;
-var _clockR       = 0;
-var _tickInterval = null;
-var _litEnabled   = false;
-var _allSegments  = [];   // [{el, isCircle}] — real digit group shapes
+var _handHour      = null;
+var _handMinute    = null;
+var _handSecond    = null;
+var _clockCx       = 0;
+var _clockCy       = 0;
+var _clockR        = 0;
+var _tickInterval  = null;
+var _litEnabled         = false;
+var _secondEnabled      = true;
+var _allSegments        = [];
+var _pinnedSegments     = {};   // segmentId -> true
+var _clickToggleEnabled = false;
+var _hoverOnEnabled  = false;
+var _hoverOffEnabled = false;
+var _offsetX = 0;
+var _offsetY = 0;
+
+// Hand geometry — length and start offset as % of radius
+var _hourLen   = 50;  var _hourOff   = 0;
+var _minuteLen = 75;  var _minuteOff = 0;
+var _secondLen = 85;  var _secondOff = 0;
 
 // ── Stubs for helpers defined in sevSegClickable.js ────────────────────────
 function shapeRowColSegmentFromId(id) {
@@ -62,17 +74,6 @@ function _segmentsIntersect(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) {
   return t >= 0 && t <= 1 && u >= 0 && u <= 1;
 }
 
-function _lineHitsPolygon(lx1, ly1, lx2, ly2, polygon) {
-  var pts = polygon.points;
-  var n   = pts.numberOfItems;
-  for (var i = 0; i < n; i++) {
-    var a = pts.getItem(i);
-    var b = pts.getItem((i + 1) % n);
-    if (_segmentsIntersect(lx1, ly1, lx2, ly2, a.x, a.y, b.x, b.y)) return true;
-  }
-  return false;
-}
-
 function _distPointToSeg(px, py, ax, ay, bx, by) {
   var dx = bx - ax, dy = by - ay;
   var lenSq = dx * dx + dy * dy;
@@ -81,11 +82,37 @@ function _distPointToSeg(px, py, ax, ay, bx, by) {
   return Math.sqrt(nx * nx + ny * ny);
 }
 
-function _lineHitsCircle(lx1, ly1, lx2, ly2, circle) {
+function _lineHitsPolygon(lx1, ly1, lx2, ly2, polygon, tol) {
+  var pts = polygon.points;
+  var n   = pts.numberOfItems;
+  // Centerline crosses a polygon edge
+  for (var i = 0; i < n; i++) {
+    var a = pts.getItem(i);
+    var b = pts.getItem((i + 1) % n);
+    if (_segmentsIntersect(lx1, ly1, lx2, ly2, a.x, a.y, b.x, b.y)) return true;
+  }
+  if (tol > 0) {
+    // Any polygon vertex within half-thickness of the centerline
+    for (var i = 0; i < n; i++) {
+      var p = pts.getItem(i);
+      if (_distPointToSeg(p.x, p.y, lx1, ly1, lx2, ly2) <= tol) return true;
+    }
+    // Any polygon edge within half-thickness of the hand endpoints (capsule ends)
+    for (var i = 0; i < n; i++) {
+      var a = pts.getItem(i);
+      var b = pts.getItem((i + 1) % n);
+      if (_distPointToSeg(lx1, ly1, a.x, a.y, b.x, b.y) <= tol) return true;
+      if (_distPointToSeg(lx2, ly2, a.x, a.y, b.x, b.y) <= tol) return true;
+    }
+  }
+  return false;
+}
+
+function _lineHitsCircle(lx1, ly1, lx2, ly2, circle, tol) {
   var cx = parseFloat(circle.getAttribute("cx"));
   var cy = parseFloat(circle.getAttribute("cy"));
   var r  = parseFloat(circle.getAttribute("r"));
-  return _distPointToSeg(cx, cy, lx1, ly1, lx2, ly2) <= r;
+  return _distPointToSeg(cx, cy, lx1, ly1, lx2, ly2) <= r + tol;
 }
 
 // ── Hand helpers ───────────────────────────────────────────────────────────
@@ -100,12 +127,12 @@ function _makeHand(svg, before, cx, cy, strokeWidth) {
   return line;
 }
 
-function _setHand(hand, cx, cy, angleDeg, length) {
+function _setHand(hand, cx, cy, angleDeg, startR, endR) {
   var rad = (angleDeg - 90) * Math.PI / 180;
-  hand.setAttribute("x1", cx);
-  hand.setAttribute("y1", cy);
-  hand.setAttribute("x2", cx + Math.cos(rad) * length);
-  hand.setAttribute("y2", cy + Math.sin(rad) * length);
+  hand.setAttribute("x1", cx + Math.cos(rad) * startR);
+  hand.setAttribute("y1", cy + Math.sin(rad) * startR);
+  hand.setAttribute("x2", cx + Math.cos(rad) * endR);
+  hand.setAttribute("y2", cy + Math.sin(rad) * endR);
 }
 
 // ── Tick ───────────────────────────────────────────────────────────────────
@@ -120,39 +147,53 @@ function tickClock() {
   var degM = (m + s / 60) * 6;
   var degS = (s + ms / 1000) * 6;
 
-  _setHand(_handHour,   _clockCx, _clockCy, degH, _clockR * 0.50);
-  _setHand(_handMinute, _clockCx, _clockCy, degM, _clockR * 0.75);
-  _setHand(_handSecond, _clockCx, _clockCy, degS, _clockR * 0.85);
+  _setHand(_handHour,   _clockCx, _clockCy, degH, _clockR * _hourOff   / 100, _clockR * _hourLen   / 100);
+  _setHand(_handMinute, _clockCx, _clockCy, degM, _clockR * _minuteOff / 100, _clockR * _minuteLen / 100);
+  _setHand(_handSecond, _clockCx, _clockCy, degS, _clockR * _secondOff / 100, _clockR * _secondLen / 100);
 
   // Hide hand lines when lit mode is on — only lit segments should be visible
   var handStroke = _litEnabled ? "none" : "#e03030";
   _handHour.setAttribute("stroke",   handStroke);
   _handMinute.setAttribute("stroke", handStroke);
-  _handSecond.setAttribute("stroke", handStroke);
-
-  if (!_litEnabled) return;
+  _handSecond.setAttribute("stroke", _litEnabled ? "none" : (_secondEnabled ? "#e03030" : "none"));
 
   // Reset all segments to invisible
   for (var i = 0; i < _allSegments.length; i++) {
     _allSegments[i].el.setAttribute("fill", "none");
   }
 
-  // Light up segments touched by any hand
-  var hands = [_handHour, _handMinute, _handSecond];
-  for (var hi = 0; hi < hands.length; hi++) {
-    var hand = hands[hi];
-    var hx1 = parseFloat(hand.getAttribute("x1"));
-    var hy1 = parseFloat(hand.getAttribute("y1"));
-    var hx2 = parseFloat(hand.getAttribute("x2"));
-    var hy2 = parseFloat(hand.getAttribute("y2"));
+  // Light up segments touched by any active hand (only when lit mode on)
+  if (_litEnabled) {
+    var hands = [
+      { el: _handHour,   tol: parseFloat(_handHour.getAttribute("stroke-width"))   / 2 },
+      { el: _handMinute, tol: parseFloat(_handMinute.getAttribute("stroke-width")) / 2 },
+    ];
+    if (_secondEnabled) hands.push(
+      { el: _handSecond, tol: parseFloat(_handSecond.getAttribute("stroke-width")) / 2 }
+    );
 
-    for (var i = 0; i < _allSegments.length; i++) {
-      if (_allSegments[i].el.getAttribute("fill") === "#e03030") continue; // already lit
-      var hit = _allSegments[i].isCircle
-        ? _lineHitsCircle(hx1, hy1, hx2, hy2, _allSegments[i].el)
-        : _lineHitsPolygon(hx1, hy1, hx2, hy2, _allSegments[i].el);
-      if (hit) _allSegments[i].el.setAttribute("fill", "#e03030");
+    for (var hi = 0; hi < hands.length; hi++) {
+      var hand = hands[hi].el;
+      var tol  = hands[hi].tol;
+      var hx1  = parseFloat(hand.getAttribute("x1"));
+      var hy1  = parseFloat(hand.getAttribute("y1"));
+      var hx2  = parseFloat(hand.getAttribute("x2"));
+      var hy2  = parseFloat(hand.getAttribute("y2"));
+
+      for (var i = 0; i < _allSegments.length; i++) {
+        if (_allSegments[i].el.getAttribute("fill") === "#e03030") continue;
+        var hit = _allSegments[i].isCircle
+          ? _lineHitsCircle(hx1, hy1, hx2, hy2, _allSegments[i].el, tol)
+          : _lineHitsPolygon(hx1, hy1, hx2, hy2, _allSegments[i].el, tol);
+        if (hit) _allSegments[i].el.setAttribute("fill", "#e03030");
+      }
     }
+  }
+
+  // Apply manually pinned segments (always, on top of everything)
+  for (var pid in _pinnedSegments) {
+    var pel = document.getElementById(pid);
+    if (pel) pel.setAttribute("fill", "#e03030");
   }
 }
 
@@ -204,6 +245,8 @@ function buildClock() {
   maskBg.setAttribute("fill", "white");
   mask.appendChild(maskBg);
 
+  var maskDigitsLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  maskDigitsLayer.setAttribute("id", "mask-digits-layer");
   for (var row = 0; row < CLOCK_ROWS; row++) {
     for (var col = 0; col < CLOCK_COLS; col++) {
       var g     = document.getElementById(row + "_" + col);
@@ -216,9 +259,10 @@ function buildClock() {
         shapes[k].setAttribute("fill",   "black");
         shapes[k].setAttribute("stroke", "none");
       }
-      mask.appendChild(clone);
+      maskDigitsLayer.appendChild(clone);
     }
   }
+  mask.appendChild(maskDigitsLayer);
   defs.appendChild(mask);
   svg.insertBefore(defs, svg.firstChild);
 
@@ -241,9 +285,10 @@ function buildClock() {
 
   // Step 4: grey masked plane
   var plane = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  plane.setAttribute("id",     "clock-plane");
   plane.setAttribute("width",  W);
   plane.setAttribute("height", H);
-  plane.setAttribute("fill",   "#e8e8e8");
+  plane.setAttribute("fill",   _clickToggleEnabled ? "#c8c8c8" : "#e8e8e8");
   plane.setAttribute("mask",   "url(#cutout)");
   svg.insertBefore(plane, firstDigit);
 
@@ -269,8 +314,54 @@ function buildClock() {
     }
   }
 
+  // Wire click-to-toggle on each segment
+  for (var si = 0; si < _allSegments.length; si++) {
+    _allSegments[si].el.setAttribute("pointer-events", "all");
+    _allSegments[si].el.style.cursor = (_clickToggleEnabled || _hoverOnEnabled || _hoverOffEnabled) ? "pointer" : "default";
+    (function(seg) {
+      seg.el.addEventListener("click", function() {
+        if (!_clickToggleEnabled) return;
+        var id = seg.el.getAttribute("id");
+        if (!id) return;
+        if (_pinnedSegments[id]) {
+          delete _pinnedSegments[id];
+        } else {
+          _pinnedSegments[id] = true;
+        }
+      });
+      seg.el.addEventListener("mouseenter", function() {
+        if (!_hoverOnEnabled && !_hoverOffEnabled) return;
+        var id = seg.el.getAttribute("id");
+        if (!id) return;
+        if (_hoverOnEnabled)  _pinnedSegments[id] = true;
+        if (_hoverOffEnabled) delete _pinnedSegments[id];
+      });
+    })(_allSegments[si]);
+  }
+
+  // Wrap all digit groups in a single layer so offset can be applied without rebuild
+  var digitsLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  digitsLayer.setAttribute("id", "digits-layer");
+  var firstGroup = document.getElementById("0_0");
+  svg.insertBefore(digitsLayer, firstGroup);
+  for (var row = 0; row < CLOCK_ROWS; row++) {
+    for (var col = 0; col < CLOCK_COLS; col++) {
+      var dg = document.getElementById(row + "_" + col);
+      if (dg) digitsLayer.appendChild(dg);
+    }
+  }
+
+  applyDigitOffset(_offsetX, _offsetY);
+
   tickClock();
   _tickInterval = setInterval(tickClock, 50);
+}
+
+function applyDigitOffset(x, y) {
+  var dl = document.getElementById("digits-layer");
+  if (dl) dl.setAttribute("transform", "translate(" + x + "," + y + ")");
+  var ml = document.getElementById("mask-digits-layer");
+  if (ml) ml.setAttribute("transform", "translate(" + x + "," + y + ")");
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────
