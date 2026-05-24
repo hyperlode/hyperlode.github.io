@@ -1,179 +1,219 @@
 <!DOCTYPE html>
-<html>
-	<head>
-	
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-		<title>sevenSeg</title>
-		 <link rel='stylesheet' type='text/css' href='style.css'/>
-<!-- 		
-		<link href="https://fonts.googleapis.com/css?family=Iceberg" rel="stylesheet">
-		<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/ui-darkness/jquery-ui.css" rel="stylesheet">   
-		<link href="prettify.css" rel="stylesheet"> -->
-		
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-		<!-- <script src="https://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script> -->
-		<!-- <script src="sevenSeg.js"></script> -->
-				
-	  
- 		<!-- <script type='text/javascript' src="sevenSeg.js"></script> -->
-		<script type='text/javascript' src="sevSegClickable.js"></script>
-		<script type='text/javascript' src="saveSvgAsPng.js"></script>
-		<script type='text/javascript' src="svgOperations.js"></script>
-		<script type='text/javascript' src="domFunctions.js"></script>
-		<script type='text/javascript' src="fifteenSeg.js"></script>
-		<script type='text/javascript' src="sevSeg.js"></script>
-		<script type='text/javascript' src="circle.js"></script>
-		<!-- <script type='text/javascript' src="sevSegBare.js"></script> -->
-		
-		
-		  <!-- Bootstrap core CSS -->
-		<link href="/bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
-		<!-- Bootstrap theme -->
-		<link href="/bootstrap-3.3.2-dist/css/bootstrap-theme.min.css" rel="stylesheet">
-
-		<!-- Custom styles for this template -->
-		<link href="theme.css" rel="stylesheet">
-
-		<!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-		<!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-		<script src="../../assets/js/ie-emulation-modes-warning.js"></script>
-
-		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-		<!--[if lt IE 9]>
-		  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-		<![endif]-->
-		
-		<!-- Bootstrap special select -->
-		<script src="/silviomoreto-bootstrap-select-83d5a1b/js/bootstrap-select.js"></script>
-		<script src="/silviomoreto-bootstrap-select-83d5a1b/dist/js/bootstrap-select.min.css"></script>
-		<link href="/silviomoreto-bootstrap-select-83d5a1b/dist/css/bootstrap-select.min.css" rel="stylesheet">
-			
-		
-	</head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Segment Painter</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+  <script src="sevSegClickable.js"></script>
+  <script src="saveSvgAsPng.js"></script>
+  <script src="svgOperations.js"></script>
+  <script src="domFunctions.js"></script>
+  <script src="fifteenSeg.js"></script>
+  <script src="sevSeg.js"></script>
+  <script src="circle.js"></script>
+</head>
 <body>
-	<p>https://silviomoreto.github.io/bootstrap-select/</p>
 
+<div id="app">
 
-<!-- <p>Kind of shape:</p> -->
-	<select class="selectpicker" id="shapeModeBootstrap">
-	  <option value="circle">Circle</option>
-	  <option value = "sevSeg">7 Segment digits</option>
-	  <option value="fifteenSeg">15 Segment digits</option>
-	</select>
+  <nav id="sidebar">
 
-	<!-- <div id="shapeModeDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"> -->
-		<!-- <p>Kind of shape:</p> -->
-		<!-- <input type="radio" id="shapeModeCircle" name="shapeMode" value="circle"  /> -->
-		<!-- <label for="shapeModeCircle">Circle</label> -->
-		<!-- <input type="radio" id="shapeModeSevSeg" name="shapeMode"  value="sevSeg" checked="checked"/> -->
-		<!-- <label for="shapeModeSevSeg">7 Segment digits</label> -->
-		<!-- <input type="radio" id="shapeModeFifteenSeg" name="shapeMode"  value="fifteenSeg"/> -->
-		<!-- <label for="shapeModeFifteenSeg">15 Segment digits</label> -->
-	<!-- </div> -->
-	
-	<!-- <div id="controls"> -->
-	<!--  -->
-		<!-- <div id="mouseOverMode"> -->
-		<!-- <p>Change digits on:</p> -->
-		<!-- <input type="radio" id="segmentToggleByHover" name="segmentToggleTrigger" value="hover" checked="checked" /> -->
-		<!-- <label for="segmentToggleByHover">Hover</label> -->
-		<!-- <input type="radio" id="segmentToggleByClick" name="segmentToggleTrigger" value="click" /> -->
-		<!-- <label for="segmentToggleByClick">Click</label> -->
-	<!-- </div> -->
-	<p>Change digits on:</p>
-	<select class="selectpicker" id="segmentToggleTriggerBootstrap">
-	  <option value="hover" > Hover</option>
-	  <option value = "click">Click</option>
-	</select>
-	
+    <div id="logo">Segment Painter</div>
 
-	
-	
-	<!-- <div id="digitsToChangeMode"> -->
-		<!-- <p>Which digits will change:</p> -->
-		<!-- <input type="radio" id="digitChangeSingle" name="digitChangeMode" value="single" checked="checked" /> -->
-		<!-- <label for="digitChangeSingle">Single</label> -->
-		<!-- <input type="radio" id="digitChangeRow" name="digitChangeMode" value="row"  /> -->
-		<!-- <label for="digitChangeRow">Row</label> -->
-		<!-- <input type="radio" id="digitChangeColumn" name="digitChangeMode" value="column"  /> -->
-		<!-- <label for="digitChangeColumn">Column</label> -->
-		<!-- <input type="radio" id="digitChangeCross" name="digitChangeMode" value="cross"  /> -->
-		<!-- <label for="digitChangeCross">RowAndColumn</label> -->
-		<!-- <input type="radio" id="digitChangeAll" name="digitChangeMode" value="all" /> -->
-		<!-- <label for="digitChangeAll">All</label> -->
-	<!-- </div> -->
-	<p>Which digits will change:</p>
-	<select class="selectpicker" id="digitChangeModeBootstrap">
-	  <option value = "single">Single</option>
-	  <option value = "row">Row</option>
-	  <option value = "column">Column</option>
-	  <option value="cross" >RowAndColumn</option>
-	  <option value = "all" >All</option>
-	</select>
+    <div class="section">
+      <div class="section-label">Shape</div>
+      <div class="chip-group" data-for="shapeModeBootstrap">
+        <button class="chip active" data-value="sevSeg">7-Seg</button>
+        <button class="chip" data-value="fifteenSeg">15-Seg</button>
+        <button class="chip" data-value="circle">Dots</button>
+      </div>
+    </div>
 
-	
-	
-	<!-- <div id="changeMode"> -->
-	<!-- <p>Type Of Change:</p> -->
-	<!-- <input type="radio" id="segmentChangeModeOn" name="segmentChangeMode" value="on" /> -->
-	<!-- <label for="segmentChangeModeOn">On</label> -->
-	<!-- <input type="radio" id="segmentChangeModeOff" name="segmentChangeMode" value="off" /> -->
-	<!-- <label for="segmentChangeModeOff">Off</label> -->
-	<!-- <input type="radio" id="segmentChangeModeToggle" name="segmentChangeMode" value="toggle" checked="checked"/> -->
-	<!-- <label for="segmentChangeModeToggle">Toggle</label> -->
-	<!-- </div> -->
-	<p>Type Of Change:</p>
-	<select class="selectpicker" id="segmentChangeModeBootstrap">
-	  <option value = "on">On</option>
-	  <option value = "off">Off</option>
-	  <option value = "toggle" selected>Toggle</option>
-	</select>
+    <div class="section">
+      <div class="section-label">Interact</div>
+      <div class="chip-group" data-for="segmentToggleTriggerBootstrap">
+        <button class="chip active" data-value="hover">Hover</button>
+        <button class="chip" data-value="click">Click</button>
+      </div>
+    </div>
 
-	
-	
-	
-	<div id="saveAsPng">
-		<input id="buttonSaveAsPng" type="button" value="saveAsPng" onclick="saveAsPng();" />
-	</div>
-	<div id="reset">
-		<!-- <input id="" type="button" value="" onclick=";" /> -->
-		<input id="allSegmentsOff" type="button" value="All Off" onclick="digit_changeAll_AllSegments(false);" />
-		<input id="allSegmentsOn" type="button" value="All On" onclick="digit_changeAll_AllSegments(true);" />
-		<input id="allDecPointsOff" type="button" value="All Dec Off" onclick="digit_changeAll_SingleSegment('P',false);" />
-		<input id="allDecPointsOn" type="button" value="All Dec On" onclick="digit_changeAll_SingleSegment('P',true);" />
-	</div>
-	
-	<div id="fieldSettings">
-		<input name="rows" type="text" maxlength="512" id="input_field_rows" />lines
-		<input name="colums" type="text" maxlength="512" id="input_field_columns" />digits per line
-		<input id="updateFieldSize" type="button" value="update" onclick="digits_redefineQuantity();" />
-	</div>
-		<div id="importExport">
-			<textarea cols="40" rows="5" name="imageAsTxt" id="textArea_imageAsText">
-				
-			</textarea>
-			<input id="stringToText" type="button" value="from text" onclick="importString();" />
-			<input id="textToImage" type="button" value="import" onclick="importImage();" />
-			<input id="imageToText" type="button" value="export" onclick="exportImage();" />
-			
-		</div>
-	
-	</div>
-	
+    <div class="section">
+      <div class="section-label">Affect</div>
+      <div class="chip-group" data-for="digitChangeModeBootstrap">
+        <button class="chip active" data-value="single">Single</button>
+        <button class="chip" data-value="row">Row</button>
+        <button class="chip" data-value="column">Col</button>
+        <button class="chip" data-value="cross">Cross</button>
+        <button class="chip" data-value="all">All</button>
+      </div>
+    </div>
 
-	<div id="drawing">
-	</div>
-	
-	<!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="/bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
-    <script src="/bootstrap-3.3.2-dist/js/docs.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="/bootstrap-3.3.2-dist/assets/js/ie10-viewport-bug-workaround.js"></script>
-	
+    <div class="section">
+      <div class="section-label">Paint</div>
+      <div class="chip-group" data-for="segmentChangeModeBootstrap">
+        <button class="chip active" data-value="toggle">Toggle</button>
+        <button class="chip" data-value="on">On</button>
+        <button class="chip" data-value="off">Off</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Theme</div>
+      <div class="chip-group">
+        <button class="chip theme-chip active" data-theme="amber" onclick="setTheme('amber')"><span class="swatch" style="background:#e8910a"></span>Amber</button>
+        <button class="chip theme-chip" data-theme="red" onclick="setTheme('red')"><span class="swatch" style="background:#cc1111"></span>Red</button>
+      </div>
+      <div class="color-row">
+        <label class="color-label"><input type="color" id="color-bg"  value="#0d0d0d"><span>BG</span></label>
+        <label class="color-label"><input type="color" id="color-on"  value="#e8910a"><span>On</span></label>
+        <label class="color-label"><input type="color" id="color-off" value="#1e1e1e"><span>Off</span></label>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-label">Reset</div>
+      <div class="chip-group">
+        <button class="chip" onclick="digit_changeAll_AllSegments(false)">All Off</button>
+        <button class="chip" onclick="digit_changeAll_AllSegments(true)">All On</button>
+        <button class="chip" onclick="digit_changeAll_SingleSegment('P',false)">· Off</button>
+        <button class="chip" onclick="digit_changeAll_SingleSegment('P',true)">· On</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Grid</div>
+      <div class="grid-row">
+        <input type="number" id="input_field_rows" value="5" min="1" max="50" title="Rows">
+        <span class="dim">×</span>
+        <input type="number" id="input_field_columns" value="24" min="1" max="50" title="Columns">
+        <button class="chip" onclick="digits_redefineQuantity()">Apply</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-label">Text / Data</div>
+      <textarea id="textArea_imageAsText" rows="4" placeholder="Type text or paste export data…"></textarea>
+      <div class="chip-group">
+        <button class="chip" onclick="importString()">Text →</button>
+        <button class="chip" onclick="exportImage()">Export</button>
+        <button class="chip" onclick="importImage()">Import</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <button id="buttonSaveAsPng" class="save-btn">↓ Save PNG</button>
+
+  </nav>
+
+  <main id="canvas-wrap">
+    <div id="drawing"></div>
+  </main>
+
+</div>
+
+<!-- Hidden selects — existing JS reads values from these -->
+<select id="shapeModeBootstrap" hidden>
+  <option value="sevSeg" selected>7-Seg</option>
+  <option value="fifteenSeg">15-Seg</option>
+  <option value="circle">Dots</option>
+</select>
+<select id="segmentToggleTriggerBootstrap" hidden>
+  <option value="hover" selected>Hover</option>
+  <option value="click">Click</option>
+</select>
+<select id="digitChangeModeBootstrap" hidden>
+  <option value="single" selected>Single</option>
+  <option value="row">Row</option>
+  <option value="column">Column</option>
+  <option value="cross">Cross</option>
+  <option value="all">All</option>
+</select>
+<select id="segmentChangeModeBootstrap" hidden>
+  <option value="toggle" selected>Toggle</option>
+  <option value="on">On</option>
+  <option value="off">Off</option>
+</select>
+
+<script>
+  var THEMES = {
+    amber: { fill: '#e8910a', empty: '#1e1e1e', stroke: '#0d0d0d', bg: '#0d0d0d' },
+    red:   { fill: '#cc1111', empty: '#e8e8e8', stroke: '#ffffff', bg: '#ffffff' }
+  };
+
+  function applyColors(fill, empty, bg) {
+    var stroke = bg;
+    FILL_COLOUR = fill; EMPTY_COLOUR = empty; STROKE_COLOUR = stroke; SVG_BACKGROUND = bg;
+    document.documentElement.style.setProperty('--seg-on',  fill);
+    document.documentElement.style.setProperty('--seg-off', empty);
+    document.documentElement.style.setProperty('--bg',      bg);
+    document.querySelectorAll('[data-rel]').forEach(function(el) {
+      el.setAttribute('fill',   el.getAttribute('data-rel') === 'true' ? fill : empty);
+      el.setAttribute('stroke', stroke);
+    });
+    var svg = document.getElementById(SVG_ID);
+    if (svg) svg.style.background = bg;
+    document.getElementById('canvas-wrap').style.background = bg;
+  }
+
+  function setTheme(name) {
+    var t = THEMES[name];
+    applyColors(t.fill, t.empty, t.bg);
+    document.getElementById('color-bg').value  = t.bg;
+    document.getElementById('color-on').value  = t.fill;
+    document.getElementById('color-off').value = t.empty;
+    document.body.setAttribute('data-theme', name);
+    document.querySelectorAll('.theme-chip').forEach(function(c) {
+      c.classList.toggle('active', c.getAttribute('data-theme') === name);
+    });
+  }
+
+  // Colour pickers — live update without changing active theme chip
+  document.getElementById('color-bg').addEventListener('input', function() {
+    var bg = this.value;
+    SVG_BACKGROUND = bg; STROKE_COLOUR = bg;
+    document.documentElement.style.setProperty('--bg', bg);
+    var svg = document.getElementById(SVG_ID);
+    if (svg) svg.style.background = bg;
+    document.getElementById('canvas-wrap').style.background = bg;
+    document.querySelectorAll('[data-rel]').forEach(function(el) { el.setAttribute('stroke', bg); });
+  });
+  document.getElementById('color-on').addEventListener('input', function() {
+    FILL_COLOUR = this.value;
+    document.documentElement.style.setProperty('--seg-on', this.value);
+    document.querySelectorAll('[data-rel="true"]').forEach(function(el) { el.setAttribute('fill', FILL_COLOUR); });
+  });
+  document.getElementById('color-off').addEventListener('input', function() {
+    EMPTY_COLOUR = this.value;
+    document.documentElement.style.setProperty('--seg-off', this.value);
+    document.querySelectorAll('[data-rel="false"]').forEach(function(el) { el.setAttribute('fill', EMPTY_COLOUR); });
+  });
+
+  // Wire visible chip groups to hidden selects
+  document.querySelectorAll('.chip-group[data-for]').forEach(function(group) {
+    var selectId = group.getAttribute('data-for');
+    var select = document.getElementById(selectId);
+    group.querySelectorAll('.chip').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        group.querySelectorAll('.chip').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        select.value = btn.getAttribute('data-value');
+        if (selectId === 'shapeModeBootstrap') {
+          shape_deleteAll();
+          NUMBER_OF_CHARACTERS_ON_LINE = parseInt(document.getElementById('input_field_columns').value) || 24;
+          NUMBER_OF_LINES = parseInt(document.getElementById('input_field_rows').value) || 5;
+          svgPopulate();
+        }
+      });
+    });
+  });
+</script>
+
 </body>
 </html>

@@ -32,11 +32,11 @@ var DECPOINT_DIAMETER = 6;
 
 
 
-var FILL_COLOUR= "red";
-var EMPTY_COLOUR= "#E6E6E6";
-var STROKE_COLOUR= "white";
-var STROKE_WIDTH = 0.1;
-var SVG_BACKGROUND = "white";
+var FILL_COLOUR= "#e8910a";
+var EMPTY_COLOUR= "#1e1e1e";
+var STROKE_COLOUR= "#0d0d0d";
+var STROKE_WIDTH = 0.5;
+var SVG_BACKGROUND = "#0d0d0d";
 var SCALE = 1;
 
 
