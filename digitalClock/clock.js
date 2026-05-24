@@ -31,14 +31,16 @@ var CLOCK_ROWS = 15;
 var GAP_X = 8;
 var GAP_Y = 8;
 
-// ── Clock hand state ───────────────────────────────────────────────────────
-var _handHour   = null;
-var _handMinute = null;
-var _handSecond = null;
-var _clockCx    = 0;
-var _clockCy    = 0;
-var _clockR     = 0;
+// ── Runtime state ──────────────────────────────────────────────────────────
+var _handHour     = null;
+var _handMinute   = null;
+var _handSecond   = null;
+var _clockCx      = 0;
+var _clockCy      = 0;
+var _clockR       = 0;
 var _tickInterval = null;
+var _litEnabled   = false;
+var _allSegments  = [];   // [{el, isCircle}] — real digit group shapes
 
 // ── Stubs for helpers defined in sevSegClickable.js ────────────────────────
 function shapeRowColSegmentFromId(id) {
@@ -48,13 +50,49 @@ function shapeRowColSegmentFromId(id) {
 }
 function defineDigitsAndChangeColorOfSelectedSegment() {}
 
+// ── Geometry helpers ───────────────────────────────────────────────────────
+function _segmentsIntersect(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) {
+  var d1x = p2x - p1x, d1y = p2y - p1y;
+  var d2x = p4x - p3x, d2y = p4y - p3y;
+  var cross = d1x * d2y - d1y * d2x;
+  if (Math.abs(cross) < 1e-10) return false;
+  var dx = p3x - p1x, dy = p3y - p1y;
+  var t = (dx * d2y - dy * d2x) / cross;
+  var u = (dx * d1y - dy * d1x) / cross;
+  return t >= 0 && t <= 1 && u >= 0 && u <= 1;
+}
+
+function _lineHitsPolygon(lx1, ly1, lx2, ly2, polygon) {
+  var pts = polygon.points;
+  var n   = pts.numberOfItems;
+  for (var i = 0; i < n; i++) {
+    var a = pts.getItem(i);
+    var b = pts.getItem((i + 1) % n);
+    if (_segmentsIntersect(lx1, ly1, lx2, ly2, a.x, a.y, b.x, b.y)) return true;
+  }
+  return false;
+}
+
+function _distPointToSeg(px, py, ax, ay, bx, by) {
+  var dx = bx - ax, dy = by - ay;
+  var lenSq = dx * dx + dy * dy;
+  var t = lenSq === 0 ? 0 : Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lenSq));
+  var nx = ax + t * dx - px, ny = ay + t * dy - py;
+  return Math.sqrt(nx * nx + ny * ny);
+}
+
+function _lineHitsCircle(lx1, ly1, lx2, ly2, circle) {
+  var cx = parseFloat(circle.getAttribute("cx"));
+  var cy = parseFloat(circle.getAttribute("cy"));
+  var r  = parseFloat(circle.getAttribute("r"));
+  return _distPointToSeg(cx, cy, lx1, ly1, lx2, ly2) <= r;
+}
+
 // ── Hand helpers ───────────────────────────────────────────────────────────
-function makeHand(svg, before, cx, cy, strokeWidth) {
+function _makeHand(svg, before, cx, cy, strokeWidth) {
   var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-  line.setAttribute("x1", cx);
-  line.setAttribute("y1", cy);
-  line.setAttribute("x2", cx);
-  line.setAttribute("y2", cy - 10);
+  line.setAttribute("x1", cx);  line.setAttribute("y1", cy);
+  line.setAttribute("x2", cx);  line.setAttribute("y2", cy);
   line.setAttribute("stroke", "#e03030");
   line.setAttribute("stroke-width", strokeWidth);
   line.setAttribute("stroke-linecap", "round");
@@ -62,7 +100,7 @@ function makeHand(svg, before, cx, cy, strokeWidth) {
   return line;
 }
 
-function setHand(hand, cx, cy, angleDeg, length) {
+function _setHand(hand, cx, cy, angleDeg, length) {
   var rad = (angleDeg - 90) * Math.PI / 180;
   hand.setAttribute("x1", cx);
   hand.setAttribute("y1", cy);
@@ -70,32 +108,55 @@ function setHand(hand, cx, cy, angleDeg, length) {
   hand.setAttribute("y2", cy + Math.sin(rad) * length);
 }
 
+// ── Tick ───────────────────────────────────────────────────────────────────
 function tickClock() {
-  var now  = new Date();
-  var h    = now.getHours() % 12;
-  var m    = now.getMinutes();
-  var s    = now.getSeconds();
-  var ms   = now.getMilliseconds();
+  var now = new Date();
+  var h   = now.getHours() % 12;
+  var m   = now.getMinutes();
+  var s   = now.getSeconds();
+  var ms  = now.getMilliseconds();
 
   var degH = (h + m / 60) * 30;
   var degM = (m + s / 60) * 6;
   var degS = (s + ms / 1000) * 6;
 
-  setHand(_handHour,   _clockCx, _clockCy, degH, _clockR * 0.50);
-  setHand(_handMinute, _clockCx, _clockCy, degM, _clockR * 0.75);
-  setHand(_handSecond, _clockCx, _clockCy, degS, _clockR * 0.85);
+  _setHand(_handHour,   _clockCx, _clockCy, degH, _clockR * 0.50);
+  _setHand(_handMinute, _clockCx, _clockCy, degM, _clockR * 0.75);
+  _setHand(_handSecond, _clockCx, _clockCy, degS, _clockR * 0.85);
+
+  if (!_litEnabled) return;
+
+  // Reset all segments to invisible
+  for (var i = 0; i < _allSegments.length; i++) {
+    _allSegments[i].el.setAttribute("fill", "none");
+  }
+
+  // Light up segments touched by any hand
+  var hands = [_handHour, _handMinute, _handSecond];
+  for (var hi = 0; hi < hands.length; hi++) {
+    var hand = hands[hi];
+    var hx1 = parseFloat(hand.getAttribute("x1"));
+    var hy1 = parseFloat(hand.getAttribute("y1"));
+    var hx2 = parseFloat(hand.getAttribute("x2"));
+    var hy2 = parseFloat(hand.getAttribute("y2"));
+
+    for (var i = 0; i < _allSegments.length; i++) {
+      if (_allSegments[i].el.getAttribute("fill") === "#e03030") continue; // already lit
+      var hit = _allSegments[i].isCircle
+        ? _lineHitsCircle(hx1, hy1, hx2, hy2, _allSegments[i].el)
+        : _lineHitsPolygon(hx1, hy1, hx2, hy2, _allSegments[i].el);
+      if (hit) _allSegments[i].el.setAttribute("fill", "#e03030");
+    }
+  }
 }
 
-// ── Main build function ────────────────────────────────────────────────────
+// ── Build ──────────────────────────────────────────────────────────────────
 function buildClock() {
-  // Stop existing tick
   if (_tickInterval) { clearInterval(_tickInterval); _tickInterval = null; }
 
-  // Remove existing SVG if rebuilding
   var existing = document.getElementById(SVG_ID);
   if (existing) existing.parentNode.removeChild(existing);
 
-  // Apply gap settings
   DIGIT_MARGIN_HORIZONTAL_LEFT  = Math.floor(GAP_X / 2);
   DIGIT_MARGIN_HORIZONTAL_RIGHT = Math.ceil(GAP_X / 2);
   DIGIT_MARGIN_VERTICAL_TOP     = Math.floor(GAP_Y / 2);
@@ -118,7 +179,7 @@ function buildClock() {
   svg.style.display    = "block";
   document.getElementById("drawing").appendChild(svg);
 
-  // Step 1: generate all digit groups (black fill — for mask only)
+  // Step 1: generate digit groups (black fill — for mask only)
   FILL_COLOUR = EMPTY_COLOUR = "#000000";
   for (var row = 0; row < CLOCK_ROWS; row++) {
     for (var col = 0; col < CLOCK_COLS; col++) {
@@ -126,7 +187,7 @@ function buildClock() {
     }
   }
 
-  // Step 2: build cutout mask
+  // Step 2: cutout mask
   var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
   var mask = document.createElementNS("http://www.w3.org/2000/svg", "mask");
   mask.setAttribute("id", "cutout");
@@ -155,10 +216,9 @@ function buildClock() {
   defs.appendChild(mask);
   svg.insertBefore(defs, svg.firstChild);
 
-  // Step 3: background layer — red fill rect + clock hands, all before grey plane
+  // Step 3: background layer
   var firstDigit = document.getElementById("0_0");
 
-  // Solid red background (toggled by checkbox)
   var redBg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   redBg.setAttribute("id",     "red-bg");
   redBg.setAttribute("width",  W);
@@ -168,12 +228,12 @@ function buildClock() {
   redBg.setAttribute("visibility", chk && chk.checked ? "visible" : "hidden");
   svg.insertBefore(redBg, firstDigit);
 
-  // Clock hands — inserted before grey plane, on top of red bg
-  _handHour   = makeHand(svg, firstDigit, _clockCx, _clockCy, 14);
-  _handMinute = makeHand(svg, firstDigit, _clockCx, _clockCy,  9);
-  _handSecond = makeHand(svg, firstDigit, _clockCx, _clockCy,  5);
+  // Hands — sit between red bg and grey plane
+  _handHour   = _makeHand(svg, firstDigit, _clockCx, _clockCy, 14);
+  _handMinute = _makeHand(svg, firstDigit, _clockCx, _clockCy,  9);
+  _handSecond = _makeHand(svg, firstDigit, _clockCx, _clockCy,  5);
 
-  // Step 4: grey masked plane on top of all background elements
+  // Step 4: grey masked plane
   var plane = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   plane.setAttribute("width",  W);
   plane.setAttribute("height", H);
@@ -181,22 +241,30 @@ function buildClock() {
   plane.setAttribute("mask",   "url(#cutout)");
   svg.insertBefore(plane, firstDigit);
 
-  // Step 5: hide real digit groups (served mask geometry only)
+  // Step 5: hide real digit groups + collect segment refs for lit-up feature
+  // The digit groups sit ABOVE the grey plane in z-order — perfect for lit segments
+  _allSegments = [];
   for (var row = 0; row < CLOCK_ROWS; row++) {
     for (var col = 0; col < CLOCK_COLS; col++) {
       var g = document.getElementById(row + "_" + col);
       if (!g) continue;
-      var segs = g.querySelectorAll("polygon, circle");
-      for (var k = 0; k < segs.length; k++) {
-        segs[k].setAttribute("fill",   "none");
-        segs[k].setAttribute("stroke", "none");
+      var polys   = g.querySelectorAll("polygon");
+      var circles = g.querySelectorAll("circle");
+      for (var i = 0; i < polys.length;   i++) {
+        polys[i].setAttribute("fill", "none");
+        polys[i].setAttribute("stroke", "none");
+        _allSegments.push({ el: polys[i], isCircle: false });
+      }
+      for (var i = 0; i < circles.length; i++) {
+        circles[i].setAttribute("fill", "none");
+        circles[i].setAttribute("stroke", "none");
+        _allSegments.push({ el: circles[i], isCircle: true });
       }
     }
   }
 
-  // Start ticking
   tickClock();
-  _tickInterval = setInterval(tickClock, 1000);
+  _tickInterval = setInterval(tickClock, 50);
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────

@@ -39,6 +39,10 @@
       <label for="chk-red-bg">Full red background</label>
     </div>
     <div class="ctrl">
+      <input type="checkbox" id="chk-light-up">
+      <label for="chk-light-up">Segments light up on touch</label>
+    </div>
+    <div class="ctrl">
       <label for="slider-gapx">Gap X</label>
       <input type="range" id="slider-gapx" min="0" max="60" value="8">
       <span class="val" id="val-gapx">8</span>
@@ -74,6 +78,15 @@
       DECPOINT_SPACE = dp;
       buildClock();
     }
+
+    document.getElementById("chk-light-up").addEventListener("change", function () {
+      _litEnabled = this.checked;
+      if (!this.checked) {
+        for (var i = 0; i < _allSegments.length; i++) {
+          _allSegments[i].el.setAttribute("fill", "none");
+        }
+      }
+    });
 
     document.getElementById("slider-gapx").addEventListener("input", onSliderChange);
     document.getElementById("slider-gapy").addEventListener("input", onSliderChange);
