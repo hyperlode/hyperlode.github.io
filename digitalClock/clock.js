@@ -124,6 +124,12 @@ function tickClock() {
   _setHand(_handMinute, _clockCx, _clockCy, degM, _clockR * 0.75);
   _setHand(_handSecond, _clockCx, _clockCy, degS, _clockR * 0.85);
 
+  // Hide hand lines when lit mode is on — only lit segments should be visible
+  var handStroke = _litEnabled ? "none" : "#e03030";
+  _handHour.setAttribute("stroke",   handStroke);
+  _handMinute.setAttribute("stroke", handStroke);
+  _handSecond.setAttribute("stroke", handStroke);
+
   if (!_litEnabled) return;
 
   // Reset all segments to invisible
