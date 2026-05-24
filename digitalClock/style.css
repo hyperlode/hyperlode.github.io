@@ -1,0 +1,244 @@
+:root {
+  --bg:           #0d0d0d;
+  --sidebar-bg:   #131313;
+  --surface:      #1e1e1e;
+  --surface-hover:#252525;
+  --border:       #2b2b2b;
+  --accent:       #e8910a;
+  --accent-bg:    rgba(232,145,10,0.13);
+  --text:         #c8c8c8;
+  --text-dim:     #4a4a4a;
+  --radius:       5px;
+  --sidebar-w:    200px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 12px;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+}
+
+#app {
+  display: flex;
+  height: 100vh;
+}
+
+/* ── Sidebar ── */
+#sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 12px 20px;
+  overflow-y: auto;
+}
+
+#logo {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.section-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0 -12px;
+  flex-shrink: 0;
+}
+
+/* ── Chip buttons ── */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.chip {
+  padding: 4px 9px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  line-height: 1.5;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+  user-select: none;
+}
+
+.chip:hover {
+  background: var(--surface-hover);
+  border-color: #3a3a3a;
+}
+
+.chip.active {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Grid row ── */
+.grid-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.grid-row input[type="number"] {
+  width: 42px;
+  padding: 4px 5px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 11px;
+  font-family: inherit;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+.grid-row input[type="number"]::-webkit-inner-spin-button,
+.grid-row input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+.grid-row input[type="number"]:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.dim { color: var(--text-dim); }
+
+/* ── Textarea ── */
+textarea#textArea_imageAsText {
+  width: 100%;
+  padding: 6px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'SF Mono', Consolas, Monaco, monospace;
+  font-size: 10px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 64px;
+}
+textarea#textArea_imageAsText::placeholder { color: var(--text-dim); }
+textarea#textArea_imageAsText:focus { outline: none; border-color: var(--accent); }
+
+/* ── Save button ── */
+.save-btn {
+  margin-top: auto;
+  padding: 8px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  color: #000;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: opacity 0.15s;
+}
+.save-btn:hover { opacity: 0.82; }
+
+/* ── Canvas ── */
+#canvas-wrap {
+  flex: 1;
+  overflow: auto;
+  background: var(--bg);
+  padding: 24px;
+}
+
+/* ── Scrollbars ── */
+#sidebar::-webkit-scrollbar,
+#canvas-wrap::-webkit-scrollbar { width: 5px; height: 5px; }
+#sidebar::-webkit-scrollbar-track,
+#canvas-wrap::-webkit-scrollbar-track { background: transparent; }
+#sidebar::-webkit-scrollbar-thumb,
+#canvas-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── Theme: Red ── */
+body[data-theme="red"] {
+  --accent:    #cc1111;
+  --accent-bg: rgba(204,17,17,0.13);
+}
+body[data-theme="red"] #canvas-wrap { background: #ffffff; }
+body[data-theme="red"] .save-btn { background: #cc1111; }
+
+/* ── Swatch dot in theme chips ── */
+/* ── Colour pickers ── */
+.color-row {
+  display: flex;
+  gap: 8px;
+}
+.color-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+}
+.color-label span {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+}
+input[type="color"] {
+  -webkit-appearance: none;
+  width: 36px;
+  height: 26px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+}
+input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+input[type="color"]::-webkit-color-swatch { border: none; border-radius: 3px; }
+input[type="color"]:hover { border-color: #3a3a3a; }
+
+/* ── Swatch dot in theme chips ── */
+.swatch {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 5px;
+  flex-shrink: 0;
+}
+
+/* ── Segment colours — driven by CSS vars so themes apply instantly ── */
+:root {
+  --seg-on:  #e8910a;
+  --seg-off: #1e1e1e;
+}
+circle[data-rel="true"],
+polygon[data-rel="true"]  { fill: var(--seg-on); }
+circle[data-rel="false"],
+polygon[data-rel="false"] { fill: var(--seg-off); }

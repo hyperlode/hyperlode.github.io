@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Digital Clock</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #e8e8e8;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 16px 20px;
+      font-family: sans-serif;
+      font-size: 13px;
+    }
+    #controls {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .ctrl { display: flex; align-items: center; gap: 6px; }
+    .ctrl label { white-space: nowrap; }
+    .ctrl input[type=range] { width: 100px; }
+    .ctrl .val { width: 28px; text-align: right; color: #555; }
+  </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+  <script src="svgOperations.js"></script>
+  <script src="sevSeg.js"></script>
+  <script src="clock.js"></script>
+</head>
+<body>
+  <div id="controls">
+    <div class="ctrl">
+      <input type="checkbox" id="chk-red-bg">
+      <label for="chk-red-bg">Full red background</label>
+    </div>
+    <div class="ctrl">
+      <label for="slider-gapx">Gap X</label>
+      <input type="range" id="slider-gapx" min="0" max="60" value="15">
+      <span class="val" id="val-gapx">15</span>
+    </div>
+    <div class="ctrl">
+      <label for="slider-gapy">Gap Y</label>
+      <input type="range" id="slider-gapy" min="0" max="60" value="20">
+      <span class="val" id="val-gapy">20</span>
+    </div>
+  </div>
+  <div id="drawing"></div>
+
+  <script>
+    document.getElementById("chk-red-bg").addEventListener("change", function () {
+      var el = document.getElementById("red-bg");
+      if (el) el.setAttribute("visibility", this.checked ? "visible" : "hidden");
+    });
+
+    function onGapChange() {
+      var gx = parseInt(document.getElementById("slider-gapx").value);
+      var gy = parseInt(document.getElementById("slider-gapy").value);
+      document.getElementById("val-gapx").textContent = gx;
+      document.getElementById("val-gapy").textContent = gy;
+      GAP_X = gx;
+      GAP_Y = gy;
+      buildClock();
+    }
+
+    document.getElementById("slider-gapx").addEventListener("input", onGapChange);
+    document.getElementById("slider-gapy").addEventListener("input", onGapChange);
+  </script>
+</body>
+</html>

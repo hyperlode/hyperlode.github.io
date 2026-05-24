@@ -3,7 +3,14 @@
     "allow": [
       "Bash(git:*)",
       "Bash(wc -l \"/c/Data/GIT/hyperlode.github.io\"/Set-game-trainer/src/*.js)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(cp -r C:/Data/GIT/hyperlode.github.io/7segment/domFunctions.js C:/Data/GIT/hyperlode.github.io/digitalClock/domFunctions.js)",
+      "Bash(cp C:/Data/GIT/hyperlode.github.io/7segment/saveSvgAsPng.js C:/Data/GIT/hyperlode.github.io/digitalClock/saveSvgAsPng.js)",
+      "Bash(cp C:/Data/GIT/hyperlode.github.io/7segment/svgOperations.js C:/Data/GIT/hyperlode.github.io/digitalClock/svgOperations.js)",
+      "Bash(cp C:/Data/GIT/hyperlode.github.io/7segment/sevSeg.js C:/Data/GIT/hyperlode.github.io/digitalClock/sevSeg.js)",
+      "Bash(cp C:/Data/GIT/hyperlode.github.io/7segment/fifteenSeg.js C:/Data/GIT/hyperlode.github.io/digitalClock/fifteenSeg.js)",
+      "Bash(python -m http.server 8000)",
+      "Bash(findstr \":8000\")"
     ]
   }
 }
