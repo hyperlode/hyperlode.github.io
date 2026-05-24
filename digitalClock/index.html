@@ -40,13 +40,18 @@
     </div>
     <div class="ctrl">
       <label for="slider-gapx">Gap X</label>
-      <input type="range" id="slider-gapx" min="0" max="60" value="15">
-      <span class="val" id="val-gapx">15</span>
+      <input type="range" id="slider-gapx" min="0" max="60" value="8">
+      <span class="val" id="val-gapx">8</span>
     </div>
     <div class="ctrl">
       <label for="slider-gapy">Gap Y</label>
-      <input type="range" id="slider-gapy" min="0" max="60" value="20">
-      <span class="val" id="val-gapy">20</span>
+      <input type="range" id="slider-gapy" min="0" max="60" value="8">
+      <span class="val" id="val-gapy">8</span>
+    </div>
+    <div class="ctrl">
+      <label for="slider-decpoint">Dec point X</label>
+      <input type="range" id="slider-decpoint" min="-20" max="40" value="8">
+      <span class="val" id="val-decpoint">8</span>
     </div>
   </div>
   <div id="drawing"></div>
@@ -57,18 +62,22 @@
       if (el) el.setAttribute("visibility", this.checked ? "visible" : "hidden");
     });
 
-    function onGapChange() {
+    function onSliderChange() {
       var gx = parseInt(document.getElementById("slider-gapx").value);
       var gy = parseInt(document.getElementById("slider-gapy").value);
+      var dp = parseInt(document.getElementById("slider-decpoint").value);
       document.getElementById("val-gapx").textContent = gx;
       document.getElementById("val-gapy").textContent = gy;
+      document.getElementById("val-decpoint").textContent = dp;
       GAP_X = gx;
       GAP_Y = gy;
+      DECPOINT_SPACE = dp;
       buildClock();
     }
 
-    document.getElementById("slider-gapx").addEventListener("input", onGapChange);
-    document.getElementById("slider-gapy").addEventListener("input", onGapChange);
+    document.getElementById("slider-gapx").addEventListener("input", onSliderChange);
+    document.getElementById("slider-gapy").addEventListener("input", onSliderChange);
+    document.getElementById("slider-decpoint").addEventListener("input", onSliderChange);
   </script>
 </body>
 </html>

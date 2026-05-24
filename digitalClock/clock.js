@@ -29,8 +29,8 @@ var STROKE_WIDTH  = 0;
 // ── Config ─────────────────────────────────────────────────────────────────
 var CLOCK_COLS = 15;
 var CLOCK_ROWS = 15;
-var GAP_X = 15;   // total horizontal space between digits
-var GAP_Y = 20;   // total vertical space between digits
+var GAP_X = 8;    // total horizontal space between digits
+var GAP_Y = 8;    // total vertical space between digits
 
 // ── Stubs for helpers defined in sevSegClickable.js ────────────────────────
 function shapeRowColSegmentFromId(id) {
@@ -41,16 +41,6 @@ function shapeRowColSegmentFromId(id) {
 function defineDigitsAndChangeColorOfSelectedSegment() {}
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-function makeLine(x1, y1, x2, y2, color, width) {
-  var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-  line.setAttribute("x1", x1);  line.setAttribute("y1", y1);
-  line.setAttribute("x2", x2);  line.setAttribute("y2", y2);
-  line.setAttribute("stroke", color);
-  line.setAttribute("stroke-width", width);
-  line.setAttribute("stroke-linecap", "round");
-  return line;
-}
-
 // ── Main build function ────────────────────────────────────────────────────
 function buildClock() {
   // Remove existing SVG if rebuilding
@@ -126,11 +116,6 @@ function buildClock() {
   redBg.setAttribute("visibility", chk && chk.checked ? "visible" : "hidden");
   svg.insertBefore(redBg, firstDigit);
 
-  // Red diagonal lines
-  var step = 30;
-  for (var i = -H; i < W + H; i += step) {
-    svg.insertBefore(makeLine(i, 0, i + H, H, "#e03030", 1.5), firstDigit);
-  }
 
   // Step 4: grey plane with cutout mask on top of lines
   var plane = document.createElementNS("http://www.w3.org/2000/svg", "rect");
