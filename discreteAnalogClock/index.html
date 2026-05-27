@@ -66,12 +66,12 @@
     </div>
     <div class="ctrl">
       <label for="slider-hour-len">Length %</label>
-      <input type="range" id="slider-hour-len" min="0" max="100" value="50">
+      <input type="range" id="slider-hour-len" min="0" max="150" value="50">
       <span class="val" id="val-hour-len">50</span>
     </div>
     <div class="ctrl">
       <label for="slider-hour-off">Offset %</label>
-      <input type="range" id="slider-hour-off" min="-50" max="50" value="0">
+      <input type="range" id="slider-hour-off" min="-150" max="150" value="0">
       <span class="val" id="val-hour-off">0</span>
     </div>
 
@@ -83,12 +83,12 @@
     </div>
     <div class="ctrl">
       <label for="slider-min-len">Length %</label>
-      <input type="range" id="slider-min-len" min="0" max="100" value="75">
+      <input type="range" id="slider-min-len" min="0" max="150" value="75">
       <span class="val" id="val-min-len">75</span>
     </div>
     <div class="ctrl">
       <label for="slider-min-off">Offset %</label>
-      <input type="range" id="slider-min-off" min="-50" max="50" value="0">
+      <input type="range" id="slider-min-off" min="-150" max="150" value="0">
       <span class="val" id="val-min-off">0</span>
     </div>
 
@@ -104,12 +104,12 @@
     </div>
     <div class="ctrl">
       <label for="slider-sec-len">Length %</label>
-      <input type="range" id="slider-sec-len" min="0" max="100" value="85">
+      <input type="range" id="slider-sec-len" min="0" max="150" value="85">
       <span class="val" id="val-sec-len">85</span>
     </div>
     <div class="ctrl">
       <label for="slider-sec-off">Offset %</label>
-      <input type="range" id="slider-sec-off" min="-50" max="50" value="0">
+      <input type="range" id="slider-sec-off" min="-150" max="150" value="0">
       <span class="val" id="val-sec-off">0</span>
     </div>
 
@@ -145,6 +145,22 @@
       <label for="slider-decpoint">Dec pt X</label>
       <input type="range" id="slider-decpoint" min="-20" max="40" value="8">
       <span class="val" id="val-decpoint">8</span>
+    </div>
+
+    <div class="section-title">Time</div>
+    <div class="ctrl">
+      <input type="checkbox" id="chk-manual-time">
+      <label for="chk-manual-time" style="width:auto">Manual time</label>
+    </div>
+    <div class="ctrl">
+      <label for="slider-manual-h">Hour</label>
+      <input type="range" id="slider-manual-h" min="0" max="11" value="0" step="1" disabled>
+      <span class="val" id="val-manual-h">0</span>
+    </div>
+    <div class="ctrl">
+      <label for="slider-manual-m">Minute</label>
+      <input type="range" id="slider-manual-m" min="0" max="59" value="0" step="1" disabled>
+      <span class="val" id="val-manual-m">0</span>
     </div>
 
     <div class="section-title">Segments</div>
@@ -197,6 +213,25 @@
 
     document.getElementById("chk-seconds").addEventListener("change", function () {
       _secondEnabled = this.checked;
+    });
+
+    document.getElementById("chk-manual-time").addEventListener("change", function () {
+      _manualTime = this.checked;
+      document.getElementById("slider-manual-h").disabled = !this.checked;
+      document.getElementById("slider-manual-m").disabled = !this.checked;
+      if (this.checked) tickClock();
+    });
+
+    document.getElementById("slider-manual-h").addEventListener("input", function () {
+      _manualHour = parseInt(this.value);
+      document.getElementById("val-manual-h").textContent = this.value;
+      if (_manualTime) tickClock();
+    });
+
+    document.getElementById("slider-manual-m").addEventListener("input", function () {
+      _manualMinute = parseInt(this.value);
+      document.getElementById("val-manual-m").textContent = this.value;
+      if (_manualTime) tickClock();
     });
 
     // Thickness

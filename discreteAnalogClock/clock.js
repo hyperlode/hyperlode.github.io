@@ -46,6 +46,9 @@ var _pinnedSegments     = {};   // segmentId -> true
 var _clickToggleEnabled = false;
 var _hoverOnEnabled  = false;
 var _hoverOffEnabled = false;
+var _manualTime    = false;
+var _manualHour    = 0;   // 0–11
+var _manualMinute  = 0;   // 0–59
 var _offsetX = 0;
 var _offsetY = 0;
 
@@ -137,11 +140,14 @@ function _setHand(hand, cx, cy, angleDeg, startR, endR) {
 
 // ── Tick ───────────────────────────────────────────────────────────────────
 function tickClock() {
-  var now = new Date();
-  var h   = now.getHours() % 12;
-  var m   = now.getMinutes();
-  var s   = now.getSeconds();
-  var ms  = now.getMilliseconds();
+  var h, m, s, ms;
+  if (_manualTime) {
+    h = _manualHour; m = _manualMinute; s = 0; ms = 0;
+  } else {
+    var now = new Date();
+    h = now.getHours() % 12; m = now.getMinutes();
+    s = now.getSeconds();    ms = now.getMilliseconds();
+  }
 
   var degH = (h + m / 60) * 30;
   var degM = (m + s / 60) * 6;
