@@ -234,7 +234,7 @@ function buildClock() {
   svg.setAttribute("width",  W);
   svg.setAttribute("height", H);
   svg.style.background = _bgColor;
-  document.body.style.background = _bgColor;
+  document.body.style.background = _planeColor;
   svg.style.display    = "block";
   document.getElementById("drawing").appendChild(svg);
 
@@ -371,13 +371,13 @@ function applyBgColor(c) {
   _bgColor = c;
   var svg = document.getElementById(SVG_ID);
   if (svg) svg.style.background = c;
-  document.body.style.background = c;
 }
 
 function applyPlaneColor(c) {
   _planeColor = c;
   var plane = document.getElementById("clock-plane");
   if (plane) plane.setAttribute("fill", c);
+  document.body.style.background = c;
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────
