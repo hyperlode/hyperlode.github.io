@@ -39,6 +39,12 @@
     #settings-json { width: 100%; height: 80px; font-size: 10px; font-family: monospace; resize: vertical; box-sizing: border-box; }
     .btn-row { display: flex; gap: 6px; }
     .btn-row button { flex: 1; font-size: 11px; padding: 3px 0; cursor: pointer; }
+    .color-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+    .color-row label { white-space: nowrap; width: 62px; flex-shrink: 0; color: #444; }
+    input[type=color] { width: 36px; height: 22px; padding: 1px 2px; border: 1px solid #bbb; border-radius: 3px; cursor: pointer; background: none; }
+    .swatches { display: flex; flex-wrap: wrap; gap: 4px; padding-left: 68px; margin-bottom: 6px; }
+    .swatch { width: 16px; height: 16px; border-radius: 3px; cursor: pointer; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.18); }
+    .swatch.active { box-shadow: inset 0 0 0 1px rgba(0,0,0,0.18), 0 0 0 2px #444; }
   </style>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
   <script src="svgOperations.js"></script>
@@ -50,12 +56,42 @@
 
     <div class="section-title">Display</div>
     <div class="ctrl">
-      <input type="checkbox" id="chk-red-bg">
-      <label for="chk-red-bg" style="width:auto">Full red background</label>
-    </div>
-    <div class="ctrl">
       <input type="checkbox" id="chk-light-up">
       <label for="chk-light-up" style="width:auto">Segments light up</label>
+    </div>
+    <div class="color-row">
+      <label for="color-bg">Background</label>
+      <input type="color" id="color-bg" value="#e8e8e8">
+    </div>
+    <div class="swatches" id="swatches-bg">
+      <div class="swatch active" data-color="#e8e8e8" style="background:#e8e8e8" title="Light grey"></div>
+      <div class="swatch"        data-color="#ffffff" style="background:#ffffff"  title="White"></div>
+      <div class="swatch"        data-color="#b0b8c0" style="background:#b0b8c0" title="Cool grey"></div>
+      <div class="swatch"        data-color="#222222" style="background:#222222" title="Near black"></div>
+      <div class="swatch"        data-color="#000000" style="background:#000000" title="Black"></div>
+    </div>
+    <div class="color-row">
+      <label for="color-plane">Face</label>
+      <input type="color" id="color-plane" value="#e8e8e8">
+    </div>
+    <div class="swatches" id="swatches-plane">
+      <div class="swatch active" data-color="#e8e8e8" style="background:#e8e8e8" title="Light grey"></div>
+      <div class="swatch"        data-color="#ffffff" style="background:#ffffff"  title="White"></div>
+      <div class="swatch"        data-color="#cccccc" style="background:#cccccc" title="Medium grey"></div>
+      <div class="swatch"        data-color="#222222" style="background:#222222" title="Near black"></div>
+      <div class="swatch"        data-color="#000000" style="background:#000000" title="Black"></div>
+    </div>
+    <div class="color-row">
+      <label for="color-seg">Segments</label>
+      <input type="color" id="color-seg" value="#e03030">
+    </div>
+    <div class="swatches" id="swatches-seg">
+      <div class="swatch active" data-color="#e03030" style="background:#e03030" title="Red"></div>
+      <div class="swatch"        data-color="#4488ff" style="background:#4488ff" title="Blue"></div>
+      <div class="swatch"        data-color="#30c060" style="background:#30c060" title="Green"></div>
+      <div class="swatch"        data-color="#f07020" style="background:#f07020" title="Orange"></div>
+      <div class="swatch"        data-color="#d8cc00" style="background:#d8cc00" title="Yellow"></div>
+      <div class="swatch"        data-color="#ffffff" style="background:#ffffff"  title="White"></div>
     </div>
 
     <div class="section-title">Hour hand</div>
@@ -132,6 +168,16 @@
 
     <div class="section-title">Grid</div>
     <div class="ctrl">
+      <label for="slider-cols">Columns</label>
+      <input type="range" id="slider-cols" min="0" max="50" value="15">
+      <span class="val" id="val-cols">15</span>
+    </div>
+    <div class="ctrl">
+      <label for="slider-rows">Rows</label>
+      <input type="range" id="slider-rows" min="0" max="50" value="15">
+      <span class="val" id="val-rows">15</span>
+    </div>
+    <div class="ctrl">
       <label for="slider-gapx">Gap X</label>
       <input type="range" id="slider-gapx" min="0" max="60" value="8">
       <span class="val" id="val-gapx">8</span>
@@ -199,11 +245,6 @@
       });
     }
 
-    document.getElementById("chk-red-bg").addEventListener("change", function () {
-      var el = document.getElementById("red-bg");
-      if (el) el.setAttribute("visibility", this.checked ? "visible" : "hidden");
-    });
-
     document.getElementById("chk-light-up").addEventListener("change", function () {
       _litEnabled = this.checked;
       if (!this.checked)
@@ -263,6 +304,10 @@
 
     // Digits / Grid — require full rebuild
     function onGridChange() {
+      CLOCK_COLS     = parseInt(document.getElementById("slider-cols").value);
+      CLOCK_ROWS     = parseInt(document.getElementById("slider-rows").value);
+      document.getElementById("val-cols").textContent = CLOCK_COLS;
+      document.getElementById("val-rows").textContent = CLOCK_ROWS;
       DIGIT_SKEW = parseInt(document.getElementById("slider-skew").value);
       document.getElementById("val-skew").textContent = DIGIT_SKEW;
       GAP_X          = parseInt(document.getElementById("slider-gapx").value);
@@ -273,6 +318,8 @@
       document.getElementById("val-decpoint").textContent = DECPOINT_SPACE;
       buildClock();
     }
+    document.getElementById("slider-cols").addEventListener("input", onGridChange);
+    document.getElementById("slider-rows").addEventListener("input", onGridChange);
     document.getElementById("slider-skew").addEventListener("input", onGridChange);
     document.getElementById("slider-gapx").addEventListener("input", onGridChange);
     document.getElementById("slider-gapy").addEventListener("input", onGridChange);
@@ -288,8 +335,32 @@
       var cursor = active ? "pointer" : "default";
       for (var i = 0; i < _allSegments.length; i++) _allSegments[i].el.style.cursor = cursor;
       var plane = document.getElementById("clock-plane");
-      if (plane) plane.setAttribute("fill", active ? "#c8c8c8" : "#e8e8e8");
+      if (plane) plane.setAttribute("fill", _planeColor);
     }
+
+    function setupColorGroup(swatchesId, inputId, onChange) {
+      var container = document.getElementById(swatchesId);
+      var input     = document.getElementById(inputId);
+      var swatches  = container.querySelectorAll(".swatch");
+
+      function select(color, fromSwatch) {
+        input.value = color;
+        for (var i = 0; i < swatches.length; i++)
+          swatches[i].classList.toggle("active", fromSwatch && swatches[i].dataset.color === color);
+        onChange(color);
+      }
+
+      for (var i = 0; i < swatches.length; i++) {
+        (function(sw) {
+          sw.addEventListener("click", function() { select(sw.dataset.color, true); });
+        })(swatches[i]);
+      }
+      input.addEventListener("input", function() { select(input.value, false); });
+    }
+
+    setupColorGroup("swatches-bg",    "color-bg",    function(c) { applyBgColor(c); });
+    setupColorGroup("swatches-plane", "color-plane", function(c) { applyPlaneColor(c); });
+    setupColorGroup("swatches-seg",   "color-seg",   function(c) { _segmentColor = c; });
 
     document.getElementById("chk-hover-on").addEventListener("change", function() {
       _hoverOnEnabled = this.checked;
@@ -308,9 +379,11 @@
     var _sliderIds   = ["slider-hour-w","slider-hour-len","slider-hour-off",
                         "slider-min-w","slider-min-len","slider-min-off",
                         "slider-sec-w","slider-sec-len","slider-sec-off",
-                        "slider-skew","slider-gapx","slider-gapy","slider-decpoint",
+                        "slider-skew","slider-cols","slider-rows",
+                        "slider-gapx","slider-gapy","slider-decpoint",
                         "slider-offset-x","slider-offset-y"];
-    var _checkboxIds = ["chk-red-bg","chk-light-up","chk-seconds"];
+    var _checkboxIds = ["chk-light-up","chk-seconds"];
+    var _colorIds    = ["color-bg","color-plane","color-seg"];
 
     function saveSettings() {
       var s = {};
@@ -319,6 +392,7 @@
       s["chk-click-toggle"] = document.getElementById("chk-click-toggle").checked;
       s["chk-hover-on"]  = document.getElementById("chk-hover-on").checked;
       s["chk-hover-off"] = document.getElementById("chk-hover-off").checked;
+      _colorIds.forEach(function(id) { s[id] = document.getElementById(id).value; });
       s.pinnedSegments = Object.keys(_pinnedSegments);
       document.getElementById("settings-json").value = JSON.stringify(s, null, 2);
     }
@@ -355,6 +429,13 @@
         hfEl.checked = s["chk-hover-off"];
         hfEl.dispatchEvent(new Event("change"));
       }
+      // Restore colors
+      _colorIds.forEach(function(id) {
+        if (s[id] === undefined) return;
+        var el = document.getElementById(id);
+        el.value = s[id];
+        el.dispatchEvent(new Event("input"));
+      });
       // Restore pinned segments
       if (Array.isArray(s.pinnedSegments)) {
         _pinnedSegments = {};

@@ -31,6 +31,11 @@ var CLOCK_ROWS = 15;
 var GAP_X = 8;
 var GAP_Y = 8;
 
+// ── Colours ────────────────────────────────────────────────────────────────
+var _bgColor      = "#e8e8e8";  // SVG + page background (shows through "off" segments)
+var _planeColor   = "#e8e8e8";  // face plane between / around digit cells
+var _segmentColor = "#e03030";  // lit segments and clock hands
+
 // ── Runtime state ──────────────────────────────────────────────────────────
 var _handHour      = null;
 var _handMinute    = null;
@@ -123,7 +128,7 @@ function _makeHand(svg, before, cx, cy, strokeWidth) {
   var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
   line.setAttribute("x1", cx);  line.setAttribute("y1", cy);
   line.setAttribute("x2", cx);  line.setAttribute("y2", cy);
-  line.setAttribute("stroke", "#e03030");
+  line.setAttribute("stroke", _segmentColor);
   line.setAttribute("stroke-width", strokeWidth);
   line.setAttribute("stroke-linecap", "round");
   svg.insertBefore(line, before);
@@ -158,10 +163,10 @@ function tickClock() {
   _setHand(_handSecond, _clockCx, _clockCy, degS, _clockR * _secondOff / 100, _clockR * _secondLen / 100);
 
   // Hide hand lines when lit mode is on — only lit segments should be visible
-  var handStroke = _litEnabled ? "none" : "#e03030";
+  var handStroke = _litEnabled ? "none" : _segmentColor;
   _handHour.setAttribute("stroke",   handStroke);
   _handMinute.setAttribute("stroke", handStroke);
-  _handSecond.setAttribute("stroke", _litEnabled ? "none" : (_secondEnabled ? "#e03030" : "none"));
+  _handSecond.setAttribute("stroke", _litEnabled ? "none" : (_secondEnabled ? _segmentColor : "none"));
 
   // Reset all segments to invisible
   for (var i = 0; i < _allSegments.length; i++) {
@@ -187,11 +192,11 @@ function tickClock() {
       var hy2  = parseFloat(hand.getAttribute("y2"));
 
       for (var i = 0; i < _allSegments.length; i++) {
-        if (_allSegments[i].el.getAttribute("fill") === "#e03030") continue;
+        if (_allSegments[i].el.getAttribute("fill") === _segmentColor) continue;
         var hit = _allSegments[i].isCircle
           ? _lineHitsCircle(hx1, hy1, hx2, hy2, _allSegments[i].el, tol)
           : _lineHitsPolygon(hx1, hy1, hx2, hy2, _allSegments[i].el, tol);
-        if (hit) _allSegments[i].el.setAttribute("fill", "#e03030");
+        if (hit) _allSegments[i].el.setAttribute("fill", _segmentColor);
       }
     }
   }
@@ -199,7 +204,7 @@ function tickClock() {
   // Apply manually pinned segments (always, on top of everything)
   for (var pid in _pinnedSegments) {
     var pel = document.getElementById(pid);
-    if (pel) pel.setAttribute("fill", "#e03030");
+    if (pel) pel.setAttribute("fill", _segmentColor);
   }
 }
 
@@ -228,7 +233,8 @@ function buildClock() {
   svg.setAttribute("id", SVG_ID);
   svg.setAttribute("width",  W);
   svg.setAttribute("height", H);
-  svg.style.background = "#e8e8e8";
+  svg.style.background = _bgColor;
+  document.body.style.background = _bgColor;
   svg.style.display    = "block";
   document.getElementById("drawing").appendChild(svg);
 
@@ -272,19 +278,10 @@ function buildClock() {
   defs.appendChild(mask);
   svg.insertBefore(defs, svg.firstChild);
 
-  // Step 3: background layer
+  // Step 3: hands + plane
   var firstDigit = document.getElementById("0_0");
 
-  var redBg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-  redBg.setAttribute("id",     "red-bg");
-  redBg.setAttribute("width",  W);
-  redBg.setAttribute("height", H);
-  redBg.setAttribute("fill",   "#e03030");
-  var chk = document.getElementById("chk-red-bg");
-  redBg.setAttribute("visibility", chk && chk.checked ? "visible" : "hidden");
-  svg.insertBefore(redBg, firstDigit);
-
-  // Hands — sit between red bg and grey plane
+  // Hands — sit between defs and grey plane
   _handHour   = _makeHand(svg, firstDigit, _clockCx, _clockCy, 14);
   _handMinute = _makeHand(svg, firstDigit, _clockCx, _clockCy,  9);
   _handSecond = _makeHand(svg, firstDigit, _clockCx, _clockCy,  5);
@@ -294,7 +291,7 @@ function buildClock() {
   plane.setAttribute("id",     "clock-plane");
   plane.setAttribute("width",  W);
   plane.setAttribute("height", H);
-  plane.setAttribute("fill",   _clickToggleEnabled ? "#c8c8c8" : "#e8e8e8");
+  plane.setAttribute("fill",   _planeColor);
   plane.setAttribute("mask",   "url(#cutout)");
   svg.insertBefore(plane, firstDigit);
 
@@ -368,6 +365,19 @@ function applyDigitOffset(x, y) {
   if (dl) dl.setAttribute("transform", "translate(" + x + "," + y + ")");
   var ml = document.getElementById("mask-digits-layer");
   if (ml) ml.setAttribute("transform", "translate(" + x + "," + y + ")");
+}
+
+function applyBgColor(c) {
+  _bgColor = c;
+  var svg = document.getElementById(SVG_ID);
+  if (svg) svg.style.background = c;
+  document.body.style.background = c;
+}
+
+function applyPlaneColor(c) {
+  _planeColor = c;
+  var plane = document.getElementById("clock-plane");
+  if (plane) plane.setAttribute("fill", c);
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────
